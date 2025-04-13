@@ -12,8 +12,8 @@ exports.passwordChangeAlertMail = (user) => {
     // Send the email using nodemailer's transporter object, including the email content and necessary details
     nodeMailer.transporter.sendMail(
         {
-            name: 'Express Auth Admin',
-            from: process.env.SMTP_USER,
+            name: 'Moonfy',
+            from: '"Moonfy" <hachem03000@gmail.com>',
             to: user.email,
             subject: 'Password Change Alert',
             html: mailContent,
@@ -38,7 +38,7 @@ exports.passwordResetLinkMail = (user) => {
     // Send the email using nodemailer's transporter object, including the email content and necessary details
     nodeMailer.transporter.sendMail(
         {
-            from: process.env.SMTP_USER,
+            from: '"Moonfy" <hachem03000@gmail.com>',
             to: user.email,
             subject: 'Password Reset Request',
             html: mailContent,

@@ -5,12 +5,12 @@ const path = require('path');
 // define the transporter object for sending emails using nodemailer
 let transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true for 465, false for other ports like 587
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: false, // false for port 587 (STARTTLS)
     auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+        pass: process.env.SMTP_PASS
+    }
 });
 
 // function for rendering ejs templates
