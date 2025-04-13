@@ -60,23 +60,8 @@ module.exports.createUser = async function (req, res) {
             return res.redirect('back');
         }
 
-        // Verify reCaptcha
-        const captchaURL = `https://www.google.com/recaptcha/api/siteverify?
-            secret=${process.env.RECAPTCHA_VERIFICATION_SEC_KEY}&
-            response=${recaptchaResponse}&
-            remoteip=${req.connection.remoteAddress}`;
-        const {
-            data: { success: isCaptchaVerified },
-        } = await axios.post(captchaURL);
-
-        // If reCaptcha verification failed, return and exit
-        if (!isCaptchaVerified) {
-            req.flash(
-                'error',
-                'Captcha verification failed, please try again after some time.'
-            );
-            return res.redirect('back');
-        }
+        // reCAPTCHA verification bypassed
+        // Keeping this comment to document the change
 
         // Check if user already exists
         const existingUser = await User.findOne({ email }).exec();
@@ -178,36 +163,15 @@ module.exports.sendPasswordResetLink = async function (req, res) {
             validationError = validationError + 'Invalid email. ';
         }
 
-        if (!req.body['g-recaptcha-response']) {
-            validationError = validationError + 'Invalid captcha. ';
-        }
+        // reCAPTCHA validation check removed
 
         if (!!validationError) {
             req.flash('error', validationError);
             return res.redirect('back');
         }
 
-        //verify reCaptcha - start ---
-        let captchaURL =
-            'https://www.google.com/recaptcha/api/siteverify?secret=' +
-            process.env.RECAPTCHA_VERIFICATION_SEC_KEY +
-            '&response=' +
-            req.body['g-recaptcha-response'] +
-            '&remoteip=' +
-            req.connection.remoteAddress;
-
-        let isCaptchaVerified = await axios.post(captchaURL);
-
-        //verify reCaptcha - end ---
-
-        //if reCaptch verification failed return and exit.
-        if (!isCaptchaVerified.data.success) {
-            req.flash(
-                'error',
-                'Captcha verification failed, please try again after sometime.'
-            );
-            return res.redirect('back');
-        }
+        // reCAPTCHA verification bypassed
+        // Keeping this comment to document the change
 
         let user = await User.findOne({ email: req.body.email }).exec();
         if (user) {

@@ -23,25 +23,8 @@ passport.use(
                     return done(null, false); // return authentication failure
                 }
 
-                // Verify reCaptcha - start ---
-                let captchaURL =
-                    'https://www.google.com/recaptcha/api/siteverify?secret=' +
-                    process.env.RECAPTCHA_VERIFICATION_SEC_KEY +
-                    '&response=' +
-                    req.body['g-recaptcha-response'] +
-                    '&remoteip=' +
-                    req.connection.remoteAddress; // reCaptcha verification URL
-                let isCaptchaVerified = await axios.post(captchaURL); // make a POST request to the reCaptcha verification URL
-
-                // If reCaptcha verification failed, flash error message and redirect
-                if (!isCaptchaVerified.data.success) {
-                    req.flash(
-                        'error',
-                        'Captcha verification failed, please try again after sometime.'
-                    );
-                    return res.redirect('back');
-                }
-                // Verify reCaptcha - end ---
+                // reCAPTCHA verification bypassed
+                // Keeping this comment to document the change
 
                 // Find user in database by email
                 let user = await User.findOne({

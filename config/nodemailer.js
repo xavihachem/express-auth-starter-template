@@ -5,8 +5,8 @@ const path = require('path');
 // define the transporter object for sending emails using nodemailer
 let transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: 465,
-    secure: true,
+    port: process.env.SMTP_PORT || 587,
+    secure: false, // true for 465, false for other ports like 587
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
