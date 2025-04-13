@@ -2,10 +2,19 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth_controller');
+const dashboardController = require('../controllers/dashboard_controller');
 const passport = require('passport');
+const roleMiddleware = require('../middleware/role_middleware');
 
 // Define routes and their corresponding handlers
-router.get('/', passport.checkAuthentication, authController.home); // Home page, accessible only to authenticated users
+router.get('/', passport.checkAuthentication, dashboardController.dashboard); // Dashboard based on user role
+
+// Role-based dashboard routes
+router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminDashboard); // Admin dashboard
+router.get('/user', passport.checkAuthentication, roleMiddleware.isUser, dashboardController.userDashboard); // User dashboard
+
+// Original home route (can be used as a fallback)
+router.get('/home', passport.checkAuthentication, authController.home); // Original home page
 router.get('/sign-in', authController.signin); // Signin page
 router.get('/sign-up', authController.signup); // Signup page
 

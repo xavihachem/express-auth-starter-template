@@ -1,0 +1,56 @@
+<h3 class="mb-5">Admin Dashboard</h3>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4>Admin Controls</h4>
+    </div>
+    <div class="card-body">
+        <p>Welcome, <strong><%= locals.user.name %></strong>! You are logged in as an <strong>Administrator</strong>.</p>
+        <p>Email: <%= locals.user.email %></p>
+        
+        <div class="mt-4">
+            <h5>Admin Actions</h5>
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users"></i> Manage Users
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-cog"></i> System Settings
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-line"></i> View Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>User Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p>Total Users: <span class="badge bg-primary">2</span></p>
+                <p>Admin Users: <span class="badge bg-danger">1</span></p>
+                <p>Regular Users: <span class="badge bg-success">1</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Account Settings</h5>
+            </div>
+            <div class="card-body">
+                <a href="/change-password" class="btn btn-warning">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="/sign-out" class="btn btn-danger ms-2">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

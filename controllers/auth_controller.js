@@ -74,10 +74,13 @@ module.exports.createUser = async function (req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create new user and redirect to sign in page
+        // By default, users are created with 'user' role
+        // The role field has a default value of 'user' in the schema
         await User.create({
             email,
             name,
             password: hashedPassword,
+            // role is automatically set to 'user' by default
         });
         req.flash('success', 'User created.');
         res.redirect('/sign-in');
