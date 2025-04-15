@@ -51,6 +51,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: ''
         },
+        invitedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
     },
     {
         timeseries: true,

@@ -28,15 +28,45 @@ module.exports.signup = function (req, res) {
     return res.render('sign_up', { site_key: process.env.RECAPTCHA_SITE_KEY });
 };
 
+// Check invitation code and return inviter's name
+module.exports.checkInvitationCode = async function (req, res) {
+    try {
+        const { code } = req.body;
+        
+        if (!code) {
+            return res.status(400).json({ success: false, message: 'No invitation code provided' });
+        }
+        
+        // Find user with the provided code
+        const inviter = await User.findOne({ userCode: code });
+        
+        if (!inviter) {
+            return res.status(404).json({ success: false, message: 'Invalid invitation code' });
+        }
+        
+        // Return inviter's name
+        return res.status(200).json({
+            success: true,
+            inviterName: inviter.name,
+            message: `You were invited by ${inviter.name}`
+        });
+        
+    } catch (err) {
+        console.log('Error in checking invitation code:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 // Create and export createUser function
 module.exports.createUser = async function (req, res) {
     try {
-        // Validate the inputs provided (email, name, password)
+        // Validate the inputs provided (email, name, password, invitation code)
         const {
             email,
             name,
             password,
             confirm_password,
+            invitation_code,
             'g-recaptcha-response': recaptchaResponse,
         } = req.body;
         let errorMsg = '';
@@ -78,16 +108,31 @@ module.exports.createUser = async function (req, res) {
         const random = Math.floor(100000 + Math.random() * 900000);
         const userCode = 'UC' + timestamp + random.toString().substring(0, 2);
         
-        // Create new user with explicit userCode and redirect to sign in page
-        // By default, users are created with 'user' role
-        // The role field has a default value of 'user' in the schema
-        await User.create({
+        // Create user data object
+        const userData = {
             email,
             name,
             password: hashedPassword,
             userCode: userCode, // Explicitly set the user code
             // role is automatically set to 'user' by default
-        });
+        };
+        
+        // If invitation code is provided, find the inviter and update user data
+        if (invitation_code) {
+            const inviter = await User.findOne({ userCode: invitation_code });
+            if (inviter) {
+                userData.invitedBy = inviter._id;
+                
+                // Increment the inviter's userInvites count
+                await User.findByIdAndUpdate(
+                    inviter._id,
+                    { $inc: { userInvites: 1 } }
+                );
+            }
+        }
+        
+        // Create new user with explicit userCode and redirect to sign in page
+        await User.create(userData);
         req.flash('success', 'User created.');
         res.redirect('/sign-in');
     } catch (err) {

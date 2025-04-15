@@ -17,6 +17,7 @@ router.get('/home', passport.checkAuthentication, authController.home); // Origi
 router.get('/sign-in', authController.signin); // Signin page
 router.get('/sign-up', authController.signup); // Signup page
 
+router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
 router.post('/create-user', authController.createUser); // Create a new user
 
 router.post(

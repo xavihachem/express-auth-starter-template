@@ -51,6 +51,7 @@ app.use(flash());
 
 // Use middleware to parse request body and cookies
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Add JSON parsing middleware for API endpoints
 app.use(cookieParser());
 
 // Use middleware to serve static files
