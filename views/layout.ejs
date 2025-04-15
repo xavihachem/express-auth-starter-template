@@ -21,22 +21,183 @@
     <!-- Link to custom CSS file for layout -->
     <link rel="stylesheet" href="/css/layout.css">
     
-    <!-- Custom styles for user code display -->
+    <!-- Custom styles for modern UI with animations -->
     <style>
-        .letter-spacing-2 {
-            letter-spacing: 2px;
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #ff4d6d;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-border-radius: 16px;
+            --transition-speed: 0.3s;
         }
+        
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        /* Modern card styling */
+        .card {
+            border-radius: var(--card-border-radius);
+            border: none;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Modern navbar styling */
+        .navbar {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .nav-link {
+            position: relative;
+            margin: 0 0.3rem;
+            padding: 0.5rem 0.8rem !important;
+            border-radius: 8px;
+            transition: all var(--transition-speed);
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: white;
+            transition: all var(--transition-speed);
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        /* User code styling */
         .user-code {
-            font-family: monospace;
+            font-family: 'Roboto Mono', monospace;
             font-weight: bold;
             letter-spacing: 3px;
             font-size: 1.8rem;
-            color: #0d6efd;
-            background-color: #f8f9fa;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.5rem;
-            border: 2px solid #0d6efd;
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
             display: inline-block;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.1);
+        }
+        
+        .user-code:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.2);
+        }
+        
+        /* Modern buttons */
+        .btn {
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-outline-light {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        
+        /* Profile badge */
+        .profile-badge {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            transition: all var(--transition-speed);
+        }
+        
+        .profile-badge:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Stats counter */
+        .stat-counter {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 
@@ -52,38 +213,54 @@
 
 <body>
     <% if (locals.user) { %>
-    <!-- Navbar only shown to logged in users -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <!-- Modern navbar with animations -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">Express Auth</a>
+            <a class="navbar-brand animate-fade-in" href="/">
+                <i class="fas fa-shield-alt me-2"></i>Express Auth
+            </a>
             <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Dashboard</a>
+                    <li class="nav-item animate-fade-in delay-1">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/team"><i class="fas fa-users me-1"></i> My Team</a>
+                    <li class="nav-item animate-fade-in delay-2">
+                        <a class="nav-link" href="/team">
+                            <i class="fas fa-users me-2"></i>My Team
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/investments"><i class="fas fa-chart-line me-1"></i> Investments</a>
+                    <li class="nav-item animate-fade-in delay-3">
+                        <a class="nav-link" href="/investments">
+                            <i class="fas fa-chart-line me-2"></i>Investments
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/challenges"><i class="fas fa-trophy me-1"></i> Daily Challenges</a>
+                    <li class="nav-item animate-fade-in delay-4">
+                        <a class="nav-link" href="/challenges">
+                            <i class="fas fa-trophy me-2"></i>Daily Challenges
+                        </a>
                     </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
                     <!-- Admin Dashboard link only visible to admin users -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Admin Dashboard</a>
+                    <li class="nav-item animate-fade-in delay-4">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-user-shield me-2"></i>Admin Panel
+                        </a>
                     </li>
                     <% } %>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-white me-3"><i class="fas fa-user me-1"></i> <%= locals.user.name %></span>
-                    <a href="/sign-out" class="btn btn-outline-light btn-sm">Sign Out</a>
+                <div class="d-flex align-items-center animate-fade-in">
+                    <div class="profile-badge me-3">
+                        <i class="fas fa-user-circle me-2"></i><%= locals.user.name %>
+                    </div>
+                    <a href="/sign-out" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt me-1"></i>Sign Out
+                    </a>
                 </div>
             </div>
         </div>
