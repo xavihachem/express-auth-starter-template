@@ -1,0 +1,121 @@
+<h3 class="mb-5">Admin Control Panel</h3>
+
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h4>Admin Controls</h4>
+    </div>
+    <div class="card-body">
+        <p>Welcome to the Admin Control Panel, <strong><%= locals.user.name %></strong>!</p>
+        <p>This panel is only accessible to administrators.</p>
+    </div>
+</div>
+
+<!-- Users Grid -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-users me-2"></i> Users List</h5>
+        <button class="btn btn-sm btn-light"><i class="fas fa-plus me-1"></i> Add New User</button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">User Code</th>
+                        <th scope="col">Invites</th>
+                        <th scope="col">Balance</th>
+                        <th scope="col">Withdraw</th>
+                        <th scope="col">Withdraw Wallet</th>
+                        <th scope="col">Deposit Wallet</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users && users.length > 0) { %>
+                        <% users.forEach((user, index) => { %>
+                            <tr>
+                                <th scope="row"><%= index + 1 %></th>
+                                <td><%= user.name %></td>
+                                <td><%= user.email %></td>
+                                <td>
+                                    <span class="badge <%= user.role === 'admin' ? 'bg-danger' : 'bg-success' %>">
+                                        <%= user.role === 'admin' ? 'Admin' : 'User' %>
+                                    </span>
+                                </td>
+                                <td><%= user.userCode || 'N/A' %></td>
+                                <td><%= user.userInvites || 0 %></td>
+                                <td>$<%= user.balance ? user.balance.toFixed(2) : '0.00' %></td>
+                                <td>$<%= user.withdraw ? user.withdraw.toFixed(2) : '0.00' %></td>
+                                <td>
+                                    <% if (user.withdrawWallet) { %>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<%= user.withdrawWallet %>">
+                                            <%= user.withdrawWallet %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="text-muted">Not set</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (user.depositWallet) { %>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<%= user.depositWallet %>">
+                                            <%= user.depositWallet %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="text-muted">Not set</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-primary" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="11" class="text-center py-3">No users found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>System Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p>Total Users: <span class="badge bg-primary"><%= users ? users.length : 0 %></span></p>
+                <p>Admin Users: <span class="badge bg-danger"><%= users ? users.filter(u => u.role === 'admin').length : 0 %></span></p>
+                <p>Regular Users: <span class="badge bg-success"><%= users ? users.filter(u => u.role === 'user').length : 0 %></span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

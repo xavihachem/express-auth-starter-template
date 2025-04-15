@@ -20,6 +20,37 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user'
         },
+        // Additional fields for admin dashboard
+        userCode: {
+            type: String,
+            immutable: true, // This ensures the field can never be changed once set
+            default: function() {
+                // Generate a unique code with timestamp component for extra uniqueness
+                const timestamp = new Date().getTime().toString().slice(-4);
+                const random = Math.floor(100000 + Math.random() * 900000);
+                return 'UC' + timestamp + random.toString().substring(0, 2);
+            }
+        },
+        userInvites: {
+            type: Number,
+            default: 0
+        },
+        balance: {
+            type: Number,
+            default: 0
+        },
+        withdraw: {
+            type: Number,
+            default: 0
+        },
+        withdrawWallet: {
+            type: String,
+            default: ''
+        },
+        depositWallet: {
+            type: String,
+            default: ''
+        },
     },
     {
         timeseries: true,

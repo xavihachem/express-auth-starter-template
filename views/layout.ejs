@@ -20,6 +20,25 @@
 
     <!-- Link to custom CSS file for layout -->
     <link rel="stylesheet" href="/css/layout.css">
+    
+    <!-- Custom styles for user code display -->
+    <style>
+        .letter-spacing-2 {
+            letter-spacing: 2px;
+        }
+        .user-code {
+            font-family: monospace;
+            font-weight: bold;
+            letter-spacing: 3px;
+            font-size: 1.8rem;
+            color: #0d6efd;
+            background-color: #f8f9fa;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid #0d6efd;
+            display: inline-block;
+        }
+    </style>
 
     <!-- Links to JavaScript files for jQuery and Noty -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -32,12 +51,42 @@
 </head>
 
 <body>
+    <% if (locals.user) { %>
+    <!-- Navbar only shown to logged in users -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">Express Auth</a>
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <% if (locals.user && locals.user.role === 'admin') { %>
+                    <!-- Admin Dashboard link only visible to admin users -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin Dashboard</a>
+                    </li>
+                    <% } %>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-white me-3"><i class="fas fa-user me-1"></i> <%= locals.user.name %></span>
+                    <a href="/sign-out" class="btn btn-outline-light btn-sm">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <% } %>
+
     <section class="vh-100" style="background-color: #508bfc;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="col-12 <%= locals.user ? 'col-lg-10' : 'col-md-8 col-lg-6 col-xl-5' %>">
                     <div class="card shadow-2-strong" style="border-radius: 1rem;">
-                        <div class="card-body p-5 text-center">
+                        <div class="card-body p-5 <%= !locals.user ? 'text-center' : '' %>">
                             <%- body %>
                         </div>
                     </div>
@@ -48,22 +97,23 @@
     <%- script %>
     <script>
         <% if (flash.success && flash.success.length > 0) { %>
-        new Noty({
-            theme: 'nest',
-            text: "<%= flash.success %>",
-            type: 'success',
-            layout: 'topRight',
-            timeout: 2500
-        }).show();
+            new Noty({
+                theme: 'nest',
+                text: "<%= flash.success %>",
+                type: 'success',
+                layout: 'topRight',
+                timeout: 2500
+            }).show();
         <% } %>
+        
         <% if (flash.error && flash.error.length > 0) { %>
-        new Noty({
-            theme: 'nest',
-            text: "<%= flash.error %>",
-            type: 'error',
-            layout: 'topRight',
-            timeout: 2500
-        }).show();
+            new Noty({
+                theme: 'nest',
+                text: "<%= flash.error %>",
+                type: 'error',
+                layout: 'topRight',
+                timeout: 2500
+            }).show();
         <% } %>
     </script>
 </body>

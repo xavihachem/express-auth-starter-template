@@ -1,0 +1,77 @@
+<h3 class="mb-5">User Dashboard</h3>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4>Welcome to Your Dashboard</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <p>Hello, <strong><%= locals.user.name %></strong>!</p>
+                <p>Email: <%= locals.user.email %></p>
+                <p>Account Type: <span class="badge <%= locals.user.role === 'admin' ? 'bg-danger' : 'bg-success' %>"><%= locals.user.role === 'admin' ? 'Administrator' : 'Regular User' %></span></p>
+            </div>
+            <div class="col-md-4 text-center border-start">
+                <div class="py-2">
+                    <h5 class="text-muted mb-3">Your User Code</h5>
+                    <div class="user-code" style="font-size: 1.5rem;">
+                        <%= locals.completeUser ? locals.completeUser.userCode : (locals.user.userCode || 'N/A') %>
+                    </div>
+                    <p class="small text-muted mt-2">Keep this code for future reference</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Code Card -->
+<div class="card mb-4 border-primary">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-id-card me-2"></i> Your Personal User Code</h5>
+    </div>
+    <div class="card-body text-center">
+        <p class="mb-3">This is your unique identification code for the platform:</p>
+        <div class="user-code">
+            <%= locals.completeUser ? locals.completeUser.userCode : (locals.user.userCode || 'N/A') %>
+        </div>
+        <p class="text-muted mt-3">You'll need this code for referrals and special platform features.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user"></i> View Profile
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell"></i> Notifications
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-envelope"></i> Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Account Settings</h5>
+            </div>
+            <div class="card-body">
+                <a href="/change-password" class="btn btn-warning">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="/sign-out" class="btn btn-danger ms-2">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
