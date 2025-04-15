@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth_controller');
 const dashboardController = require('../controllers/dashboard_controller');
+const teamController = require('../controllers/team_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 
@@ -11,6 +12,9 @@ router.get('/', passport.checkAuthentication, dashboardController.dashboard); //
 
 // Admin panel route - only accessible by admin users
 router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminPanel); // Admin panel
+
+// Team page route - only accessible by authenticated users
+router.get('/team', passport.checkAuthentication, teamController.team); // Team page
 
 // Original home route (can be used as a fallback)
 router.get('/home', passport.checkAuthentication, authController.home); // Original home page

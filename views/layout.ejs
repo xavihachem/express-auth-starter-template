@@ -65,6 +65,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Dashboard</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/team"><i class="fas fa-users me-1"></i> My Team</a>
+                    </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
                     <!-- Admin Dashboard link only visible to admin users -->
                     <li class="nav-item">
