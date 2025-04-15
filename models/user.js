@@ -61,6 +61,18 @@ const userSchema = new mongoose.Schema(
             enum: ['rejected', 'pending', 'access'],
             default: 'rejected'
         },
+        challengePoints: {
+            type: Number,
+            default: 0
+        },
+        completedChallenges: {
+            type: [String],
+            default: []
+        },
+        lastChallengeReset: {
+            type: Date,
+            default: Date.now
+        },
     },
     {
         timeseries: true,

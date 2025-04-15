@@ -60,6 +60,10 @@ app.use(express.static('assets'));
 // Use custom middleware to set flash messages
 app.use(customMiddleware.setFlash);
 
+// Initialize challenges
+const challengesController = require('./controllers/challenges_controller');
+challengesController.initializeChallenges();
+
 // Use routes
 app.use('/', require('./routes'));
 

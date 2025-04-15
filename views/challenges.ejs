@@ -1,0 +1,144 @@
+<h3 class="mb-5">Daily Challenges</h3>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4><i class="fas fa-trophy me-2"></i> Challenge Progress</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 text-center border-end">
+                <h6 class="text-muted mb-2">Challenge Points</h6>
+                <h3 class="text-success"><%= challengePoints %></h3>
+            </div>
+            <div class="col-md-4 text-center border-end">
+                <h6 class="text-muted mb-2">Completed Today</h6>
+                <h3 class="text-primary"><%= completedToday %> / <%= totalChallenges %></h3>
+            </div>
+            <div class="col-md-4 text-center">
+                <h6 class="text-muted mb-2">Next Reset</h6>
+                <h3 class="text-warning" id="countdown">Loading...</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Available Challenges -->
+    <div class="col-md-6">
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Available Challenges</h5>
+                <span class="badge bg-light text-dark"><%= availableChallenges.length %> remaining</span>
+            </div>
+            <div class="card-body p-0">
+                <% if (availableChallenges && availableChallenges.length > 0) { %>
+                    <ul class="list-group list-group-flush">
+                        <% availableChallenges.forEach(challenge => { %>
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1"><%= challenge.title %></h6>
+                                        <p class="text-muted mb-0 small"><%= challenge.description %></p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-primary me-2"><%= challenge.points %> points</span>
+                                        <form action="/complete-challenge" method="post">
+                                            <input type="hidden" name="challengeId" value="<%= challenge.id %>">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check me-1"></i> Complete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5>All challenges completed!</h5>
+                        <p class="text-muted">Come back tomorrow for new challenges</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Completed Challenges -->
+    <div class="col-md-6">
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> Completed Challenges</h5>
+                <span class="badge bg-light text-dark"><%= completedToday %> completed</span>
+            </div>
+            <div class="card-body p-0">
+                <% if (completedChallenges && completedChallenges.length > 0) { %>
+                    <ul class="list-group list-group-flush">
+                        <% completedChallenges.forEach(challenge => { %>
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1"><%= challenge.title %></h6>
+                                        <p class="text-muted mb-0 small"><%= challenge.description %></p>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success"><%= challenge.points %> points</span>
+                                    </div>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="text-center py-4">
+                        <i class="fas fa-hourglass-start fa-3x text-muted mb-3"></i>
+                        <h5>No challenges completed yet</h5>
+                        <p class="text-muted">Complete challenges to earn points</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-info-circle me-2"></i> Challenge Information</h5>
+    </div>
+    <div class="card-body">
+        <ul class="mb-0">
+            <li>Complete daily challenges to earn points</li>
+            <li>Challenges reset every 24 hours at midnight</li>
+            <li>Points can be used for special features and rewards</li>
+            <li>Some challenges may require verification</li>
+        </ul>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="/" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    </a>
+</div>
+
+<script>
+    // Calculate time until next reset (midnight)
+    function updateCountdown() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const timeRemaining = tomorrow - now;
+        
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        
+        document.getElementById('countdown').textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Update countdown every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
