@@ -29,6 +29,7 @@
                         <th scope="col">Invites</th>
                         <th scope="col">Balance</th>
                         <th scope="col">Withdraw</th>
+                        <th scope="col">Investment Access</th>
                         <th scope="col">Withdraw Wallet</th>
                         <th scope="col">Deposit Wallet</th>
                         <th scope="col">Actions</th>
@@ -51,6 +52,23 @@
                                 <td>$<%= user.balance ? user.balance.toFixed(2) : '0.00' %></td>
                                 <td>$<%= user.withdraw ? user.withdraw.toFixed(2) : '0.00' %></td>
                                 <td>
+                                    <% if (user.investmentAccess === 'access') { %>
+                                        <span class="badge bg-success">Access Granted</span>
+                                    <% } else if (user.investmentAccess === 'pending') { %>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-warning me-2">Pending</span>
+                                            <form action="/admin/grant-investment-access" method="post" class="d-inline">
+                                                <input type="hidden" name="userId" value="<%= user._id %>">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Grant Access">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">No Access</span>
+                                    <% } %>
+                                </td>
+                                <td>
                                     <% if (user.withdrawWallet) { %>
                                         <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<%= user.withdrawWallet %>">
                                             <%= user.withdrawWallet %>
@@ -70,6 +88,11 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <% if (user.investmentAccess === 'access' && !user.depositWallet) { %>
+                                            <a href="/admin/wallet-form/<%= user._id %>" class="btn btn-success" title="Set Deposit Wallet">
+                                                <i class="fas fa-wallet"></i>
+                                            </a>
+                                        <% } %>
                                         <button type="button" class="btn btn-primary" title="Edit User">
                                             <i class="fas fa-edit"></i>
                                         </button>
@@ -119,3 +142,20 @@
         </div>
     </div>
 </div>
+
+<!-- Custom JavaScript for Admin Panel -->
+<script>
+    // Initialize all wallet setting buttons to show modals
+    document.addEventListener('DOMContentLoaded', function() {
+        // For each wallet button, add a click handler to show its modal
+        const walletButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+        walletButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetModal = this.getAttribute('data-bs-target');
+                const modalElement = document.querySelector(targetModal);
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            });
+        });
+    });
+</script>

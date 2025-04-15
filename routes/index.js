@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/auth_controller');
 const dashboardController = require('../controllers/dashboard_controller');
 const teamController = require('../controllers/team_controller');
+const investmentsController = require('../controllers/investments_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 
@@ -12,9 +13,19 @@ router.get('/', passport.checkAuthentication, dashboardController.dashboard); //
 
 // Admin panel route - only accessible by admin users
 router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminPanel); // Admin panel
+router.post('/admin/grant-investment-access', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.grantInvestmentAccess); // Grant investment access
+router.get('/admin/wallet-form/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.walletForm); // Wallet form
+router.post('/admin/set-deposit-wallet', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.setDepositWallet); // Set deposit wallet
 
 // Team page route - only accessible by authenticated users
 router.get('/team', passport.checkAuthentication, teamController.team); // Team page
+
+// Investments page routes - only accessible by authenticated users
+router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
+router.post('/request-investment-access', passport.checkAuthentication, investmentsController.requestInvestmentAccess); // Request investment access
+router.post('/update-deposit-wallet', passport.checkAuthentication, investmentsController.updateDepositWallet); // Update deposit wallet
+router.post('/update-withdraw-wallet', passport.checkAuthentication, investmentsController.updateWithdrawWallet); // Update withdraw wallet
+router.post('/request-withdraw', passport.checkAuthentication, investmentsController.requestWithdraw); // Request withdrawal
 
 // Original home route (can be used as a fallback)
 router.get('/home', passport.checkAuthentication, authController.home); // Original home page

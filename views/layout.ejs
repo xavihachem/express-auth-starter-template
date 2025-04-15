@@ -68,6 +68,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/team"><i class="fas fa-users me-1"></i> My Team</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/investments"><i class="fas fa-chart-line me-1"></i> Investments</a>
+                    </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
                     <!-- Admin Dashboard link only visible to admin users -->
                     <li class="nav-item">
@@ -99,7 +102,7 @@
     </section>
     <%- script %>
     <script>
-        <% if (flash.success && flash.success.length > 0) { %>
+        <% if (locals.flash && flash.success && flash.success.length > 0) { %>
             new Noty({
                 theme: 'nest',
                 text: "<%= flash.success %>",
@@ -109,7 +112,7 @@
             }).show();
         <% } %>
         
-        <% if (flash.error && flash.error.length > 0) { %>
+        <% if (locals.flash && flash.error && flash.error.length > 0) { %>
             new Noty({
                 theme: 'nest',
                 text: "<%= flash.error %>",

@@ -1,0 +1,202 @@
+<h3 class="mb-5">Your Investments</h3>
+
+<div class="row">
+    <!-- Balance Overview Card -->
+    <div class="col-md-12">
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-wallet me-2"></i> Balance Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center border-end">
+                        <h6 class="text-muted mb-2">Current Balance</h6>
+                        <h3 class="text-success"><%= balance.toFixed(2) %> USD</h3>
+                    </div>
+                    <div class="col-md-4 text-center border-end">
+                        <h6 class="text-muted mb-2">Pending Withdrawals</h6>
+                        <h3 class="text-warning"><%= withdraw.toFixed(2) %> USD</h3>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h6 class="text-muted mb-2">Available for Withdrawal</h6>
+                        <h3 class="text-primary"><%= balance.toFixed(2) %> USD</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Deposit Section -->
+    <div class="col-md-6">
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i> Deposit</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">To make a deposit, please send funds to your personal deposit wallet address:</p>
+                
+                <% if (depositWallet) { %>
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 wallet-address" style="word-break: break-all;">
+                                <code><%= depositWallet %></code>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success ms-2" onclick="copyToClipboard('<%= depositWallet %>')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">You haven't set up a deposit wallet address yet.</p>
+                    </div>
+                <% } %>
+                
+                <form action="/update-deposit-wallet" method="post" class="mt-3">
+                    <div class="form-outline mb-3">
+                        <label for="depositWallet" class="form-label">Update Deposit Wallet Address</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="depositWallet" 
+                            name="depositWallet" 
+                            value="<%= depositWallet %>" 
+                            placeholder="Enter your deposit wallet address"
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Deposit Wallet</button>
+                </form>
+                
+                <div class="mt-4">
+                    <h6>Deposit Instructions:</h6>
+                    <ol class="mb-0">
+                        <li>Copy your personal deposit wallet address</li>
+                        <li>Send funds to this address from your external wallet</li>
+                        <li>Your balance will be updated once the transaction is confirmed</li>
+                        <li>Minimum deposit: 10 USD</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Withdraw Section -->
+    <div class="col-md-6">
+        <div class="card mb-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i> Withdraw</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Request a withdrawal to your personal withdraw wallet address:</p>
+                
+                <% if (withdrawWallet) { %>
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 wallet-address" style="word-break: break-all;">
+                                <code><%= withdrawWallet %></code>
+                            </div>
+                            <button class="btn btn-sm btn-outline-info ms-2" onclick="copyToClipboard('<%= withdrawWallet %>')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">You need to set up a withdraw wallet address before requesting withdrawals.</p>
+                    </div>
+                <% } %>
+                
+                <form action="/update-withdraw-wallet" method="post" class="mt-3">
+                    <div class="form-outline mb-3">
+                        <label for="withdrawWallet" class="form-label">Update Withdraw Wallet Address</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="withdrawWallet" 
+                            name="withdrawWallet" 
+                            value="<%= withdrawWallet %>" 
+                            placeholder="Enter your withdraw wallet address"
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-info">Update Withdraw Wallet</button>
+                </form>
+                
+                <form action="/request-withdraw" method="post" class="mt-4">
+                    <div class="form-outline mb-3">
+                        <label for="amount" class="form-label">Withdraw Amount (USD)</label>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            id="amount" 
+                            name="amount" 
+                            min="10" 
+                            max="<%= balance %>" 
+                            step="0.01" 
+                            placeholder="Enter amount to withdraw"
+                            <%= !withdrawWallet || balance <= 0 ? 'disabled' : '' %>
+                        >
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="btn btn-danger" 
+                        <%= !withdrawWallet || balance <= 0 ? 'disabled' : '' %>
+                    >
+                        Request Withdrawal
+                    </button>
+                    
+                    <% if (!withdrawWallet) { %>
+                        <small class="d-block mt-2 text-muted">Please set a withdraw wallet address first.</small>
+                    <% } else if (balance <= 0) { %>
+                        <small class="d-block mt-2 text-muted">Insufficient balance for withdrawal.</small>
+                    <% } %>
+                </form>
+                
+                <div class="mt-4">
+                    <h6>Withdrawal Information:</h6>
+                    <ul class="mb-0">
+                        <li>Minimum withdrawal: 10 USD</li>
+                        <li>Processing time: 24-48 hours</li>
+                        <li>Withdrawal fee: 2%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="/" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    </a>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Create a temporary element for the success message
+            const message = document.createElement('div');
+            message.textContent = 'Copied to clipboard!';
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.padding = '10px 20px';
+            message.style.backgroundColor = '#28a745';
+            message.style.color = 'white';
+            message.style.borderRadius = '5px';
+            message.style.zIndex = '9999';
+            
+            // Add the message to the body
+            document.body.appendChild(message);
+            
+            // Remove the message after 2 seconds
+            setTimeout(function() {
+                document.body.removeChild(message);
+            }, 2000);
+        }, function() {
+            console.error('Failed to copy text');
+        });
+    }
+</script>

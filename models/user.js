@@ -56,6 +56,11 @@ const userSchema = new mongoose.Schema(
             ref: 'User',
             default: null
         },
+        investmentAccess: {
+            type: String,
+            enum: ['rejected', 'pending', 'access'],
+            default: 'rejected'
+        },
     },
     {
         timeseries: true,
