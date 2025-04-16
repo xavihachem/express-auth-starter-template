@@ -6,6 +6,7 @@ const dashboardController = require('../controllers/dashboard_controller');
 const teamController = require('../controllers/team_controller');
 const investmentsController = require('../controllers/investments_controller');
 const challengesController = require('../controllers/challenges_controller');
+const ranksController = require('../controllers/ranks_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 
@@ -24,6 +25,9 @@ router.get('/team', passport.checkAuthentication, teamController.team); // Team 
 // Challenges routes - only accessible by authenticated users
 router.get('/challenges', passport.checkAuthentication, challengesController.challenges); // Challenges page
 router.post('/complete-challenge', passport.checkAuthentication, challengesController.completeChallenge); // Complete a challenge
+
+// Ranks route - only accessible by authenticated users
+router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ranks page
 
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
