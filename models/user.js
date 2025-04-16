@@ -44,6 +44,28 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
+        withdrawalRequests: {
+            type: [{
+                amount: Number,
+                status: {
+                    type: String,
+                    enum: ['pending', 'approved', 'rejected', 'cancelled'],
+                    default: 'pending'
+                },
+                requestDate: {
+                    type: Date,
+                    default: Date.now
+                },
+                processedDate: Date,
+                requestId: {
+                    type: String,
+                    default: function() {
+                        return 'WD' + new Date().getTime().toString();
+                    }
+                }
+            }],
+            default: []
+        },
         withdrawWallet: {
             type: String,
             default: ''

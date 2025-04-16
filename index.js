@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo'); // MongoDB session store for Expres
 const flash = require('connect-flash'); // middleware for displaying flash messages
 const expressLayouts = require('express-ejs-layouts'); // layout support for Express.js
 const customMiddleware = require('./config/middleware'); // custom middleware for handling flash messages
+const notificationsMiddleware = require('./middleware/notifications_middleware'); // middleware for handling notifications
 const db = require('./config/mongoose'); // module for connecting to MongoDB
 const passportLocal = require('./config/passport-local'); // Passport Local authentication strategy
 const passportGoogle = require('./config/passport-google'); // Passport Google authentication strategy
@@ -60,6 +61,9 @@ app.use(express.static('public')); // Serve files from public directory for uplo
 
 // Use custom middleware to set flash messages
 app.use(customMiddleware.setFlash);
+
+// Use middleware to set notifications
+app.use(notificationsMiddleware.setNotifications);
 
 // Initialize challenges
 const challengesController = require('./controllers/challenges_controller');

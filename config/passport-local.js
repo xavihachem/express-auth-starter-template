@@ -40,10 +40,17 @@ passport.use(
                 }
 
                 // Compare password with hashed password in database
-                let matchPassword = await bcrypt.compare(
-                    password,
-                    user.password
-                );
+                
+                // Ensure consistent password handling by trimming whitespace
+                const cleanPassword = password.trim();
+                
+                // Try with both original and cleaned password to be safe
+                let matchPassword = await bcrypt.compare(cleanPassword, user.password);
+                
+                // If the cleaned password doesn't match, try the original as a fallback
+                if (!matchPassword && cleanPassword !== password) {
+                    matchPassword = await bcrypt.compare(password, user.password);
+                }
 
                 if (!matchPassword) {
                     // If password doesn't match, flash error message and return authentication failure

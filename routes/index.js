@@ -8,6 +8,7 @@ const investmentsController = require('../controllers/investments_controller');
 const challengesController = require('../controllers/challenges_controller');
 const ranksController = require('../controllers/ranks_controller');
 const profileController = require('../controllers/profile_controller');
+const notificationsController = require('../controllers/notifications_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 
@@ -17,6 +18,7 @@ router.get('/', passport.checkAuthentication, dashboardController.dashboard); //
 // Admin panel route - only accessible by admin users
 router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminPanel); // Admin panel
 router.post('/admin/grant-investment-access', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.grantInvestmentAccess); // Grant investment access
+router.post('/admin/reject-investment-access', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.rejectInvestmentAccess); // Reject investment access
 router.get('/admin/wallet-form/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.walletForm); // Wallet form
 router.post('/admin/set-deposit-wallet', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.setDepositWallet); // Set deposit wallet
 
@@ -29,6 +31,10 @@ router.post('/complete-challenge', passport.checkAuthentication, challengesContr
 
 // Ranks route - only accessible by authenticated users
 router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ranks page
+
+// Notifications routes - only accessible by authenticated users
+router.get('/notifications', passport.checkAuthentication, notificationsController.notifications); // Notifications page
+router.post('/mark-notifications-read', passport.checkAuthentication, notificationsController.markAllAsRead); // Mark all notifications as read
 
 // Import multer for file uploads
 const upload = require('../config/multer');
@@ -45,6 +51,7 @@ router.post('/request-investment-access', passport.checkAuthentication, investme
 router.post('/update-deposit-wallet', passport.checkAuthentication, investmentsController.updateDepositWallet); // Update deposit wallet
 router.post('/update-withdraw-wallet', passport.checkAuthentication, investmentsController.updateWithdrawWallet); // Update withdraw wallet
 router.post('/request-withdraw', passport.checkAuthentication, investmentsController.requestWithdraw); // Request withdrawal
+router.get('/cancel-withdrawal/:requestId', passport.checkAuthentication, investmentsController.cancelWithdrawal); // Cancel withdrawal request
 
 // Original home route (can be used as a fallback)
 router.get('/home', passport.checkAuthentication, authController.home); // Original home page

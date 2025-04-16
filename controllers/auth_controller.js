@@ -100,8 +100,12 @@ module.exports.createUser = async function (req, res) {
             return res.redirect('back');
         }
 
-        // Hash the password before saving
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Clean the password by removing any leading/trailing whitespace
+        const cleanPassword = password.trim();
+        
+        // IMPORTANT: Do NOT hash the password here!
+        // The User model has a pre-save hook that will hash the password
+        // If we hash it here, it will be double-hashed
 
         // Generate a permanent user code
         const timestamp = new Date().getTime().toString().slice(-4);
@@ -112,7 +116,7 @@ module.exports.createUser = async function (req, res) {
         const userData = {
             email,
             name,
-            password: hashedPassword,
+            password: cleanPassword, // Use the clean password, model will hash it
             userCode: userCode, // Explicitly set the user code
             // role is automatically set to 'user' by default
         };

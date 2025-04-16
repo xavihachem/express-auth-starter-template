@@ -1,0 +1,148 @@
+<div class="container-fluid animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-bell me-2"></i>Notifications</h3>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card animate-fade-in delay-1">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Notifications</h5>
+                    <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-check-double me-1"></i>Mark all as read
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="notificationsList">
+                        <% if (notifications && notifications.items && notifications.items.length > 0) { %>
+                            <% notifications.items.forEach(function(notification) { %>
+                                <!-- Notification Item -->
+                                <div class="list-group-item border-0 border-bottom <%= notification.read ? 'text-muted bg-light' : '' %>" data-id="<%= notification.id %>">
+                                    <div class="d-flex">
+                                        <div class="rounded-circle bg-<%= notification.bgColor %> p-2 me-3 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-<%= notification.icon %>"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0 <%= notification.read ? '' : 'fw-bold' %>"><%= notification.title %></h6>
+                                                <small class="text-muted"><%= notification.time %></small>
+                                            </div>
+                                            <p class="mb-0"><%= notification.message %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="list-group-item border-0 border-bottom text-center py-4">
+                                <p class="mb-0 text-muted">No notifications to display</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <small class="text-muted">You've reached the end of your notifications</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mark all as read button functionality
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                // Show loading state
+                const originalText = markAllReadBtn.innerHTML;
+                markAllReadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+                markAllReadBtn.disabled = true;
+                
+                // Send AJAX request to mark all as read
+                fetch('/mark-notifications-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI to show all notifications as read
+                        const notificationItems = document.querySelectorAll('#notificationsList .list-group-item');
+                        notificationItems.forEach(item => {
+                            item.classList.add('text-muted', 'bg-light');
+                            const title = item.querySelector('h6');
+                            if (title) title.classList.remove('fw-bold');
+                        });
+                        
+                        // Remove notification badge from navbar
+                        const badges = document.querySelectorAll('.notification-badge');
+                        badges.forEach(badge => {
+                            badge.style.display = 'none';
+                        });
+                        
+                        // Show success message
+                        showToast('Success', 'All notifications marked as read', 'success');
+                    } else {
+                        showToast('Error', 'Failed to mark notifications as read', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error', 'An error occurred', 'danger');
+                })
+                .finally(() => {
+                    // Restore button state
+                    markAllReadBtn.innerHTML = originalText;
+                    markAllReadBtn.disabled = false;
+                });
+            });
+        }
+        
+        // Helper function to show toast notifications
+        function showToast(title, message, type) {
+            // Check if we have the toast container, if not create it
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast element
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            
+            // Create toast content
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <strong>${title}:</strong> ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Add toast to container
+            toastContainer.appendChild(toastEl);
+            
+            // Initialize and show toast
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            toast.show();
+            
+            // Remove toast after it's hidden
+            toastEl.addEventListener('hidden.bs.toast', function() {
+                toastEl.remove();
+            });
+        }
+    });
+</script>

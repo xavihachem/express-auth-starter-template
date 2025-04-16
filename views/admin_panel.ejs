@@ -57,13 +57,21 @@
                                     <% } else if (user.investmentAccess === 'pending') { %>
                                         <div class="d-flex align-items-center">
                                             <span class="badge bg-warning me-2">Pending</span>
-                                            <form action="/admin/grant-investment-access" method="post" class="d-inline">
+                                            <form action="/admin/grant-investment-access" method="post" class="d-inline me-1">
                                                 <input type="hidden" name="userId" value="<%= user._id %>">
                                                 <button type="submit" class="btn btn-sm btn-success" title="Grant Access">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </form>
+                                            <form action="/admin/reject-investment-access" method="post" class="d-inline">
+                                                <input type="hidden" name="userId" value="<%= user._id %>">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Reject Access" onclick="return confirm('Are you sure you want to reject this investment access request?')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
                                         </div>
+                                    <% } else if (user.investmentAccess === 'rejected') { %>
+                                        <span class="badge bg-danger">Rejected</span>
                                     <% } else { %>
                                         <span class="badge bg-secondary">No Access</span>
                                     <% } %>

@@ -32,7 +32,8 @@ module.exports.investments = async function(req, res) {
             balance: currentUser.balance || 0,
             withdraw: currentUser.withdraw || 0,
             withdrawWallet: currentUser.withdrawWallet || '',
-            depositWallet: currentUser.depositWallet || ''
+            depositWallet: currentUser.depositWallet || '',
+            withdrawalRequests: currentUser.withdrawalRequests || []
         });
     } catch (err) {
         console.log('Error in investments controller:', err);
@@ -118,6 +119,17 @@ module.exports.requestInvestmentAccess = async function(req, res) {
         // Update user's investment access status to pending
         await User.findByIdAndUpdate(req.user._id, { investmentAccess: 'pending' });
         
+        // Create notification for all admins
+        const Notification = require('../models/notification');
+        await Notification.notifyAdmins({
+            title: 'Investment Access Request',
+            message: `User ${user.name} (${user.email}) has requested investment access.`,
+            type: 'info',
+            icon: 'wallet',
+            actionType: 'investment_request',
+            relatedTo: user._id
+        });
+        
         req.flash('success', 'Investment access requested successfully. Please wait for admin approval.');
         return res.redirect('/investments');
     } catch (err) {
@@ -160,19 +172,131 @@ module.exports.requestWithdraw = async function(req, res) {
             return res.redirect('/investments');
         }
         
-        // Update user's balance and withdraw amount
+        // Create a new withdrawal request
+        const withdrawalRequest = {
+            amount: withdrawAmount,
+            status: 'pending',
+            requestDate: new Date()
+        };
+        
+        // Update user's balance and add withdrawal request
         await User.findByIdAndUpdate(req.user._id, {
-            $inc: { 
-                balance: -withdrawAmount,
-                withdraw: withdrawAmount
-            }
+            $inc: { balance: -withdrawAmount },
+            $push: { withdrawalRequests: withdrawalRequest }
         });
         
-        req.flash('success', `Withdrawal request for ${withdrawAmount} submitted successfully`);
+        // Get the updated user to get the request ID
+        const updatedUser = await User.findById(req.user._id);
+        const newRequest = updatedUser.withdrawalRequests[updatedUser.withdrawalRequests.length - 1];
+        
+        // Create notification for the user
+        const Notification = require('../models/notification');
+        await Notification.notifyUser(user._id, {
+            title: 'Withdrawal Request Submitted',
+            message: `Your withdrawal request for $${withdrawAmount} has been submitted and is pending approval.`,
+            type: 'info',
+            icon: 'money-bill-wave',
+            actionType: 'withdrawal_request',
+            actionId: newRequest.requestId
+        });
+        
+        // Create notification for all admins
+        await Notification.notifyAdmins({
+            title: 'New Withdrawal Request',
+            message: `User ${user.name} (${user.email}) has requested a withdrawal of $${withdrawAmount}.`,
+            type: 'warning',
+            icon: 'money-bill-wave',
+            actionType: 'withdrawal_request',
+            relatedTo: user._id,
+            actionId: newRequest.requestId
+        });
+        
+        req.flash('success', `Withdrawal request for $${withdrawAmount} submitted successfully. You can cancel this request before it's processed.`);
         return res.redirect('/investments');
     } catch (err) {
         console.log('Error requesting withdrawal:', err);
         req.flash('error', 'Failed to process withdrawal request');
+        return res.redirect('/investments');
+    }
+};
+
+// Handle withdrawal cancellation
+module.exports.cancelWithdrawal = async function(req, res) {
+    try {
+        // Check if user is authenticated
+        if (!req.isAuthenticated()) {
+            req.flash('error', 'Please sign in to cancel a withdrawal');
+            return res.redirect('/sign-in');
+        }
+
+        const { requestId } = req.params;
+        
+        if (!requestId) {
+            req.flash('error', 'Invalid withdrawal request');
+            return res.redirect('/investments');
+        }
+        
+        // Find the user and the specific withdrawal request
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/');
+        }
+        
+        // Find the withdrawal request
+        const withdrawalRequest = user.withdrawalRequests.find(req => req.requestId === requestId);
+        
+        if (!withdrawalRequest) {
+            req.flash('error', 'Withdrawal request not found');
+            return res.redirect('/investments');
+        }
+        
+        // Check if the request is still pending
+        if (withdrawalRequest.status !== 'pending') {
+            req.flash('error', `Cannot cancel withdrawal request with status: ${withdrawalRequest.status}`);
+            return res.redirect('/investments');
+        }
+        
+        // Update the request status to cancelled
+        await User.updateOne(
+            { _id: user._id, 'withdrawalRequests.requestId': requestId },
+            { 
+                $set: { 
+                    'withdrawalRequests.$.status': 'cancelled',
+                    'withdrawalRequests.$.processedDate': new Date()
+                },
+                $inc: { balance: withdrawalRequest.amount } // Return the funds to the user's balance
+            }
+        );
+        
+        // Create notification for the user
+        const Notification = require('../models/notification');
+        await Notification.notifyUser(user._id, {
+            title: 'Withdrawal Cancelled',
+            message: `Your withdrawal request for $${withdrawalRequest.amount} has been cancelled. The funds have been returned to your balance.`,
+            type: 'success',
+            icon: 'undo',
+            actionType: 'withdrawal_cancelled',
+            actionId: requestId
+        });
+        
+        // Create notification for admins
+        await Notification.notifyAdmins({
+            title: 'Withdrawal Request Cancelled',
+            message: `User ${user.name} (${user.email}) has cancelled their withdrawal request for $${withdrawalRequest.amount}.`,
+            type: 'info',
+            icon: 'undo',
+            actionType: 'withdrawal_cancelled',
+            relatedTo: user._id,
+            actionId: requestId
+        });
+        
+        req.flash('success', `Withdrawal request for $${withdrawalRequest.amount} has been cancelled. The funds have been returned to your balance.`);
+        return res.redirect('/investments');
+    } catch (err) {
+        console.log('Error cancelling withdrawal:', err);
+        req.flash('error', 'Failed to cancel withdrawal request');
         return res.redirect('/investments');
     }
 };

@@ -15,7 +15,19 @@
                     </div>
                     <div class="col-md-4 text-center border-end">
                         <h6 class="text-muted mb-2">Pending Withdrawals</h6>
-                        <h3 class="text-warning"><%= withdraw.toFixed(2) %> USD</h3>
+                        <h3 class="text-warning">
+                            <% 
+                                let pendingWithdrawals = 0;
+                                if (typeof withdrawalRequests !== 'undefined' && withdrawalRequests && withdrawalRequests.length > 0) {
+                                    withdrawalRequests.forEach(function(req) {
+                                        if (req.status === 'pending') {
+                                            pendingWithdrawals += req.amount;
+                                        }
+                                    });
+                                }
+                            %>
+                            <%= pendingWithdrawals.toFixed(2) %> USD
+                        </h3>
                     </div>
                     <div class="col-md-4 text-center">
                         <h6 class="text-muted mb-2">Available for Withdrawal</h6>
@@ -26,6 +38,106 @@
         </div>
     </div>
 </div>
+
+<!-- Pending Withdrawal Requests -->
+<% if (typeof withdrawalRequests !== 'undefined' && withdrawalRequests && withdrawalRequests.filter(req => req.status === 'pending').length > 0) { %>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Pending Withdrawal Requests</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% withdrawalRequests.filter(req => req.status === 'pending').forEach(function(request) { %>
+                                <tr>
+                                    <td><small class="text-muted"><%= request.requestId %></small></td>
+                                    <td><strong class="text-warning">$<%= request.amount.toFixed(2) %></strong></td>
+                                    <td><%= new Date(request.requestDate).toLocaleString() %></td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    </td>
+                                    <td>
+                                        <a href="/cancel-withdrawal/<%= request.requestId %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this withdrawal request? The funds will be returned to your balance.')">
+                                            <i class="fas fa-times me-1"></i> Cancel
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">Pending withdrawals are typically processed within 24-48 hours. You can cancel a withdrawal request before it's processed.</small>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Recent Withdrawal History -->
+<% if (typeof withdrawalRequests !== 'undefined' && withdrawalRequests && withdrawalRequests.filter(req => req.status !== 'pending').length > 0) { %>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i> Withdrawal History</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Amount</th>
+                                <th>Request Date</th>
+                                <th>Processed Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% withdrawalRequests.filter(req => req.status !== 'pending')
+                                .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate))
+                                .slice(0, 5)
+                                .forEach(function(request) { 
+                                    let statusClass = '';
+                                    switch(request.status) {
+                                        case 'approved': statusClass = 'bg-success'; break;
+                                        case 'rejected': statusClass = 'bg-danger'; break;
+                                        case 'cancelled': statusClass = 'bg-secondary'; break;
+                                        default: statusClass = 'bg-info';
+                                    }
+                            %>
+                                <tr>
+                                    <td><small class="text-muted"><%= request.requestId %></small></td>
+                                    <td><strong>$<%= request.amount.toFixed(2) %></strong></td>
+                                    <td><%= new Date(request.requestDate).toLocaleString() %></td>
+                                    <td><%= request.processedDate ? new Date(request.processedDate).toLocaleString() : 'N/A' %></td>
+                                    <td>
+                                        <span class="badge <%= statusClass %>"><%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %></span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
 
 <div class="row">
     <!-- Deposit Section -->
