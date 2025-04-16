@@ -157,6 +157,12 @@ module.exports.requestWithdraw = async function(req, res) {
             return res.redirect('/investments');
         }
         
+        // Enforce minimum withdrawal amount of $40
+        if (withdrawAmount < 40) {
+            req.flash('error', 'Minimum withdrawal amount is $40');
+            return res.redirect('/investments');
+        }
+        
         // Find the current user
         const user = await User.findById(req.user._id);
         

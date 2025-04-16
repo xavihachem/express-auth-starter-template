@@ -19,15 +19,25 @@ const storage = multer.diskStorage({
 function checkFileType(file, cb) {
     // Allowed extensions
     const filetypes = /jpeg|jpg|png|gif/;
+    // Allowed mime types
+    const mimetypes = /jpeg|jpg|png|gif/;
+    
+    // Get file extension
+    const extension = path.extname(file.originalname).toLowerCase().substring(1); // Remove the dot
+    // Get mime type
+    const mimetype = file.mimetype.split('/')[1];
+    
     // Check extension
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const validExtension = filetypes.test(extension);
     // Check mime type
-    const mimetype = filetypes.test(file.mimetype);
+    const validMimetype = mimetypes.test(mimetype);
 
-    if (mimetype && extname) {
+    if (validExtension && validMimetype) {
         return cb(null, true);
     } else {
-        cb('Error: Images Only! (jpeg, jpg, png, gif)');
+        // Create a more informative error message
+        const errorMsg = `Unsupported file format: ${extension || mimetype}. Only JPEG, JPG, PNG, and GIF formats are allowed.`;
+        cb(new Error(errorMsg));
     }
 }
 

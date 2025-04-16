@@ -221,7 +221,7 @@
                     <button type="submit" class="btn btn-info">Update Withdraw Wallet</button>
                 </form>
                 
-                <form action="/request-withdraw" method="post" class="mt-4">
+                <form action="/request-withdraw" method="post" class="mt-4" id="withdrawForm">
                     <div class="form-outline mb-3">
                         <label for="amount" class="form-label">Withdraw Amount (USD)</label>
                         <input 
@@ -229,34 +229,41 @@
                             class="form-control" 
                             id="amount" 
                             name="amount" 
-                            min="10" 
+                            min="40" 
                             max="<%= balance %>" 
                             step="0.01" 
-                            placeholder="Enter amount to withdraw"
-                            <%= !withdrawWallet || balance <= 0 ? 'disabled' : '' %>
+                            placeholder="Enter amount to withdraw (min: $40)"
+                            <%= !withdrawWallet || balance < 40 ? 'disabled' : '' %>
+                            required
+                            oninput="validateWithdrawalAmount(this)"
                         >
+                        <div class="form-text text-danger" id="amountError" style="display: none;"></div>
                     </div>
                     <button 
                         type="submit" 
                         class="btn btn-danger" 
-                        <%= !withdrawWallet || balance <= 0 ? 'disabled' : '' %>
+                        id="withdrawButton"
+                        <%= !withdrawWallet || balance < 40 ? 'disabled' : '' %>
                     >
                         Request Withdrawal
                     </button>
                     
                     <% if (!withdrawWallet) { %>
                         <small class="d-block mt-2 text-muted">Please set a withdraw wallet address first.</small>
-                    <% } else if (balance <= 0) { %>
-                        <small class="d-block mt-2 text-muted">Insufficient balance for withdrawal.</small>
+                    <% } else if (balance < 40) { %>
+                        <small class="d-block mt-2 text-muted">Minimum withdrawal amount is $40. Your balance is insufficient.</small>
+                    <% } else { %>
+                        <small class="d-block mt-2 text-muted">Minimum withdrawal: $40. Maximum: $<%= balance.toFixed(2) %></small>
                     <% } %>
                 </form>
                 
                 <div class="mt-4">
                     <h6>Withdrawal Information:</h6>
                     <ul class="mb-0">
-                        <li>Minimum withdrawal: 10 USD</li>
+                        <li>Minimum withdrawal: 40 USD</li>
                         <li>Processing time: 24-48 hours</li>
                         <li>Withdrawal fee: 2%</li>
+                        <li>You cannot withdraw more than your available balance</li>
                     </ul>
                 </div>
             </div>
@@ -293,8 +300,57 @@
             setTimeout(function() {
                 document.body.removeChild(message);
             }, 2000);
-        }, function() {
+        }).catch(function() {
             console.error('Failed to copy text');
         });
     }
+    
+    function validateWithdrawalAmount(input) {
+        const amount = parseFloat(input.value);
+        const userBalance = parseFloat('<%= balance %>'); // Parse as string first to avoid EJS template issues
+        const minAmount = 40;
+        const errorElement = document.getElementById('amountError');
+        const withdrawButton = document.getElementById('withdrawButton');
+        
+        // Reset error state
+        errorElement.style.display = 'none';
+        withdrawButton.disabled = false;
+        
+        // Validate amount
+        if (isNaN(amount)) {
+            errorElement.textContent = 'Please enter a valid number';
+            errorElement.style.display = 'block';
+            withdrawButton.disabled = true;
+            return false;
+        }
+        
+        if (amount < minAmount) {
+            errorElement.textContent = 'Minimum withdrawal amount is $' + minAmount;
+            errorElement.style.display = 'block';
+            withdrawButton.disabled = true;
+            return false;
+        }
+        
+        if (amount > userBalance) {
+            errorElement.textContent = 'You cannot withdraw more than your available balance ($' + userBalance.toFixed(2) + ')';
+            errorElement.style.display = 'block';
+            withdrawButton.disabled = true;
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Add form validation on submit
+    document.addEventListener('DOMContentLoaded', function() {
+        const withdrawForm = document.getElementById('withdrawForm');
+        if (withdrawForm) {
+            withdrawForm.addEventListener('submit', function(event) {
+                const amountInput = document.getElementById('amount');
+                if (!validateWithdrawalAmount(amountInput)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    });
 </script>

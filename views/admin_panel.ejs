@@ -1,108 +1,233 @@
-<h3 class="mb-5">Admin Control Panel</h3>
+<h3 class="mb-4">Admin Control Panel</h3>
 
-<div class="card mb-4">
-    <div class="card-header bg-danger text-white">
-        <h4>Admin Controls</h4>
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Admin Dashboard</h4>
+        <span class="badge bg-light text-dark">Admin: <%= locals.user.name %></span>
     </div>
     <div class="card-body">
-        <p>Welcome to the Admin Control Panel, <strong><%= locals.user.name %></strong>!</p>
-        <p>This panel is only accessible to administrators.</p>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body py-3">
+                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Total Users</h6>
+                        <h2 class="mt-2 mb-0"><%= users.length %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body py-3">
+                        <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Pending Requests</h6>
+                        <h2 class="mt-2 mb-0"><%= users.filter(u => u.investmentAccess === 'pending').length %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body py-3">
+                        <h6 class="mb-0"><i class="fas fa-check-circle me-2"></i>Active Investors</h6>
+                        <h2 class="mt-2 mb-0"><%= users.filter(u => u.investmentAccess === 'access').length %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body py-3">
+                        <h6 class="mb-0"><i class="fas fa-wallet me-2"></i>Total Balance</h6>
+                        <h2 class="mt-2 mb-0">$<%= users.reduce((sum, user) => sum + (user.balance || 0), 0).toFixed(2) %></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Users Grid -->
-<div class="card mb-4">
+<div class="card mb-4 shadow-sm">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-users me-2"></i> Users List</h5>
-        <button class="btn btn-sm btn-light"><i class="fas fa-plus me-1"></i> Add New User</button>
+        <h5 class="mb-0"><i class="fas fa-users me-2"></i> Users Management</h5>
+        <div>
+            <a href="/admin/withdrawal-requests" class="btn btn-sm btn-warning me-2">
+                <i class="fas fa-money-bill-wave me-1"></i> View All Withdrawal Requests
+            </a>
+            <button class="btn btn-sm btn-light"><i class="fas fa-plus me-1"></i> Add New User</button>
+        </div>
     </div>
-    <div class="card-body p-0">
+    <div class="card-body">
+        <!-- Search and Filter Controls -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="userSearch" class="form-control" placeholder="Search by name, email or user code..." onkeyup="filterUsers()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select" onchange="filterUsers()">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending Requests</option>
+                    <option value="access">Access Granted</option>
+                    <option value="rejected">Access Rejected</option>
+                    <option value="none">No Access</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="roleFilter" class="form-select" onchange="filterUsers()">
+                    <option value="all">All Roles</option>
+                    <option value="user">Users</option>
+                    <option value="admin">Admins</option>
+                </select>
+            </div>
+        </div>
+        
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
+            <div class="alert alert-info d-none" id="noResultsMessage">
+                <i class="fas fa-info-circle me-2"></i> No users match your search criteria.
+            </div>
+            <table class="table table-striped table-hover mb-0" id="usersTable">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Role</th>
-                        <th scope="col">User Code</th>
-                        <th scope="col">Invites</th>
-                        <th scope="col">Balance</th>
-                        <th scope="col">Withdraw</th>
-                        <th scope="col">Investment Access</th>
-                        <th scope="col">Withdraw Wallet</th>
-                        <th scope="col">Deposit Wallet</th>
-                        <th scope="col">Actions</th>
+                        <th scope="col" class="text-center" style="width: 40px;">#</th>
+                        <th scope="col" style="width: 200px;">User</th>
+                        <th scope="col" class="text-center" style="width: 80px;">Role</th>
+                        <th scope="col" class="text-center" style="width: 80px;">Invites</th>
+                        <th scope="col" class="text-center" style="width: 120px;">Balance</th>
+                        <th scope="col" class="text-center" style="width: 120px;">Pending</th>
+                        <th scope="col" class="text-center" style="width: 150px;">Investment</th>
+                        <th scope="col" style="width: 200px;">Wallets</th>
+                        <th scope="col" class="text-center" style="width: 100px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="usersTableBody">
                     <% if (users && users.length > 0) { %>
-                        <% users.forEach((user, index) => { %>
-                            <tr>
-                                <th scope="row"><%= index + 1 %></th>
-                                <td><%= user.name %></td>
-                                <td><%= user.email %></td>
+                        <% 
+                        // Sort users: pending first, then access, then rejected, then none
+                        const sortedUsers = [...users].sort((a, b) => {
+                            const order = { 'pending': 0, 'access': 1, 'rejected': 2, undefined: 3 };
+                            return (order[a.investmentAccess] || 3) - (order[b.investmentAccess] || 3);
+                        });
+                        
+                        // Initialize users for JavaScript pagination
+                        // Pagination is handled by client-side JavaScript
+                        %>
+                        <% sortedUsers.forEach((user, index) => { %>
+                            <tr class="user-row <%= user.investmentAccess === 'pending' ? 'table-warning' : '' %>" data-name="<%= user.name.toLowerCase() %>" data-email="<%= user.email.toLowerCase() %>" data-code="<%= (user.userCode || '').toLowerCase() %>" data-role="<%= user.role %>" data-status="<%= user.investmentAccess || 'none' %>">
+                                <th scope="row" class="text-center"><%= index + 1 %></th>
                                 <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <span class="avatar-circle bg-<%= user.role === 'admin' ? 'danger' : 'primary' %> text-white">
+                                                <%= user.name.charAt(0).toUpperCase() %>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div><%= user.name %></div>
+                                            <small class="text-muted"><%= user.email %></small>
+                                            <small class="text-muted d-block">Code: <code><%= user.userCode || 'N/A' %></code></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
                                     <span class="badge <%= user.role === 'admin' ? 'bg-danger' : 'bg-success' %>">
                                         <%= user.role === 'admin' ? 'Admin' : 'User' %>
                                     </span>
                                 </td>
-                                <td><%= user.userCode || 'N/A' %></td>
-                                <td><%= user.userInvites || 0 %></td>
-                                <td>$<%= user.balance ? user.balance.toFixed(2) : '0.00' %></td>
-                                <td>$<%= user.withdraw ? user.withdraw.toFixed(2) : '0.00' %></td>
-                                <td>
+                                <td class="text-center"><span class="badge bg-secondary"><%= user.userInvites || 0 %></span></td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <span class="badge bg-<%= (user.balance && user.balance > 0) ? 'success' : 'secondary' %> p-2">
+                                            $<%= user.balance ? user.balance.toFixed(2) : '0.00' %>
+                                        </span>
+                                        <a href="/admin/edit-balance/<%= user._id %>" class="btn btn-sm btn-outline-primary ms-2" title="Edit Balance">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <% 
+                                    let pendingWithdrawals = 0;
+                                    if (user.withdrawalRequests && user.withdrawalRequests.length > 0) {
+                                        user.withdrawalRequests.forEach(req => {
+                                            if (req.status === 'pending') {
+                                                pendingWithdrawals += req.amount;
+                                            }
+                                        });
+                                    }
+                                    %>
+                                    <% if (pendingWithdrawals > 0) { %>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <span class="badge bg-warning text-dark p-2">
+                                                $<%= pendingWithdrawals.toFixed(2) %>
+                                            </span>
+                                            <a href="/admin/withdrawal-requests/<%= user._id %>" class="btn btn-sm btn-outline-warning ms-2" title="View Withdrawal Requests">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary p-2">$0.00</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-center">
                                     <% if (user.investmentAccess === 'access') { %>
-                                        <span class="badge bg-success">Access Granted</span>
+                                        <span class="badge bg-success p-2">Access Granted</span>
                                     <% } else if (user.investmentAccess === 'pending') { %>
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge bg-warning me-2">Pending</span>
-                                            <form action="/admin/grant-investment-access" method="post" class="d-inline me-1">
-                                                <input type="hidden" name="userId" value="<%= user._id %>">
-                                                <button type="submit" class="btn btn-sm btn-success" title="Grant Access">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
-                                            <form action="/admin/reject-investment-access" method="post" class="d-inline">
-                                                <input type="hidden" name="userId" value="<%= user._id %>">
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Reject Access" onclick="return confirm('Are you sure you want to reject this investment access request?')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <span class="badge bg-warning text-dark p-2 me-2">Pending</span>
+                                            <div class="btn-group btn-group-sm">
+                                                <form action="/admin/grant-investment-access" method="post" class="d-inline">
+                                                    <input type="hidden" name="userId" value="<%= user._id %>">
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Grant Access">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="/admin/reject-investment-access" method="post" class="d-inline">
+                                                    <input type="hidden" name="userId" value="<%= user._id %>">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Reject Access" onclick="return confirm('Are you sure you want to reject this investment access request?')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     <% } else if (user.investmentAccess === 'rejected') { %>
-                                        <span class="badge bg-danger">Rejected</span>
+                                        <span class="badge bg-danger p-2">Rejected</span>
                                     <% } else { %>
-                                        <span class="badge bg-secondary">No Access</span>
+                                        <span class="badge bg-secondary p-2">No Access</span>
                                     <% } %>
                                 </td>
                                 <td>
-                                    <% if (user.withdrawWallet) { %>
-                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<%= user.withdrawWallet %>">
-                                            <%= user.withdrawWallet %>
-                                        </span>
-                                    <% } else { %>
-                                        <span class="text-muted">Not set</span>
-                                    <% } %>
+                                    <div class="wallet-info">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="badge bg-success text-white">Deposit</span>
+                                            <div class="d-flex align-items-center">
+                                                <% if (user.depositWallet) { %>
+                                                    <small class="text-truncate" style="max-width: 100px;" title="<%= user.depositWallet %>">
+                                                        <code><%= user.depositWallet.substring(0, 8) %>...</code>
+                                                    </small>
+                                                <% } else { %>
+                                                    <small class="text-muted">Not set</small>
+                                                <% } %>
+                                                <a href="/admin/wallet-form/<%= user._id %>" class="btn btn-sm btn-outline-success ms-1 py-0 px-1" title="<%= user.depositWallet ? 'Edit Deposit Wallet' : 'Set Deposit Wallet' %>">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-info text-white">Withdraw</span>
+                                            <% if (user.withdrawWallet) { %>
+                                                <small class="text-truncate" style="max-width: 100px;" title="<%= user.withdrawWallet %>">
+                                                    <code><%= user.withdrawWallet.substring(0, 8) %>...</code>
+                                                </small>
+                                            <% } else { %>
+                                                <small class="text-muted">Not set</small>
+                                            <% } %>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>
-                                    <% if (user.depositWallet) { %>
-                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<%= user.depositWallet %>">
-                                            <%= user.depositWallet %>
-                                        </span>
-                                    <% } else { %>
-                                        <span class="text-muted">Not set</span>
-                                    <% } %>
-                                </td>
-                                <td>
+                                <td class="text-center">
                                     <div class="btn-group btn-group-sm">
-                                        <% if (user.investmentAccess === 'access') { %>
-                                            <a href="/admin/wallet-form/<%= user._id %>" class="btn btn-success" title="<%= user.depositWallet ? 'Update Deposit Wallet' : 'Set Deposit Wallet' %>">
-                                                <i class="fas fa-wallet"></i>
-                                            </a>
-                                        <% } %>
                                         <button type="button" class="btn btn-primary" title="Edit User">
-                                            <i class="fas fa-edit"></i>
+                                            <i class="fas fa-user-edit"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger" title="Delete User">
                                             <i class="fas fa-trash"></i>
@@ -113,14 +238,204 @@
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="11" class="text-center py-3">No users found</td>
+                            <td colspan="10" class="text-center py-3">No users found</td>
                         </tr>
                     <% } %>
                 </tbody>
             </table>
+            
+            <!-- Pagination Controls -->
+            <div class="d-flex justify-content-center mt-3" id="paginationContainer">
+                <nav aria-label="Users pagination">
+                    <ul class="pagination" id="usersPagination">
+                        <li class="page-item disabled" id="prevPage">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <!-- Page numbers will be inserted here by JavaScript -->
+                        <li class="page-item disabled" id="nextPage">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- CSS for avatar circle -->
+<style>
+    .avatar-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-weight: bold;
+    }
+    
+    .wallet-info {
+        font-size: 0.9rem;
+    }
+    
+    /* Highlight pending rows */
+    .table-warning td {
+        background-color: rgba(255, 243, 205, 0.4) !important;
+    }
+</style>
+
+<!-- JavaScript for search and filtering -->
+<script>
+    // Pagination variables
+    const itemsPerPage = 15;
+    let currentPage = 1;
+    let filteredRows = [];
+    
+    function filterUsers() {
+        const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const roleFilter = document.getElementById('roleFilter').value;
+        const rows = document.querySelectorAll('.user-row');
+        let visibleCount = 0;
+        
+        // Reset filtered rows
+        filteredRows = [];
+        
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const email = row.getAttribute('data-email');
+            const code = row.getAttribute('data-code');
+            const role = row.getAttribute('data-role');
+            const status = row.getAttribute('data-status');
+            
+            // Check if row matches all filters
+            const matchesSearch = name.includes(searchTerm) || 
+                                 email.includes(searchTerm) || 
+                                 code.includes(searchTerm);
+                                 
+            const matchesStatus = statusFilter === 'all' || status === statusFilter;
+            const matchesRole = roleFilter === 'all' || role === roleFilter;
+            
+            // Add to filtered rows if it matches all filters
+            if (matchesSearch && matchesStatus && matchesRole) {
+                filteredRows.push(row);
+                visibleCount++;
+            }
+        });
+        
+        // Show/hide no results message
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        if (visibleCount === 0) {
+            noResultsMessage.classList.remove('d-none');
+            // Hide pagination if no results
+            document.getElementById('paginationContainer').classList.add('d-none');
+        } else {
+            noResultsMessage.classList.add('d-none');
+            // Show pagination if there are results
+            document.getElementById('paginationContainer').classList.remove('d-none');
+            // Update pagination
+            updatePagination();
+        }
+        
+        // Reset to first page when filters change
+        goToPage(1);
+    }
+    
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        const paginationElement = document.getElementById('usersPagination');
+        
+        // Clear existing page numbers
+        const pageItems = paginationElement.querySelectorAll('.page-item:not(#prevPage):not(#nextPage)');
+        pageItems.forEach(item => item.remove());
+        
+        // Add new page numbers
+        const nextPageItem = document.getElementById('nextPage');
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.setAttribute('data-page', i);
+            
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.textContent = i;
+            
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                goToPage(i);
+            });
+            
+            li.appendChild(a);
+            paginationElement.insertBefore(li, nextPageItem);
+        }
+        
+        // Update prev/next buttons
+        document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages || totalPages === 0);
+    }
+    
+    function goToPage(page) {
+        currentPage = page;
+        
+        // Hide all rows first
+        document.querySelectorAll('.user-row').forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        // Show only rows for current page
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+        
+        for (let i = startIndex; i < endIndex; i++) {
+            filteredRows[i].style.display = '';
+        }
+        
+        // Update active page in pagination
+        document.querySelectorAll('#usersPagination .page-item').forEach(item => {
+            if (item.getAttribute('data-page') == page) {
+                item.classList.add('active');
+            } else if (item.getAttribute('data-page')) {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Update prev/next buttons
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        document.getElementById('prevPage').classList.toggle('disabled', page === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', page === totalPages || totalPages === 0);
+    }
+    
+    // Initialize filters on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners for search and filters
+        document.getElementById('userSearch').addEventListener('input', filterUsers);
+        document.getElementById('statusFilter').addEventListener('change', filterUsers);
+        document.getElementById('roleFilter').addEventListener('change', filterUsers);
+        
+        // Add event listeners for pagination
+        document.getElementById('prevPage').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
+        });
+        
+        document.getElementById('nextPage').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentPage < Math.ceil(filteredRows.length / itemsPerPage)) {
+                goToPage(currentPage + 1);
+            }
+        });
+        
+        // Initialize pagination
+        filterUsers();
+    });
+</script>
 
 <div class="row">
     <div class="col-md-6">

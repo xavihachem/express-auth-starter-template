@@ -1,0 +1,147 @@
+<h3 class="mb-4">Withdrawal Requests</h3>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Pending Withdrawal Requests</h4>
+        <% if (user) { %>
+            <span class="badge bg-dark">User: <%= user.name %> (<%= user.email %>)</span>
+        <% } else { %>
+            <span class="badge bg-dark">All Users</span>
+        <% } %>
+    </div>
+    <div class="card-body">
+        <% if (withdrawalRequests && withdrawalRequests.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center" style="width: 50px;">#</th>
+                            <th scope="col">Request ID</th>
+                            <th scope="col">User</th>
+                            <th scope="col" class="text-center">Amount</th>
+                            <th scope="col">Wallet Address</th>
+                            <th scope="col">Request Date</th>
+                            <th scope="col" class="text-center">Status</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% withdrawalRequests.forEach((request, index) => { %>
+                            <tr class="<%= request.status === 'pending' ? 'table-warning' : (request.status === 'approved' ? 'table-success' : (request.status === 'rejected' ? 'table-danger' : 'table-secondary')) %>">
+                                <th scope="row" class="text-center"><%= index + 1 %></th>
+                                <td><code><%= request.requestId %></code></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <span class="avatar-circle bg-primary text-white">
+                                                <%= request.user.name.charAt(0).toUpperCase() %>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <%= request.user.name %>
+                                            <small class="d-block text-muted"><%= request.user.email %></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-<%= request.status === 'pending' ? 'warning text-dark' : (request.status === 'approved' ? 'success' : (request.status === 'rejected' ? 'danger' : 'secondary')) %> p-2">
+                                        $<%= request.amount.toFixed(2) %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <code class="text-truncate d-inline-block" style="max-width: 200px;" title="<%= request.user.withdrawWallet %>">
+                                        <%= request.user.withdrawWallet %>
+                                    </code>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('<%= request.user.withdrawWallet %>')" title="Copy wallet address">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </td>
+                                <td><%= new Date(request.requestDate).toLocaleString() %></td>
+                                <td class="text-center">
+                                    <span class="badge bg-<%= request.status === 'pending' ? 'warning text-dark' : (request.status === 'approved' ? 'success' : (request.status === 'rejected' ? 'danger' : 'secondary')) %>">
+                                        <%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <% if (request.status === 'pending') { %>
+                                        <div class="btn-group btn-group-sm">
+                                            <form action="/admin/approve-withdrawal" method="post" class="d-inline">
+                                                <input type="hidden" name="userId" value="<%= request.user._id %>">
+                                                <input type="hidden" name="requestId" value="<%= request.requestId %>">
+                                                <button type="submit" class="btn btn-success" title="Approve Withdrawal" onclick="return confirm('Are you sure you want to approve this withdrawal request?')">
+                                                    <i class="fas fa-check me-1"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form action="/admin/reject-withdrawal" method="post" class="d-inline">
+                                                <input type="hidden" name="userId" value="<%= request.user._id %>">
+                                                <input type="hidden" name="requestId" value="<%= request.requestId %>">
+                                                <button type="submit" class="btn btn-danger" title="Reject Withdrawal" onclick="return confirm('Are you sure you want to reject this withdrawal request? The funds will be returned to the user\'s balance.')">
+                                                    <i class="fas fa-times me-1"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="text-muted">
+                                            <%= request.processedDate ? 'Processed on ' + new Date(request.processedDate).toLocaleDateString() : 'N/A' %>
+                                        </span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No withdrawal requests found.
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between">
+    <a href="/admin" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Admin Panel
+    </a>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Create a temporary element for the success message
+            const message = document.createElement('div');
+            message.textContent = 'Copied to clipboard!';
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.padding = '10px 20px';
+            message.style.backgroundColor = '#28a745';
+            message.style.color = 'white';
+            message.style.borderRadius = '5px';
+            message.style.zIndex = '9999';
+            
+            // Add the message to the body
+            document.body.appendChild(message);
+            
+            // Remove the message after 2 seconds
+            setTimeout(function() {
+                document.body.removeChild(message);
+            }, 2000);
+        }).catch(function() {
+            console.error('Failed to copy text');
+        });
+    }
+</script>
+
+<style>
+    .avatar-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-weight: bold;
+    }
+</style>

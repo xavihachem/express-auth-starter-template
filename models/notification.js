@@ -35,7 +35,7 @@ const notificationSchema = new mongoose.Schema(
         },
         actionType: {
             type: String,
-            enum: ['investment_request', 'withdrawal_request', 'investment_access_approved', 'investment_access_rejected', 'withdrawal_cancelled', 'general'],
+            enum: ['investment_request', 'withdrawal_request', 'investment_access_approved', 'investment_access_rejected', 'withdrawal_cancelled', 'balance_updated', 'wallet_updated', 'general'],
             default: 'general'
         },
         actionId: {
