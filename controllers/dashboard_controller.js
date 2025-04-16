@@ -269,41 +269,82 @@ module.exports.updateBalance = async function(req, res) {
             return res.redirect('/');
         }
 
-        const { userId, newBalance, reason } = req.body;
-        const balanceAmount = parseFloat(newBalance);
+        const { userId, depositAmount, currentBalance, reason, isDeposit } = req.body;
         
-        if (!userId || isNaN(balanceAmount) || balanceAmount < 0 || !reason) {
-            req.flash('error', 'User ID, valid balance amount, and reason are required');
-            return res.redirect('/admin');
-        }
-        
-        // Find the user to get their current balance
-        const user = await User.findById(userId);
-        
-        if (!user) {
-            req.flash('error', 'User not found');
-            return res.redirect('/admin');
-        }
-        
-        const oldBalance = user.balance || 0;
-        
-        // Update the user's balance
-        await User.findByIdAndUpdate(userId, { balance: balanceAmount });
-        
-        // Create a notification for the user if their balance was changed
-        if (oldBalance !== balanceAmount) {
+        // Handle deposit flow
+        if (isDeposit === 'true') {
+            const depositValue = parseFloat(depositAmount);
+            
+            if (!userId || isNaN(depositValue) || depositValue <= 0) {
+                req.flash('error', 'User ID and valid deposit amount are required');
+                return res.redirect('/admin');
+            }
+            
+            // Find the user to get their current balance
+            const user = await User.findById(userId);
+            
+            if (!user) {
+                req.flash('error', 'User not found');
+                return res.redirect('/admin');
+            }
+            
+            const oldBalance = user.balance || 0;
+            const newBalance = oldBalance + depositValue;
+            
+            // Update the user's balance by adding the deposit amount
+            user.balance = newBalance;
+            await user.save();
+            
+            // Create a notification for the user about the deposit
             const Notification = require('../models/notification');
             await Notification.notifyUser(userId, {
-                title: 'Balance Updated',
-                message: `Your balance has been updated from $${oldBalance.toFixed(2)} to $${balanceAmount.toFixed(2)} by an administrator.`,
-                type: 'info',
+                title: 'Deposit Added',
+                message: `You have received a deposit of $${depositValue.toFixed(2)}.`,
+                type: 'success',
                 icon: 'money-bill-wave',
                 actionType: 'balance_updated'
             });
+            
+            req.flash('success', `Deposit of $${depositValue.toFixed(2)} added successfully to ${user.name}'s account. New balance: $${newBalance.toFixed(2)}`);
+            return res.redirect('/admin');
+        } else {
+            // Legacy code path for direct balance updates (keeping for backward compatibility)
+            const newBalance = parseFloat(req.body.newBalance);
+            
+            if (!userId || isNaN(newBalance) || newBalance < 0 || !reason) {
+                req.flash('error', 'User ID, valid balance amount, and reason are required');
+                return res.redirect('/admin');
+            }
+            
+            // Find the user to get their current balance
+            const user = await User.findById(userId);
+            
+            if (!user) {
+                req.flash('error', 'User not found');
+                return res.redirect('/admin');
+            }
+            
+            const oldBalance = user.balance || 0;
+            
+            // Update the user's balance
+            user.balance = newBalance;
+            await user.save();
+            
+            // Create a notification for the user if their balance was changed
+            if (oldBalance !== newBalance) {
+                const Notification = require('../models/notification');
+                await Notification.notifyUser(userId, {
+                    title: 'Balance Updated',
+                    message: `Your balance has been updated from $${oldBalance.toFixed(2)} to $${newBalance.toFixed(2)} by an administrator.`,
+                    type: 'info',
+                    icon: 'money-bill-wave',
+                    actionType: 'balance_updated'
+                });
+            }
+            
+            req.flash('success', `Balance for ${user.name} updated successfully from $${oldBalance.toFixed(2)} to $${newBalance.toFixed(2)}`);
+            return res.redirect('/admin');
         }
-        
-        req.flash('success', `Balance for ${user.name} updated successfully from $${oldBalance.toFixed(2)} to $${balanceAmount.toFixed(2)}`);
-        return res.redirect('/admin');
     } catch (err) {
         console.log('Error updating user balance:', err);
         req.flash('error', 'Failed to update user balance');
@@ -518,5 +559,58 @@ module.exports.rejectWithdrawal = async function(req, res) {
         console.log('Error rejecting withdrawal request:', err);
         req.flash('error', 'Failed to reject withdrawal request');
         return res.redirect('/admin/withdrawal-requests');
+    }
+};
+
+// Change user role (admin/user)
+module.exports.changeRole = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You are not authorized to perform this action');
+            return res.redirect('/');
+        }
+
+        const { userId, newRole } = req.body;
+        
+        if (!userId || !newRole) {
+            req.flash('error', 'User ID and new role are required');
+            return res.redirect('/admin');
+        }
+        
+        // Validate the new role
+        if (newRole !== 'admin' && newRole !== 'user') {
+            req.flash('error', 'Invalid role specified');
+            return res.redirect('/admin');
+        }
+        
+        // Find the user
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/admin');
+        }
+        
+        // Update the user's role
+        user.role = newRole;
+        await user.save();
+        
+        // Create notification for the user
+        const Notification = require('../models/notification');
+        await Notification.notifyUser(userId, {
+            title: 'Role Updated',
+            message: `Your account role has been changed to ${newRole}.`,
+            type: newRole === 'admin' ? 'success' : 'info',
+            icon: newRole === 'admin' ? 'user-shield' : 'user',
+            actionType: 'general'
+        });
+        
+        req.flash('success', `${user.name}'s role has been updated to ${newRole}`);
+        return res.redirect('/admin');
+    } catch (err) {
+        console.log('Error changing user role:', err);
+        req.flash('error', 'Failed to change user role');
+        return res.redirect('/admin');
     }
 };

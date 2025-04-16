@@ -313,7 +313,7 @@
                     <!-- Notification Dropdown (Mobile) -->
                     <div class="dropdown me-2">
                         <a class="nav-link position-relative" href="#" id="notificationDropdownMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell"></i>
+                            <i class="fas fa-bell text-white"></i>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" style="<%= locals.notifications && !locals.notifications.hasUnread ? 'display: none;' : '' %>">
                                 <% if (locals.notifications && locals.notifications.items) { %>
                                     <%= locals.notifications.items.filter(n => !n.read).length %>
@@ -434,7 +434,7 @@
                     <!-- Notification Dropdown (Desktop only) -->
                     <div class="dropdown me-3 d-none d-lg-block">
                         <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell"></i>
+                            <i class="fas fa-bell text-white"></i>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" style="<%= locals.notifications && !locals.notifications.hasUnread ? 'display: none;' : '' %>">
                                 <% if (locals.notifications && locals.notifications.items) { %>
                                     <%= locals.notifications.items.filter(n => !n.read).length %>

@@ -1,5 +1,28 @@
 <h3 class="mb-4">Admin Control Panel</h3>
 
+<style>
+    /* Override container size to make dashboard bigger */
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+    
+    .table {
+        width: 100% !important;
+        min-width: 1000px !important;
+    }
+    
+    /* Ensure proper cell spacing */
+    .table td, .table th {
+        padding: 0.75rem !important;
+        vertical-align: middle !important;
+    }
+</style>
+
 <div class="card mb-4 shadow-sm">
     <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Admin Dashboard</h4>
@@ -48,10 +71,9 @@
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-users me-2"></i> Users Management</h5>
         <div>
-            <a href="/admin/withdrawal-requests" class="btn btn-sm btn-warning me-2">
+            <a href="/admin/withdrawal-requests" class="btn btn-sm btn-warning">
                 <i class="fas fa-money-bill-wave me-1"></i> View All Withdrawal Requests
             </a>
-            <button class="btn btn-sm btn-light"><i class="fas fa-plus me-1"></i> Add New User</button>
         </div>
     </div>
     <div class="card-body">
@@ -226,12 +248,26 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-primary" title="Edit User">
-                                            <i class="fas fa-user-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <a href="/admin/edit-balance/<%= user._id %>" class="btn btn-primary" title="Edit Balance">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                        <% if (user.role !== 'admin') { %>
+                                        <form action="/admin/change-role" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="<%= user._id %>">
+                                            <input type="hidden" name="newRole" value="admin">
+                                            <button type="submit" class="btn btn-warning" title="Make Admin" onclick="return confirm('Are you sure you want to make <%= user.name %> an admin? This will give them full administrative privileges.')">
+                                                <i class="fas fa-user-shield"></i>
+                                            </button>
+                                        </form>
+                                        <% } else { %>
+                                        <form action="/admin/change-role" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="<%= user._id %>">
+                                            <input type="hidden" name="newRole" value="user">
+                                            <button type="submit" class="btn btn-secondary" title="Make Regular User" onclick="return confirm('Are you sure you want to change <%= user.name %> to a regular user? This will remove their administrative privileges.')">
+                                                <i class="fas fa-user"></i>
+                                            </button>
+                                        </form>
+                                        <% } %>
                                     </div>
                                 </td>
                             </tr>
@@ -290,6 +326,21 @@
 
 <!-- JavaScript for search and filtering -->
 <script>
+    // Override container width to make dashboard bigger
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the parent container and make it wider
+        const container = document.querySelector('.container');
+        if (container) {
+            container.style.maxWidth = '100%';
+        }
+        
+        // Find the column and make it full width
+        const column = document.querySelector('.col-12');
+        if (column) {
+            column.className = 'col-12';
+        }
+    });
+    
     // Pagination variables
     const itemsPerPage = 15;
     let currentPage = 1;

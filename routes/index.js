@@ -27,6 +27,7 @@ router.get('/admin/withdrawal-requests', passport.checkAuthentication, roleMiddl
 router.get('/admin/withdrawal-requests/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewWithdrawalRequests); // View user's withdrawal requests
 router.post('/admin/approve-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.approveWithdrawal); // Approve withdrawal request
 router.post('/admin/reject-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.rejectWithdrawal); // Reject withdrawal request
+router.post('/admin/change-role', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.changeRole); // Change user role
 
 // Team page route - only accessible by authenticated users
 router.get('/team', passport.checkAuthentication, teamController.team); // Team page
