@@ -1,0 +1,192 @@
+<div class="container-fluid animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-user-circle me-2"></i>User Profile</h3>
+        </div>
+    </div>
+
+    <!-- Profile Overview Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card animate-fade-in delay-1">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary p-3 me-3 text-white">
+                            <i class="fas fa-id-card fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0"><%= user.name %></h4>
+                            <p class="text-muted mb-0">Member since <%= new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Personal Information</h5>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1">Email Address</p>
+                                <p class="mb-0 fw-bold"><i class="fas fa-envelope me-2 text-primary"></i><%= user.email %></p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1">Account Type</p>
+                                <span class="badge rounded-pill <%= user.role === 'admin' ? 'bg-danger' : 'bg-success' %> px-3 py-2">
+                                    <i class="<%= user.role === 'admin' ? 'fas fa-user-shield' : 'fas fa-user' %> me-2"></i>
+                                    <%= user.role === 'admin' ? 'Administrator' : 'Regular User' %>
+                                </span>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1">Your User Code</p>
+                                <div class="user-code">
+                                    <%= user.userCode || 'N/A' %>
+                                </div>
+                                <p class="small text-muted mt-2">Share this code with friends for referrals</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Account Status</h5>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1">Challenge Points</p>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-warning p-2 me-2 text-white">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <h4 class="mb-0"><%= stats.challengePoints %> points</h4>
+                                </div>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: <%= Math.min(100, (stats.challengePoints / 500) * 100) %>%" aria-valuenow="<%= Math.min(100, (stats.challengePoints / 500) * 100) %>" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <p class="small text-muted mt-1">Completed <%= stats.completedChallenges %> challenges</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1">Investment Access Status</p>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle <%= stats.investmentAccess === 'access' ? 'bg-success' : (stats.investmentAccess === 'pending' ? 'bg-warning' : 'bg-danger') %> p-2 me-2 text-white">
+                                        <i class="<%= stats.investmentAccess === 'access' ? 'fas fa-check' : (stats.investmentAccess === 'pending' ? 'fas fa-clock' : 'fas fa-times') %>"></i>
+                                    </div>
+                                    <h5 class="mb-0"><%= stats.investmentAccess === 'access' ? 'Approved' : (stats.investmentAccess === 'pending' ? 'Pending Approval' : 'Not Requested') %></h5>
+                                </div>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar <%= stats.investmentAccess === 'access' ? 'bg-success' : (stats.investmentAccess === 'pending' ? 'bg-warning' : 'bg-danger') %>" role="progressbar" style="width: <%= accessPercentage %>%" aria-valuenow="<%= accessPercentage %>" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <% if (stats.investmentAccess !== 'access') { %>
+                                    <p class="small text-muted mt-1">
+                                        <% if (stats.investmentAccess === 'pending') { %>
+                                            Your request is being reviewed by admins
+                                        <% } else { %>
+                                            Request access from the investments page
+                                        <% } %>
+                                    </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet Information -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card animate-fade-in delay-2">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Wallet Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-muted mb-1">Deposit Wallet</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="<%= stats.depositWallet %>" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="small text-muted mt-1">This wallet is set by admins for deposits</p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-muted mb-1">Withdraw Wallet</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="<%= stats.withdrawWallet %>" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="small text-muted mt-1">Your personal wallet for withdrawals</p>
+                    </div>
+                    <% if (stats.investmentAccess === 'access') { %>
+                        <div class="d-grid gap-2">
+                            <a href="/investments" class="btn btn-primary">
+                                <i class="fas fa-chart-line me-2"></i>Manage Investments
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card animate-fade-in delay-2">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Account Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <p class="text-muted mb-1">Current Balance</p>
+                                <h3 class="mb-0 text-success">$<%= stats.balance.toFixed(2) %></h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <p class="text-muted mb-1">Total Withdrawn</p>
+                                <h3 class="mb-0 text-primary">$<%= stats.withdraw.toFixed(2) %></h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <p class="text-muted mb-1">Challenges Completed</p>
+                                <h3 class="mb-0 text-warning"><%= stats.completedChallenges %></h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <p class="text-muted mb-1">Team Members</p>
+                                <h3 class="mb-0 text-info">0</h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(button) {
+    const input = button.previousElementSibling;
+    input.select();
+    document.execCommand('copy');
+    
+    // Change button icon temporarily
+    const icon = button.querySelector('i');
+    const originalClass = icon.className;
+    icon.className = 'fas fa-check';
+    
+    setTimeout(() => {
+        icon.className = originalClass;
+    }, 1000);
+}
+</script>

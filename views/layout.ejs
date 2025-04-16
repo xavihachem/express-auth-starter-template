@@ -199,6 +199,13 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        
+        /* Ensure dropdowns always appear on top */
+        .dropdown-menu {
+            z-index: 9999 !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: fixed;
+        }
     </style>
 
     <!-- Scripts for Bootstrap, Material Design Bootstrap and Noty -->
@@ -206,7 +213,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.1/noty.min.js"></script>
     
-    <!-- Custom script for mobile navbar -->
+    <!-- Custom script for mobile navbar and dropdowns -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Bootstrap tooltips
@@ -231,6 +238,56 @@
                         if (window.innerWidth < 992) { // Only on mobile view
                             bsCollapse.hide();
                         }
+                    });
+                });
+                
+                // Fix for dropdown menus to appear on top of all content
+                var dropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+                dropdownToggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function() {
+                        // Small delay to ensure the dropdown is created
+                        setTimeout(function() {
+                            var dropdown = document.querySelector('.dropdown-menu.show');
+                            if (dropdown) {
+                                // Move dropdown to the body to avoid stacking context issues
+                                document.body.appendChild(dropdown);
+                                
+                                // Position the dropdown correctly
+                                var toggleRect = toggle.getBoundingClientRect();
+                                var isUserDropdown = toggle.id === 'userDropdown';
+                                
+                                dropdown.style.position = 'fixed';
+                                dropdown.style.zIndex = '9999';
+                                dropdown.style.top = (toggleRect.bottom + window.scrollY) + 'px';
+                                
+                                if (isUserDropdown) {
+                                    // Position the user dropdown to the right of the toggle button
+                                    dropdown.style.left = toggleRect.left + 'px';
+                                    dropdown.style.maxHeight = '200px';
+                                    dropdown.style.overflowY = 'auto';
+                                    dropdown.style.width = '200px';
+                                } else {
+                                    // For notification dropdown, position it more to the right
+                                    dropdown.style.left = (toggleRect.left - 50) + 'px';
+                                    dropdown.style.maxHeight = '400px';
+                                    dropdown.style.overflowY = 'auto';
+                                    dropdown.style.width = '280px';
+                                }
+                                
+                                // Add event listener to close dropdown when clicking outside
+                                var closeDropdownHandler = function(e) {
+                                    if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+                                        dropdown.classList.remove('show');
+                                        document.removeEventListener('click', closeDropdownHandler);
+                                    }
+                                };
+                                
+                                // Delay adding the event listener to prevent immediate closing
+                                setTimeout(function() {
+                                    document.addEventListener('click', closeDropdownHandler);
+                                }, 100);
+                            }
+                        }, 10);
                     });
                 });
             }
@@ -290,9 +347,85 @@
                     <% } %>
                 </ul>
                 <div class="d-flex align-items-center animate-fade-in">
-                    <a href="/sign-out" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-sign-out-alt me-1"></i>Sign Out
-                    </a>
+                    <!-- Notification Dropdown -->
+                    <div class="dropdown me-3">
+                        <a href="#" class="text-white position-relative" id="notificationDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.5rem;">
+                                3
+                                <span class="visually-hidden">unread notifications</span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="notificationDropdown" style="min-width: 300px; z-index: 9999 !important;">
+                            <li><h6 class="dropdown-header py-1">Notifications</h6></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
+                                    <div class="rounded-circle bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-trophy fa-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small fw-bold">Challenge Completed!</p>
+                                        <small class="text-muted" style="font-size: 0.7rem;">You earned 5 points for completing a challenge.</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
+                                    <div class="rounded-circle bg-success p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-medal fa-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small fw-bold">Rank Increased!</p>
+                                        <small class="text-muted" style="font-size: 0.7rem;">You've moved up to rank #12.</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
+                                    <div class="rounded-circle bg-info p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user-plus fa-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small fw-bold">New Team Member</p>
+                                        <small class="text-muted" style="font-size: 0.7rem;">Someone joined using your referral code.</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li><a class="dropdown-item text-center py-1 small" href="#">View all notifications</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- User Dropdown Menu -->
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="d-none d-md-inline"><%= locals.user.name.split(' ')[0] %></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="userDropdown" style="z-index: 9999 !important;">
+                            <li>
+                                <a class="dropdown-item py-1 small" href="/profile">
+                                    <i class="fas fa-user-circle me-2 text-primary"></i>My Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-1 small" href="/change-password">
+                                    <i class="fas fa-key me-2 text-warning"></i>Change Password
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item py-1 small" href="/sign-out">
+                                    <i class="fas fa-sign-out-alt me-2 text-danger"></i>Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
