@@ -48,7 +48,7 @@ router.post('/update-avatar', passport.checkAuthentication, upload.single('avata
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
 router.post('/request-investment-access', passport.checkAuthentication, investmentsController.requestInvestmentAccess); // Request investment access
-router.post('/update-deposit-wallet', passport.checkAuthentication, investmentsController.updateDepositWallet); // Update deposit wallet
+// Deposit wallet can only be set by admins now
 router.post('/update-withdraw-wallet', passport.checkAuthentication, investmentsController.updateWithdrawWallet); // Update withdraw wallet
 router.post('/request-withdraw', passport.checkAuthentication, investmentsController.requestWithdraw); // Request withdrawal
 router.get('/cancel-withdrawal/:requestId', passport.checkAuthentication, investmentsController.cancelWithdrawal); // Cancel withdrawal request

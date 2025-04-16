@@ -147,7 +147,7 @@
                 <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i> Deposit</h5>
             </div>
             <div class="card-body">
-                <p class="mb-3">To make a deposit, please send funds to your personal deposit wallet address:</p>
+                <p class="mb-3">To make a deposit, please send funds to your deposit wallet address assigned by the admin:</p>
                 
                 <% if (depositWallet) { %>
                     <div class="alert alert-success">
@@ -162,32 +162,18 @@
                     </div>
                 <% } else { %>
                     <div class="alert alert-warning">
-                        <p class="mb-0">You haven't set up a deposit wallet address yet.</p>
+                        <p class="mb-0">No deposit wallet address has been assigned to you yet. Please contact an admin.</p>
                     </div>
                 <% } %>
-                
-                <form action="/update-deposit-wallet" method="post" class="mt-3">
-                    <div class="form-outline mb-3">
-                        <label for="depositWallet" class="form-label">Update Deposit Wallet Address</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            id="depositWallet" 
-                            name="depositWallet" 
-                            value="<%= depositWallet %>" 
-                            placeholder="Enter your deposit wallet address"
-                        >
-                    </div>
-                    <button type="submit" class="btn btn-success">Update Deposit Wallet</button>
-                </form>
                 
                 <div class="mt-4">
                     <h6>Deposit Instructions:</h6>
                     <ol class="mb-0">
-                        <li>Copy your personal deposit wallet address</li>
+                        <li>Copy your assigned deposit wallet address</li>
                         <li>Send funds to this address from your external wallet</li>
                         <li>Your balance will be updated once the transaction is confirmed</li>
                         <li>Minimum deposit: 10 USD</li>
+                        <li>If you don't have a deposit wallet yet, please contact an admin</li>
                     </ol>
                 </div>
             </div>

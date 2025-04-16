@@ -325,7 +325,7 @@
                             <li><h6 class="dropdown-header py-1">Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <!-- Notification items -->
-                            <% if (locals.notifications && locals.notifications.items) { %>
+                            <% if (locals.notifications && locals.notifications.items && locals.notifications.items.length > 0) { %>
                                 <% locals.notifications.items.slice(0, 3).forEach(function(notification) { %>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center py-1 <%= notification.read ? 'text-muted' : '' %>" href="#">
@@ -344,13 +344,13 @@
                                 <% }); %>
                             <% } else { %>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-1" href="#">
-                                        <div class="rounded-circle bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-trophy fa-sm"></i>
+                                    <a class="dropdown-item d-flex align-items-center py-1 text-muted" href="#">
+                                        <div class="rounded-circle bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-bell-slash fa-sm"></i>
                                         </div>
                                         <div>
-                                            <p class="mb-0 small fw-bold">Challenge Completed!</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">You earned 5 points for completing a challenge.</small>
+                                            <p class="mb-0 small">No notifications</p>
+                                            <small class="text-muted" style="font-size: 0.7rem;">You're all caught up!</small>
                                         </div>
                                     </a>
                                 </li>
@@ -445,68 +445,36 @@
                         <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="notificationDropdown" style="min-width: 300px; z-index: 9999 !important;">
                             <li><h6 class="dropdown-header py-1">Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
-                            <% if (locals.notifications && locals.notifications.items) { %>
-                                <% locals.notifications.items.forEach(function(notification) { %>
+                            <% if (locals.notifications && locals.notifications.items && locals.notifications.items.length > 0) { %>
+                                <% locals.notifications.items.slice(0, 3).forEach(function(notification) { %>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center py-1 <%= notification.read ? 'text-muted' : '' %>" href="#">
-                                            <div class="rounded-circle bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fas fa-trophy fa-sm"></i>
+                                            <div class="rounded-circle bg-<%= notification.bgColor %> p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-<%= notification.icon %> fa-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="mb-0 small fw-bold <%= notification.read ? 'text-muted' : '' %>">Challenge Completed!</p>
-                                                <small class="text-muted <%= notification.read ? 'text-muted' : '' %>" style="font-size: 0.7rem;">You earned 5 points for completing a challenge.</small>
+                                                <p class="mb-0 small <%= notification.read ? '' : 'fw-bold' %>"><%= notification.title %></p>
+                                                <small class="text-muted" style="font-size: 0.7rem;"><%= notification.message %></small>
                                             </div>
                                         </a>
                                     </li>
+                                    <% if (locals.notifications.items.indexOf(notification) < Math.min(2, locals.notifications.items.length - 1)) { %>
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                    <% } %>
                                 <% }); %>
                             <% } else { %>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-1" href="#">
-                                        <div class="rounded-circle bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-trophy fa-sm"></i>
+                                    <a class="dropdown-item d-flex align-items-center py-1 text-muted" href="#">
+                                        <div class="rounded-circle bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-bell-slash fa-sm"></i>
                                         </div>
                                         <div>
-                                            <p class="mb-0 small fw-bold">Challenge Completed!</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">You earned 5 points for completing a challenge.</small>
+                                            <p class="mb-0 small">No notifications</p>
+                                            <small class="text-muted" style="font-size: 0.7rem;">You're all caught up!</small>
                                         </div>
                                     </a>
                                 </li>
                             <% } %>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
-                                    <div class="rounded-circle bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-trophy fa-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 small fw-bold">Challenge Completed!</p>
-                                        <small class="text-muted" style="font-size: 0.7rem;">You earned 5 points for completing a challenge.</small>
-                                    </div>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
-                                    <div class="rounded-circle bg-success p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-medal fa-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 small fw-bold">Rank Increased!</p>
-                                        <small class="text-muted" style="font-size: 0.7rem;">You've moved up to rank #12.</small>
-                                    </div>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-1" href="#">
-                                    <div class="rounded-circle bg-info p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-user-plus fa-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 small fw-bold">New Team Member</p>
-                                        <small class="text-muted" style="font-size: 0.7rem;">Someone joined using your referral code.</small>
-                                    </div>
-                                </a>
-                            </li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <li><a class="dropdown-item text-center py-1 small" href="/notifications">View all notifications</a></li>
                         </ul>

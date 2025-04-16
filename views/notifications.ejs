@@ -87,6 +87,14 @@
                             badge.style.display = 'none';
                         });
                         
+                        // Clear notification dropdown menus
+                        const dropdownItems = document.querySelectorAll('#notificationDropdown + .dropdown-menu .dropdown-item, #notificationDropdownMobile + .dropdown-menu .dropdown-item');
+                        dropdownItems.forEach(item => {
+                            item.classList.add('text-muted');
+                            const title = item.querySelector('p');
+                            if (title) title.classList.remove('fw-bold');
+                        });
+                        
                         // Show success message
                         showToast('Success', 'All notifications marked as read', 'success');
                     } else {

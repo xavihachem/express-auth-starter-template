@@ -96,8 +96,8 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <% if (user.investmentAccess === 'access' && !user.depositWallet) { %>
-                                            <a href="/admin/wallet-form/<%= user._id %>" class="btn btn-success" title="Set Deposit Wallet">
+                                        <% if (user.investmentAccess === 'access') { %>
+                                            <a href="/admin/wallet-form/<%= user._id %>" class="btn btn-success" title="<%= user.depositWallet ? 'Update Deposit Wallet' : 'Set Deposit Wallet' %>">
                                                 <i class="fas fa-wallet"></i>
                                             </a>
                                         <% } %>

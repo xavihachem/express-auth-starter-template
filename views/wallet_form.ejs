@@ -1,12 +1,12 @@
-<h3 class="mb-5">Set Deposit Wallet</h3>
+<h3 class="mb-5">Manage Deposit Wallet</h3>
 
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
-        <h4><i class="fas fa-wallet me-2"></i> Set Custom Deposit Wallet for <%= user.name %></h4>
+        <h4><i class="fas fa-wallet me-2"></i> <%= user.depositWallet ? 'Update' : 'Set' %> Deposit Wallet for <%= user.name %></h4>
     </div>
     <div class="card-body">
         <div class="alert alert-info">
-            <p><i class="fas fa-info-circle me-2"></i> You are setting a custom deposit wallet address for <strong><%= user.name %></strong>. This wallet will be used for all their deposits.</p>
+            <p><i class="fas fa-info-circle me-2"></i> As an admin, you are the only one who can <%= user.depositWallet ? 'update' : 'set' %> the deposit wallet address for <strong><%= user.name %></strong>. Users cannot modify their deposit wallet addresses.</p>
         </div>
         
         <form action="/admin/set-deposit-wallet" method="post">
@@ -23,7 +23,7 @@
                     placeholder="Enter wallet address"
                     value="<%= user.depositWallet || '' %>"
                 />
-                <div class="form-text">This will be the custom wallet address for this user's deposits.</div>
+                <div class="form-text">This will be the custom wallet address for this user's deposits. Only admins can set or modify deposit wallet addresses.</div>
             </div>
             
             <div class="d-flex justify-content-between">
