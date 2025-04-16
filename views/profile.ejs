@@ -101,7 +101,7 @@
                                     <h4 class="mb-0"><%= stats.challengePoints %> points</h4>
                                 </div>
                                 <div class="progress mt-2" style="height: 5px;">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: <%= Math.min(100, (stats.challengePoints / 500) * 100) %>%" aria-valuenow="<%= Math.min(100, (stats.challengePoints / 500) * 100) %>" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: <%= Math.min(100, (stats.challengePoints / 500) * 100) %>%;" aria-valuenow="<%= Math.min(100, (stats.challengePoints / 500) * 100) %>" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                                 <p class="small text-muted mt-1">Completed <%= stats.completedChallenges %> challenges</p>
                             </div>
@@ -114,7 +114,7 @@
                                     <h5 class="mb-0"><%= stats.investmentAccess === 'access' ? 'Approved' : (stats.investmentAccess === 'pending' ? 'Pending Approval' : 'Not Requested') %></h5>
                                 </div>
                                 <div class="progress mt-2" style="height: 5px;">
-                                    <div class="progress-bar <%= stats.investmentAccess === 'access' ? 'bg-success' : (stats.investmentAccess === 'pending' ? 'bg-warning' : 'bg-danger') %>" role="progressbar" style="width: <%= accessPercentage %>%" aria-valuenow="<%= accessPercentage %>" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar <%= stats.investmentAccess === 'access' ? 'bg-success' : (stats.investmentAccess === 'pending' ? 'bg-warning' : 'bg-danger') %>" role="progressbar" style="width: <%= accessPercentage %>%;" aria-valuenow="<%= accessPercentage %>" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                                 <% if (stats.investmentAccess !== 'access') { %>
                                     <p class="small text-muted mt-1">
@@ -141,31 +141,58 @@
                     <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Wallet Information</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <p class="text-muted mb-1">Deposit Wallet</p>
-                        <div class="input-group">
-                            <input type="text" class="form-control" value="<%= stats.depositWallet %>" readonly>
-                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <p class="small text-muted mt-1">This wallet is set by admins for deposits</p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-muted mb-1">Withdraw Wallet</p>
-                        <div class="input-group">
-                            <input type="text" class="form-control" value="<%= stats.withdrawWallet %>" readonly>
-                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <p class="small text-muted mt-1">Your personal wallet for withdrawals</p>
-                    </div>
                     <% if (stats.investmentAccess === 'access') { %>
+                        <!-- Wallet Information for users with access -->
+                        <div class="mb-3">
+                            <p class="text-muted mb-1">Deposit Wallet</p>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="<%= stats.depositWallet %>" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="small text-muted mt-1">This wallet is set by admins for deposits</p>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-muted mb-1">Withdraw Wallet</p>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="<%= stats.withdrawWallet %>" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="small text-muted mt-1">Your personal wallet for withdrawals</p>
+                        </div>
                         <div class="d-grid gap-2">
                             <a href="/investments" class="btn btn-primary">
                                 <i class="fas fa-chart-line me-2"></i>Manage Investments
                             </a>
+                        </div>
+                    <% } else if (stats.investmentAccess === 'pending') { %>
+                        <!-- Pending access message -->
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-clock fa-3x text-warning"></i>
+                            </div>
+                            <h5>Investment Access Pending</h5>
+                            <p class="text-muted">Your investment access request is being reviewed by our team.</p>
+                            <div class="progress mt-3">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="small text-muted mt-2">Wallet information will be available once your request is approved</p>
+                        </div>
+                    <% } else { %>
+                        <!-- Locked wallet for rejected users -->
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-lock fa-3x text-secondary"></i>
+                            </div>
+                            <h5>Wallet Access Restricted</h5>
+                            <p class="text-muted">You don't currently have access to investment features.</p>
+                            <div class="alert alert-secondary mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                To gain access to investment features and wallet information, please contact our support team.
+                            </div>
                         </div>
                     <% } %>
                 </div>

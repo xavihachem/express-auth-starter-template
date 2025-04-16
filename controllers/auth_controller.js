@@ -169,6 +169,7 @@ module.exports.changePassword = function (req, res) {
 //to update the password once user provide the current and new password
 module.exports.updatePassword = async function (req, res) {
     try {
+
         if (req.body.new_password != req.body.confirm_new_password) {
             req.flash('error', 'Confirm password should be same.');
             return res.redirect('back');
@@ -185,15 +186,19 @@ module.exports.updatePassword = async function (req, res) {
             req.flash('error', 'Invalid password.');
             return res.redirect('back');
         }
-        let updatedUser = await User.findOneAndUpdate(
+
+        // Hash the password directly before updating
+        const hashedPassword = await bcrypt.hash(req.body.new_password, 10);
+        
+        // Update the password directly in the database, bypassing any middleware
+        await User.updateOne(
             { _id: user.id },
-            { password: req.body.new_password }
-        ).exec();
-        if (updatedUser) {
-            req.flash('success', 'Password updated.');
-            authMailer.passwordChangeAlertMail(user);
-            return res.redirect('back');
-        }
+            { $set: { password: hashedPassword } }
+        );
+        
+        req.flash('success', 'Password updated.');
+        authMailer.passwordChangeAlertMail(user);
+        return res.redirect('back');
     } catch (err) {
         console.log('Error : ', err);
         return res.redirect('back');
@@ -304,28 +309,35 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
             return res.redirect('back');
         }
 
-        // Hashing password before saving
-        let newPasswordHash = await bcrypt.hash(new_password, 10);
-
-        // Updating the user's password in the database.
-        const updatedUser = await User.findOneAndUpdate(
+        // Hash the password directly before updating
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+        
+        // Update the password directly in the database, bypassing any middleware
+        const updateResult = await User.updateOne(
             { _id: id },
-            { password: newPasswordHash }
-        ).exec();
-
+            { $set: { password: hashedPassword } }
+        );
+        
+        if (updateResult.modifiedCount === 0) {
+            req.flash('error', 'User not found or password not updated');
+            return res.redirect('/sign-in');
+        }
+        
+        // Get the user for the email notification
+        const user = await User.findById(id);
+        
         // Deleting the reset token from the database as it is not required anymore.
         await Token.findByIdAndDelete(isTokenValid._id);
-
-        // Sending email to the user to notify them of password change.
-        const user = await User.findById(id);
         req.flash('success', 'Password updated.');
 
-        authMailer.passwordChangeAlertMail(user);
+        authMailer.passwordChangeAlertMail(user); // Restore mailer call
 
         // Redirecting the user to the login page.
         return res.redirect('/sign-in');
     } catch (err) {
-        // Displaying error in console if there is any error while performing the above operations.
         console.log('Error : ', err);
+        // Adding a redirect in the catch block to prevent hanging
+        req.flash('error', 'An unexpected error occurred during password reset.');
+        return res.redirect('/forgot-password'); 
     }
 };

@@ -44,6 +44,7 @@ passport.use(
                     password,
                     user.password
                 );
+
                 if (!matchPassword) {
                     // If password doesn't match, flash error message and return authentication failure
                     req.flash('error', 'Invalid Username or Password!');
@@ -53,7 +54,7 @@ passport.use(
                 // Return authentication success with user object
                 return done(null, user);
             } catch (err) {
-                console.log('Error in passport : ', err); // Log error
+                console.log('Error in passport : ', err); 
                 return done(err); // Return authentication failure with error object
             }
         }
