@@ -87,8 +87,8 @@ module.exports.completeChallenge = async function(req, res) {
 
         const { challengeId } = req.body;
         
-        if (!challengeId) {
-            req.flash('error', 'Challenge ID is required');
+        if (!challengeId || typeof challengeId !== 'string') {
+            req.flash('error', 'Valid challenge ID is required');
             return res.redirect('/challenges');
         }
         

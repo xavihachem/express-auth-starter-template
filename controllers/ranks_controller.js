@@ -14,9 +14,13 @@ module.exports.ranks = async function(req, res) {
         
         // Find the current user's rank
         const currentUser = await User.findById(req.user._id);
+        
+        // Count users with MORE points (for rank calculation)
         const userCount = await User.countDocuments({
             challengePoints: { $gt: currentUser.challengePoints }
         });
+        
+        // Users with the same number of points should have the same rank
         const currentUserRank = userCount + 1; // Add 1 because ranks start at 1, not 0
         
         // Render the ranks page with the sorted users

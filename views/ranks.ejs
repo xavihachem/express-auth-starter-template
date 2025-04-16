@@ -47,9 +47,15 @@
                                         </div>
                                     <% } else if (pointsNeeded > 0) { %>
                                         <div class="progress" style="height: 10px;">
+                                            <% 
+                                                var progressPercent = 0;
+                                                if (locals.user.challengePoints > 0 || pointsNeeded > 0) {
+                                                    progressPercent = Math.min(100, (locals.user.challengePoints / (locals.user.challengePoints + pointsNeeded)) * 100);
+                                                }
+                                            %>
                                             <div class="progress-bar bg-warning" role="progressbar" 
-                                                style="width: <%= Math.min(100, (locals.user.challengePoints / (locals.user.challengePoints + pointsNeeded)) * 100) %>%" 
-                                                aria-valuenow="<%= Math.min(100, (locals.user.challengePoints / (locals.user.challengePoints + pointsNeeded)) * 100) %>" 
+                                                style="width: <%= progressPercent %>%" 
+                                                aria-valuenow="<%= progressPercent %>" 
                                                 aria-valuemin="0" 
                                                 aria-valuemax="100"></div>
                                         </div>
@@ -71,69 +77,144 @@
         </div>
     </div>
 
-    <!-- Rankings Table -->
+    <!-- Two Column Layout for Ranks and Leaderboard -->
     <div class="row">
-        <div class="col-12">
+        <!-- Available Ranks on Left -->
+        <div class="col-md-7">
             <div class="card animate-fade-in delay-2">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top Users Leaderboard</h5>
+                    <h5 class="mb-0"><i class="fas fa-award me-2"></i>Available Ranks</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Rank</th>
-                                    <th scope="col">User</th>
-                                    <th scope="col">User Code</th>
-                                    <th scope="col">Points</th>
-                                    <th scope="col">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% users.forEach((user, index) => { %>
-                                    <tr class="<%= user._id.toString() === locals.user._id.toString() ? 'table-warning' : '' %>">
-                                        <td>
-                                            <% if (index === 0) { %>
-                                                <span class="badge rounded-pill bg-warning px-2 py-1">
-                                                    <i class="fas fa-crown me-1"></i> 1
-                                                </span>
-                                            <% } else if (index === 1) { %>
-                                                <span class="badge rounded-pill bg-secondary px-2 py-1">
-                                                    <i class="fas fa-medal me-1"></i> 2
-                                                </span>
-                                            <% } else if (index === 2) { %>
-                                                <span class="badge rounded-pill bg-danger px-2 py-1">
-                                                    <i class="fas fa-medal me-1"></i> 3
-                                                </span>
-                                            <% } else { %>
-                                                <%= index + 1 %>
-                                            <% } %>
-                                        </td>
-                                        <td>
-                                            <%= user.name %>
-                                            <% if (user._id.toString() === locals.user._id.toString()) { %>
-                                                <span class="badge bg-primary ms-2">You</span>
-                                            <% } %>
-                                        </td>
-                                        <td><code><%= user.userCode %></code></td>
-                                        <td><strong><%= user.challengePoints || 0 %></strong> pts</td>
-                                        <td>
-                                            <% if (user.role === 'admin') { %>
-                                                <span class="badge rounded-pill bg-danger px-2 py-1">
-                                                    <i class="fas fa-user-shield me-1"></i> Admin
-                                                </span>
-                                            <% } else { %>
-                                                <span class="badge rounded-pill bg-success px-2 py-1">
-                                                    <i class="fas fa-user me-1"></i> User
-                                                </span>
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-warning p-2 me-2 text-white">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <h5 class="mb-0">Legend</h5>
+                                </div>
+                                <p class="small mb-2">Top player with highest points</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" style="width: 100%"></div>
+                                </div>
+                                <p class="small text-muted mt-1">500+ points</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-info p-2 me-2 text-white">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <h5 class="mb-0">Master</h5>
+                                </div>
+                                <p class="small mb-2">Elite players with exceptional skill</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-info" style="width: 80%"></div>
+                                </div>
+                                <p class="small text-muted mt-1">300-499 points</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-primary p-2 me-2 text-white">
+                                        <i class="fas fa-medal"></i>
+                                    </div>
+                                    <h5 class="mb-0">Expert</h5>
+                                </div>
+                                <p class="small mb-2">Highly skilled and experienced players</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" style="width: 60%"></div>
+                                </div>
+                                <p class="small text-muted mt-1">150-299 points</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-success p-2 me-2 text-white">
+                                        <i class="fas fa-award"></i>
+                                    </div>
+                                    <h5 class="mb-0">Intermediate</h5>
+                                </div>
+                                <p class="small mb-2">Players with good knowledge and skills</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" style="width: 40%"></div>
+                                </div>
+                                <p class="small text-muted mt-1">50-149 points</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-secondary p-2 me-2 text-white">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <h5 class="mb-0">Beginner</h5>
+                                </div>
+                                <p class="small mb-2">New players starting their journey</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-secondary" style="width: 20%"></div>
+                                </div>
+                                <p class="small text-muted mt-1">0-49 points</p>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top 5 Leaderboard on Right -->
+        <div class="col-md-5">
+            <div class="card animate-fade-in delay-2">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top 5 Leaderboard</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <% users.slice(0, 5).forEach((user, index) => { %>
+                            <div class="list-group-item <%= user._id.toString() === locals.user._id.toString() ? 'list-group-item-warning' : '' %>">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <% if (index === 0) { %>
+                                            <div class="rounded-circle bg-warning text-white p-2 me-3" style="width: 40px; height: 40px; text-align: center;">
+                                                <i class="fas fa-crown"></i>
+                                            </div>
+                                        <% } else if (index === 1) { %>
+                                            <div class="rounded-circle bg-secondary text-white p-2 me-3" style="width: 40px; height: 40px; text-align: center;">
+                                                <i class="fas fa-medal"></i>
+                                            </div>
+                                        <% } else if (index === 2) { %>
+                                            <div class="rounded-circle bg-danger text-white p-2 me-3" style="width: 40px; height: 40px; text-align: center;">
+                                                <i class="fas fa-medal"></i>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="rounded-circle bg-light text-dark p-2 me-3" style="width: 40px; height: 40px; text-align: center;">
+                                                <%= index + 1 %>
+                                            </div>
+                                        <% } %>
+                                        <div>
+                                            <h6 class="mb-0">
+                                                <%= user.name %>
+                                                <% if (user._id.toString() === locals.user._id.toString()) { %>
+                                                    <span class="badge bg-primary ms-2">You</span>
+                                                <% } %>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary rounded-pill"><%= user.challengePoints || 0 %> pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="small text-muted mb-0">Complete daily challenges to climb the leaderboard!</p>
                 </div>
             </div>
         </div>
