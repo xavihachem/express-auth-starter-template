@@ -11,8 +11,14 @@
             <div class="card animate-fade-in delay-1">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-primary p-3 me-3 text-white">
-                            <i class="fas fa-user-circle fa-2x"></i>
+                        <div class="rounded-circle me-3 overflow-hidden" style="width: 64px; height: 64px;">
+                            <% if (locals.user.avatar) { %>
+                            <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
+                            <% } else { %>
+                            <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                <i class="fas fa-user-circle fa-2x"></i>
+                            </div>
+                            <% } %>
                         </div>
                         <div>
                             <h4 class="mb-0">Welcome back, <%= locals.user.name %>!</h4>

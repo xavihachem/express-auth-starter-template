@@ -73,6 +73,14 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: Date.now
         },
+        lastNameChange: {
+            type: Date,
+            default: null
+        },
+        avatar: {
+            type: String,
+            default: null // Path to the user's profile image
+        },
     },
     {
         timeseries: true,

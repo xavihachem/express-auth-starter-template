@@ -56,6 +56,7 @@ app.use(cookieParser());
 
 // Use middleware to serve static files
 app.use(express.static('assets'));
+app.use(express.static('public')); // Serve files from public directory for uploads
 
 // Use custom middleware to set flash messages
 app.use(customMiddleware.setFlash);

@@ -1,0 +1,174 @@
+<div class="container-fluid animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4 animate-fade-in">
+                <i class="fas fa-camera me-2"></i>Upload Profile Picture
+                <a href="/profile" class="btn btn-outline-primary btn-sm float-end">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Profile
+                </a>
+            </h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card animate-fade-in delay-1">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-crop-alt me-2"></i>Upload & Crop Your Profile Picture</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Step 1: Image Upload -->
+                    <div id="upload-container" class="mb-4">
+                        <p class="text-muted mb-3">Select an image from your device to use as your profile picture.</p>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="image-input" accept="image/*">
+                            <button class="btn btn-primary" type="button" id="upload-button">
+                                <i class="fas fa-upload me-1"></i>Upload
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Image Cropping (initially hidden) -->
+                    <div id="cropper-container" style="display: none;">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Drag to position and use the handles to resize the crop area. The selected area will be used as your profile picture.
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <div id="image-cropper-wrapper" style="max-width: 100%; margin: 0 auto;">
+                                <img id="image-to-crop" src="" alt="Image to crop" style="max-width: 100%;">
+                            </div>
+                        </div>
+                        
+                        <form action="/update-avatar" method="POST" enctype="multipart/form-data" id="crop-form">
+                            <input type="hidden" name="cropX" id="crop-x">
+                            <input type="hidden" name="cropY" id="crop-y">
+                            <input type="hidden" name="cropWidth" id="crop-width">
+                            <input type="hidden" name="cropHeight" id="crop-height">
+                            <input type="file" name="avatar" id="avatar-file" style="display: none;">
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" id="cancel-button">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Save Profile Picture
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Cropper.js library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<style>
+    /* Cropper styles */
+    .cropper-container {
+        max-width: 100%;
+    }
+    
+    #image-cropper-wrapper {
+        height: 400px;
+        width: 100%;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('image-input');
+    const uploadButton = document.getElementById('upload-button');
+    const uploadContainer = document.getElementById('upload-container');
+    const cropperContainer = document.getElementById('cropper-container');
+    const imageToCrop = document.getElementById('image-to-crop');
+    const cancelButton = document.getElementById('cancel-button');
+    const cropForm = document.getElementById('crop-form');
+    const avatarFile = document.getElementById('avatar-file');
+    
+    // Hidden crop coordinates inputs
+    const cropX = document.getElementById('crop-x');
+    const cropY = document.getElementById('crop-y');
+    const cropWidth = document.getElementById('crop-width');
+    const cropHeight = document.getElementById('crop-height');
+    
+    let cropper;
+    
+    // Handle upload button click
+    uploadButton.addEventListener('click', function() {
+        if (imageInput.files && imageInput.files[0]) {
+            const file = imageInput.files[0];
+            
+            // Check if file is an image
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Create a copy of the file for the form
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            avatarFile.files = dataTransfer.files;
+            
+            // Read the file and display it for cropping
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageToCrop.src = e.target.result;
+                
+                // Show cropper container and hide upload container
+                uploadContainer.style.display = 'none';
+                cropperContainer.style.display = 'block';
+                
+                // Initialize cropper after image is loaded
+                imageToCrop.onload = function() {
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 1, // Square crop
+                        viewMode: 1, // Restrict the crop box to not exceed the size of the canvas
+                        guides: true,
+                        center: true,
+                        background: false,
+                        autoCropArea: 0.8, // 80% of the image will be in the crop box by default
+                        crop: function(event) {
+                            // Update hidden inputs with crop data
+                            cropX.value = Math.round(event.detail.x);
+                            cropY.value = Math.round(event.detail.y);
+                            cropWidth.value = Math.round(event.detail.width);
+                            cropHeight.value = Math.round(event.detail.height);
+                        }
+                    });
+                };
+            };
+            
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select an image to upload');
+        }
+    });
+    
+    // Handle cancel button click
+    cancelButton.addEventListener('click', function() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        
+        // Reset form and inputs
+        cropForm.reset();
+        imageInput.value = '';
+        
+        // Show upload container and hide cropper container
+        uploadContainer.style.display = 'block';
+        cropperContainer.style.display = 'none';
+    });
+});
+</script>

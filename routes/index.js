@@ -30,8 +30,14 @@ router.post('/complete-challenge', passport.checkAuthentication, challengesContr
 // Ranks route - only accessible by authenticated users
 router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ranks page
 
-// Profile route
-router.get('/profile', passport.checkAuthentication, profileController.profile); // Profile page
+// Import multer for file uploads
+const upload = require('../config/multer');
+
+// Profile routes
+router.get('/profile', passport.checkAuthentication, profileController.profile);
+router.post('/update-name', passport.checkAuthentication, profileController.updateName);
+router.get('/upload-avatar', passport.checkAuthentication, profileController.showAvatarUpload);
+router.post('/update-avatar', passport.checkAuthentication, upload.single('avatar'), profileController.updateAvatar); // Profile page
 
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
