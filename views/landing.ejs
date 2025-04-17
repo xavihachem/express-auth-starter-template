@@ -102,7 +102,7 @@
             left: 50%;
             top: 18%;
             transform: translateX(-50%);
-            z-index: 2;
+            z-index: 2; /* Higher z-index to appear above stars */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -119,30 +119,7 @@
             overflow: hidden;
         }
         
-        /* Moon crater effects */
-        .moonify-logo .moon::before {
-            content: '';
-            position: absolute;
-            top: 15%;
-            left: 20%;
-            width: 20px;
-            height: 20px;
-            background: rgba(204, 226, 255, 0.8);
-            border-radius: 50%;
-            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2);
-        }
-        
-        .moonify-logo .moon::after {
-            content: '';
-            position: absolute;
-            bottom: 30%;
-            right: 25%;
-            width: 15px;
-            height: 15px;
-            background: rgba(204, 226, 255, 0.7);
-            border-radius: 50%;
-            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2);
-        }
+        /* Moon crater effects removed */
         
         /* Pulse glow animation */
         @keyframes glow {
@@ -185,51 +162,78 @@
             font-weight: 400;
             letter-spacing: 1px;
             text-align: center;
-            text-shadow: 0 2px 8px #0006;
+            perspective: 800px;
         }
         
         .tagline-line {
             display: block;
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid #5F91FF;
             margin: 0 auto;
             letter-spacing: 1px;
-            animation: typing 3.5s steps(40, end),
-                       blink-caret 0.75s step-end infinite;
-            animation-fill-mode: forwards;
-            width: 0;
-            max-width: 100%;
-            text-shadow: 0 0 5px #5F91FF80;
-            opacity: 1;
+            opacity: 0;
+            transform: translateY(20px);
+            text-shadow: 0 0 10px rgba(95, 145, 255, 0.8), 0 0 20px rgba(95, 145, 255, 0.4);
+            position: relative;
         }
         
         .tagline-line:first-child {
-            animation-delay: 1s;
             margin-bottom: 15px;
+            animation: cosmicReveal 2s forwards 1s;
         }
         
         .tagline-line:last-child {
-            animation-delay: 5s;
-            border-right: none;
             margin-top: 15px;
+            animation: cosmicReveal 2s forwards 3s;
         }
         
-        @keyframes typing {
-            0% { width: 0; }
-            100% { width: 100%; }
+        .tagline-line::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(95, 145, 255, 0.8), rgba(95, 145, 255, 0.8), transparent);
+            animation: lineGrow 3s ease-in-out forwards;
+            animation-delay: inherit;
+            box-shadow: 0 0 10px rgba(95, 145, 255, 0.8);
         }
         
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: #5F91FF; box-shadow: 0 0 10px #5F91FF; }
+        @keyframes cosmicReveal {
+            0% { 
+                opacity: 0; 
+                transform: translateY(20px); 
+                text-shadow: 0 0 10px rgba(95, 145, 255, 0.5), 0 0 20px rgba(95, 145, 255, 0.3);
+            }
+            20% { 
+                opacity: 0.2; 
+                text-shadow: 0 0 15px rgba(95, 145, 255, 0.8), 0 0 30px rgba(95, 145, 255, 0.6);
+            }
+            40% { 
+                opacity: 0.5; 
+                text-shadow: 0 0 20px rgba(95, 145, 255, 1), 0 0 40px rgba(95, 145, 255, 0.8);
+            }
+            60% { 
+                opacity: 0.8; 
+                text-shadow: 0 0 25px rgba(95, 145, 255, 1), 0 0 50px rgba(95, 145, 255, 0.8);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0); 
+                text-shadow: 0 0 10px rgba(95, 145, 255, 0.8), 0 0 20px rgba(95, 145, 255, 0.4);
+            }
+        }
+        
+        @keyframes lineGrow {
+            0% { width: 0; opacity: 0; }
+            20% { width: 0; opacity: 0.5; }
+            100% { width: 100%; opacity: 1; }
         }
         .night{
             position: absolute;
             width: 100vw; /* Limit to viewport width */
             height: 100vh; /* Limit to viewport height */
             left: 0; top: 0;
-            z-index: 1;
+            z-index: 0; /* Lower z-index so stars appear behind other elements */
             pointer-events: none;
             overflow: hidden;
         }
