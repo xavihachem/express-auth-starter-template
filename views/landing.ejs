@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonify</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Add a subtle pulse effect to the background */
+        @keyframes backgroundPulse {
+            0% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); }
+            50% { background: radial-gradient(ellipse at bottom, #0F2440, #111 90%); }
+            100% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); }
+        }
+        
+        /* Add a subtle floating effect for the moon */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Twinkling stars animation */
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.2; transform: scale(0.5); }
+        }
+        
+        /* Planet rotation animation */
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Animation styles for removed elements deleted */
+        
+        html, body {
+            height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%);
+            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
+            position: relative;
+            animation: backgroundPulse 15s ease-in-out infinite;
+            perspective: 1000px;
+            box-sizing: border-box;
+        }
+        .nav {
+            position: absolute;
+            top: 30px;
+            right: 80px; /* Position from right edge */
+            display: flex;
+            z-index: 2;
+        }
+        .nav-btn {
+            background: rgba(20, 30, 50, 0.5);
+            color: #5F91FF;
+            border: 2px solid #5F91FF;
+            padding: 10px 25px;
+            margin-left: 18px;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', Arial, sans-serif;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(95, 145, 255, 0.3), inset 0 0 10px rgba(95, 145, 255, 0.1);
+            text-transform: uppercase;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(95, 145, 255, 0.2), transparent);
+            transition: all 0.4s ease;
+        }
+        .nav-btn:hover {
+            background: rgba(30, 40, 70, 0.8);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(95, 145, 255, 0.5), inset 0 0 15px rgba(95, 145, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        .moonify-logo {
+            position: absolute;
+            left: 50%;
+            top: 18%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .moonify-logo .moon {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 40%, #fff 60%, #cce2ff 100%, #5F91FF 120%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px 15px rgba(95, 145, 255, 0.7);
+            margin-bottom: 25px;
+            position: relative;
+            animation: float 6s ease-in-out infinite, glow 8s ease-in-out infinite;
+            overflow: hidden;
+        }
+        
+        /* Moon crater effects */
+        .moonify-logo .moon::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 20px;
+            height: 20px;
+            background: rgba(204, 226, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .moonify-logo .moon::after {
+            content: '';
+            position: absolute;
+            bottom: 30%;
+            right: 25%;
+            width: 15px;
+            height: 15px;
+            background: rgba(204, 226, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Pulse glow animation */
+        @keyframes glow {
+            0% { box-shadow: 0 0 50px 15px rgba(95, 145, 255, 0.5); }
+            50% { box-shadow: 0 0 70px 20px rgba(95, 145, 255, 0.8); }
+            100% { box-shadow: 0 0 50px 15px rgba(95, 145, 255, 0.5); }
+        }
+        .moonify-logo h1 {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 3.5rem;
+            margin: 0 0 10px 0;
+            letter-spacing: 3px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .letter {
+            color: transparent;
+            text-shadow: none;
+            position: relative;
+            animation: none;
+        }
+        
+        /* Letter animations */
+        @keyframes letterAppear {
+            0% { color: transparent; text-shadow: none; }
+            20% { color: #5F91FF; text-shadow: 0 0 10px #5F91FF, 0 0 20px #5F91FF, 0 0 30px #5F91FF; }
+            40% { color: #5F91FF; text-shadow: 0 0 5px #5F91FF, 0 0 10px #5F91FF; }
+            100% { color: #5F91FF; text-shadow: 0 0 5px #5F91FF; }
+        }
+        
+        @keyframes fullWordGlow {
+            0% { color: #5F91FF; text-shadow: 0 0 5px #5F91FF; }
+            50% { color: #5F91FF; text-shadow: 0 0 10px #5F91FF, 0 0 20px #5F91FF, 0 0 30px #5F91FF; }
+            100% { color: transparent; text-shadow: none; }
+        }
+        .moonify-logo .tagline {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: 0 2px 8px #0006;
+        }
+        
+        .tagline-line {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid #5F91FF;
+            margin: 0 auto;
+            letter-spacing: 1px;
+            animation: typing 3.5s steps(40, end),
+                       blink-caret 0.75s step-end infinite;
+            animation-fill-mode: forwards;
+            width: 0;
+            max-width: 100%;
+            text-shadow: 0 0 5px #5F91FF80;
+            opacity: 1;
+        }
+        
+        .tagline-line:first-child {
+            animation-delay: 1s;
+            margin-bottom: 15px;
+        }
+        
+        .tagline-line:last-child {
+            animation-delay: 5s;
+            border-right: none;
+            margin-top: 15px;
+        }
+        
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #5F91FF; box-shadow: 0 0 10px #5F91FF; }
+        }
+        .night{
+            position: absolute;
+            width: 100vw; /* Limit to viewport width */
+            height: 100vh; /* Limit to viewport height */
+            left: 0; top: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .star{
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(-45deg, #5F91FF, rgba(0, 0, 255, 0));
+            border-radius: 999px;
+            filter: drop-shadow(0 0 6px #699BFF);
+            animation: tail 6s ease-in-out infinite,
+                       falling 6s ease-in-out infinite;
+            opacity: 0;
+            transform-origin: 0 0;
+            transform: rotate(45deg);
+        }
+        
+        /* Add trace/trail elements for each star */
+        .star::after, .star::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(-45deg, rgba(95, 145, 255, 0.3), rgba(0, 0, 255, 0));
+            border-radius: 100%;
+            transform: translateX(0) rotateZ(0);
+            filter: blur(4px);
+        }
+        @keyframes tail{
+            0%{width: 0; opacity: 0;}
+            5%{opacity: 0.3;}
+            15%{opacity: 1; width: 80px;}
+            30%{width: 250px;}
+            80%{opacity: 1;}
+            100%{width: 0; opacity: 0;}
+        }
+        @keyframes falling{
+            0%{transform: translate(0, 0) rotate(45deg);}
+            100%{transform: translate(95vw, 95vh) rotate(45deg);}
+        }
+        /* Star core shine effect */
+        .star-core {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px #5F91FF, 0 0 20px 5px rgba(95, 145, 255, 0.5);
+            transform: translate(4px, -2px);
+        }
+        
+        /* Trail effect */
+        .trail {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to left, rgba(255,255,255,0.4), rgba(95,145,255,0.1) 80%, transparent);
+            border-radius: 999px;
+            filter: blur(4px);
+            transform-origin: right center;
+            opacity: 0.7;
+        }
+        /* All stars start from top-left area with different offsets */
+        .star:nth-child(1){top: -5%; left: -2%; animation-delay: 0s;}
+        .star:nth-child(1)::before, .star:nth-child(1)::after{animation-delay: 0s;}
+        .star:nth-child(2){top: 5%; left: 5%; animation-delay: 0.4s;}
+        .star:nth-child(2)::before, .star:nth-child(2)::after{animation-delay: 0.4s;}
+        .star:nth-child(3){top: 2%; left: 12%; animation-delay: 0.8s;}
+        .star:nth-child(3)::before, .star:nth-child(3)::after{animation-delay: 0.8s;}
+        .star:nth-child(4){top: 8%; left: 0%; animation-delay: 1.2s;}
+        .star:nth-child(4)::before, .star:nth-child(4)::after{animation-delay: 1.2s;}
+        .star:nth-child(5){top: 0%; left: 20%; animation-delay: 1.6s;}
+        .star:nth-child(5)::before, .star:nth-child(5)::after{animation-delay: 1.6s;}
+        .star:nth-child(6){top: 10%; left: 10%; animation-delay: 2.0s;}
+        .star:nth-child(6)::before, .star:nth-child(6)::after{animation-delay: 2.0s;}
+        .star:nth-child(7){top: -2%; left: 8%; animation-delay: 2.4s;}
+        .star:nth-child(7)::before, .star:nth-child(7)::after{animation-delay: 2.4s;}
+        .star:nth-child(8){top: 12%; left: -5%; animation-delay: 2.8s;}
+        .star:nth-child(8)::before, .star:nth-child(8)::after{animation-delay: 2.8s;}
+        .star:nth-child(9){top: 6%; left: 15%; animation-delay: 3.2s;}
+        .star:nth-child(9)::before, .star:nth-child(9)::after{animation-delay: 3.2s;}
+        .star:nth-child(10){top: -4%; left: 25%; animation-delay: 3.6s;}
+        .star:nth-child(10)::before, .star:nth-child(10)::after{animation-delay: 3.6s;}
+        .star:nth-child(11){top: 15%; left: -8%; animation-delay: 4.0s;}
+        .star:nth-child(11)::before, .star:nth-child(11)::after{animation-delay: 4.0s;}
+        .star:nth-child(12){top: -8%; left: 15%; animation-delay: 4.4s;}
+        .star:nth-child(12)::before, .star:nth-child(12)::after{animation-delay: 4.4s;}
+        .star:nth-child(13){top: 3%; left: 28%; animation-delay: 4.8s;}
+        .star:nth-child(13)::before, .star:nth-child(13)::after{animation-delay: 4.8s;}
+        .star:nth-child(14){top: 18%; left: 2%; animation-delay: 5.2s;}
+        .star:nth-child(14)::before, .star:nth-child(14)::after{animation-delay: 5.2s;}
+        .star:nth-child(15){top: -3%; left: 32%; animation-delay: 5.6s;}
+        .star:nth-child(15)::before, .star:nth-child(15)::after{animation-delay: 5.6s;}
+        @media (max-width: 700px){
+            .moonify-logo h1{font-size:2rem;}
+            .moonify-logo .moon{width:70px;height:70px;}
+            .moonify-logo .tagline{font-size:1rem;}
+            .nav{top: 15px; right: 30px;}
+            .nav-btn{padding:6px 10px;font-size:0.8rem;letter-spacing:0px;min-width:70px;white-space:nowrap;}
+            /* Responsive styles for removed planets deleted */
+        }
+            /* Background stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star-bg {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: #fff;
+            opacity: 0.2;
+            animation: twinkle var(--twinkle-duration) ease-in-out infinite;
+            animation-delay: var(--twinkle-delay);
+        }
+        
+        /* Planet styles removed */
+        
+        
+        /* Asteroid styles removed */
+        
+        
+        /* Parallax effect */
+        .parallax-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            transform-style: preserve-3d;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .parallax-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: translateZ(var(--depth)) scale(calc(1 + var(--depth-factor)));
+        }
+    </style>
+</head>
+<body>
+    <!-- Background stars -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Planets removed -->
+    
+    <div class="nav">
+        <a href="/sign-in" style="margin-right:10px;"><button class="nav-btn">LOG IN</button></a>
+        <a href="/sign-up"><button class="nav-btn">SIGN UP</button></a>
+    </div>
+    
+    <div class="moonify-logo">
+        <div class="moon"></div>
+        <h1>
+            <span class="letter" id="letter-0">M</span>
+            <span class="letter" id="letter-1">o</span>
+            <span class="letter" id="letter-2">o</span>
+            <span class="letter" id="letter-3">n</span>
+            <span class="letter" id="letter-4">i</span>
+            <span class="letter" id="letter-5">f</span>
+            <span class="letter" id="letter-6">y</span>
+        </h1>
+        <div class="tagline">
+            <span class="tagline-line">Where your ambitions shoot for the stars.</span>
+            <span class="tagline-line">Welcome to the future of investing.</span>
+        </div>
+    </div>
+    
+    <div class="night">
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+        <div class="star"><div class="trail"></div><div class="star-core"></div></div>
+    </div>
+    
+    <script>
+        // Moonify title animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const letters = document.querySelectorAll('.letter');
+            const totalLetters = letters.length;
+            const letterDuration = 1.5; // seconds for each letter animation
+            const fullWordDuration = 2; // seconds for full word glow
+            const totalDuration = (letterDuration * totalLetters) + fullWordDuration;
+            
+            function animateTitle() {
+                // Reset all letters
+                letters.forEach(letter => {
+                    letter.style.animation = 'none';
+                    letter.style.color = 'transparent';
+                    letter.style.textShadow = 'none';
+                });
+                
+                // Animate each letter sequentially
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        letter.style.animation = `letterAppear ${letterDuration}s forwards`;
+                    }, index * letterDuration * 1000);
+                });
+                
+                // Animate full word glow and fade out
+                setTimeout(() => {
+                    letters.forEach(letter => {
+                        letter.style.animation = `fullWordGlow ${fullWordDuration}s forwards`;
+                    });
+                }, totalLetters * letterDuration * 1000);
+                
+                // Restart the animation after completion
+                setTimeout(animateTitle, totalDuration * 1000);
+            }
+            
+            // Start the animation
+            animateTitle();
+        });
+        
+        // Generate background twinkling stars
+        document.addEventListener('DOMContentLoaded', function() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star-bg');
+                
+                // Random position
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Random size
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Random twinkle animation
+                star.style.setProperty('--twinkle-duration', `${Math.random() * 3 + 2}s`);
+                star.style.setProperty('--twinkle-delay', `${Math.random() * 5}s`);
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // Parallax effect removed as there are no .parallax-layer elements
+        });
+    </script>
+</body>
+</html>

@@ -13,7 +13,17 @@ const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 
 // Define routes and their corresponding handlers
-router.get('/', passport.checkAuthentication, dashboardController.dashboard); // Dashboard based on user role
+
+// Dashboard route (for explicit dashboard navigation)
+router.get('/dashboard', passport.checkAuthentication, dashboardController.dashboard);
+router.get('/', (req, res) => {
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        // If user is authenticated, redirect to dashboard
+        return res.redirect('/dashboard');
+    }
+    // Otherwise, render the landing page without using the layout template
+    res.render('landing', { layout: false });
+}); // Show landing page or redirect to dashboard
 
 // Admin panel route - only accessible by admin users
 router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminPanel); // Admin panel
