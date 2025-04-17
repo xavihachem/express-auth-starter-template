@@ -161,6 +161,16 @@ module.exports.updateAvatar = async function(req, res) {
             return res.redirect('/');
         }
         
+        // Check if user has changed their avatar in the last week
+        if (user.lastAvatarChange && ((new Date() - new Date(user.lastAvatarChange)) / (1000 * 60 * 60 * 24) < 7)) {
+            // Delete the uploaded file since we're not using it
+            fs.unlinkSync(req.file.path);
+            
+            const daysLeft = Math.ceil(7 - ((new Date() - new Date(user.lastAvatarChange)) / (1000 * 60 * 60 * 24)));
+            req.flash('error', `You can only change your profile picture once every 7 days. Please wait ${daysLeft} more day${daysLeft !== 1 ? 's' : ''}.`);
+            return res.redirect('/profile');
+        }
+        
         // Process the image - crop to square and resize
         const { cropX, cropY, cropWidth, cropHeight } = req.body;
         
@@ -206,6 +216,7 @@ module.exports.updateAvatar = async function(req, res) {
         // Update the user's avatar path in the database
         // Store relative path from public folder
         user.avatar = `/uploads/avatars/${outputFilename}`;
+        user.lastAvatarChange = new Date(); // Track when the avatar was last changed
         await user.save();
         
         req.flash('success', 'Your profile picture has been updated successfully');

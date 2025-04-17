@@ -28,6 +28,8 @@ router.get('/admin/withdrawal-requests/:userId', passport.checkAuthentication, r
 router.post('/admin/approve-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.approveWithdrawal); // Approve withdrawal request
 router.post('/admin/reject-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.rejectWithdrawal); // Reject withdrawal request
 router.post('/admin/change-role', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.changeRole); // Change user role
+router.get('/admin/update-password/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.updatePasswordForm); // Show password update form
+router.post('/admin/update-password', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.updateUserPassword); // Update user password
 
 // Team page route - only accessible by authenticated users
 router.get('/team', passport.checkAuthentication, teamController.team); // Team page

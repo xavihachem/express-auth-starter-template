@@ -104,6 +104,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: null // Path to the user's profile image
         },
+        lastAvatarChange: {
+            type: Date,
+            default: null // Track when the avatar was last changed
+        },
     },
     {
         timeseries: true,
@@ -127,9 +131,11 @@ userSchema.pre('save', async function(next) {
 // Create a static method to handle password changes safely
 userSchema.statics.changePassword = async function(userId, newPassword) {
     try {
-        // Find the user by ID and update with the new password
-        // The pre-findOneAndUpdate hook will hash the password
-        return this.findByIdAndUpdate(userId, { password: newPassword }, { new: true });
+        // Hash the password before updating
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Find the user by ID and update with the hashed password
+        return this.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
     } catch (error) {
         throw error;
     }

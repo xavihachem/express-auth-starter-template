@@ -580,11 +580,11 @@ module.exports.changeRole = async function(req, res) {
         
         // Validate the new role
         if (newRole !== 'admin' && newRole !== 'user') {
-            req.flash('error', 'Invalid role specified');
+            req.flash('error', 'Invalid role');
             return res.redirect('/admin');
         }
         
-        // Find the user
+        // Find the user to get their details
         const user = await User.findById(userId);
         
         if (!user) {
@@ -593,24 +593,116 @@ module.exports.changeRole = async function(req, res) {
         }
         
         // Update the user's role
-        user.role = newRole;
-        await user.save();
+        await User.findByIdAndUpdate(userId, { role: newRole });
         
-        // Create notification for the user
+        // Create a notification for the user
         const Notification = require('../models/notification');
         await Notification.notifyUser(userId, {
             title: 'Role Updated',
             message: `Your account role has been changed to ${newRole}.`,
-            type: newRole === 'admin' ? 'success' : 'info',
-            icon: newRole === 'admin' ? 'user-shield' : 'user',
-            actionType: 'general'
+            type: 'info',
+            icon: 'user-shield',
+            actionType: 'role_updated'
         });
         
-        req.flash('success', `${user.name}'s role has been updated to ${newRole}`);
+        req.flash('success', `User role updated to ${newRole} successfully`);
         return res.redirect('/admin');
     } catch (err) {
         console.log('Error changing user role:', err);
         req.flash('error', 'Failed to change user role');
+        return res.redirect('/admin');
+    }
+};
+
+// Show form to update user password
+module.exports.updatePasswordForm = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You are not authorized to perform this action');
+            return res.redirect('/');
+        }
+
+        const userId = req.params.userId;
+        
+        if (!userId) {
+            req.flash('error', 'User ID is required');
+            return res.redirect('/admin');
+        }
+        
+        // Find the user to get their details
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/admin');
+        }
+        
+        // Render the password update form
+        return res.render('reset_user_password', {
+            user
+        });
+    } catch (err) {
+        console.log('Error showing password update form:', err);
+        req.flash('error', 'Failed to load password update form');
+        return res.redirect('/admin');
+    }
+};
+
+// Update user password
+module.exports.updateUserPassword = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You are not authorized to perform this action');
+            return res.redirect('/');
+        }
+
+        const { userId, newPassword, confirmPassword } = req.body;
+        
+        if (!userId || !newPassword || !confirmPassword) {
+            req.flash('error', 'All fields are required');
+            return res.redirect(`/admin/update-password/${userId}`);
+        }
+        
+        // Validate password match
+        if (newPassword !== confirmPassword) {
+            req.flash('error', 'Passwords do not match');
+            return res.redirect(`/admin/update-password/${userId}`);
+        }
+        
+        // Validate password strength
+        if (newPassword.length < 6) {
+            req.flash('error', 'Password must be at least 6 characters long');
+            return res.redirect(`/admin/update-password/${userId}`);
+        }
+        
+        // Find the user to get their details
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/admin');
+        }
+        
+        // Update the user's password using the static method
+        await User.changePassword(userId, newPassword);
+        
+        // Create a notification for the user
+        const Notification = require('../models/notification');
+        await Notification.notifyUser(userId, {
+            title: 'Password Updated',
+            message: 'Your password has been updated by an administrator. Please use your new password for future logins.',
+            type: 'warning',
+            icon: 'key',
+            actionType: 'general'
+        });
+        
+        req.flash('success', 'User password updated successfully');
+        return res.redirect('/admin');
+    } catch (err) {
+        console.log('Error updating user password:', err);
+        req.flash('error', 'Failed to update user password');
         return res.redirect('/admin');
     }
 };

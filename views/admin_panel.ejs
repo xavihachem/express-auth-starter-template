@@ -251,6 +251,9 @@
                                         <a href="/admin/edit-balance/<%= user._id %>" class="btn btn-primary" title="Edit Balance">
                                             <i class="fas fa-dollar-sign"></i>
                                         </a>
+                                        <a href="/admin/update-password/<%= user._id %>" class="btn btn-danger" title="Update Password">
+                                            <i class="fas fa-key"></i>
+                                        </a>
                                         <% if (user.role !== 'admin') { %>
                                         <form action="/admin/change-role" method="post" class="d-inline">
                                             <input type="hidden" name="userId" value="<%= user._id %>">
