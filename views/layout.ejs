@@ -20,6 +20,8 @@
 
     <!-- Link to custom CSS file for layout -->
     <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/auth-cosmic.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Custom styles for modern UI with animations -->
     <style>
@@ -515,6 +517,29 @@
     </nav>
     <% } %>
 
+    <% if (!locals.user && (locals.page === 'sign_in' || locals.page === 'sign_up')) { %>
+    <!-- Cosmic theme for auth pages (ONLY login and signup) -->
+    <section class="vh-100 auth-section">
+        <!-- Background stars -->
+        <div class="stars-bg" id="stars-bg"></div>
+        
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-2-strong cosmic-card" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+                            <%- body %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add cosmic background script -->
+        <script src="/js/cosmic-bg.js"></script>
+    </section>
+    <% } else { %>
+    <!-- Original section for ALL other pages (unchanged) -->
     <section class="vh-100" style="background-color: #508bfc;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
@@ -528,6 +553,7 @@
             </div>
         </div>
     </section>
+    <% } %>
     <%- script %>
     <% if (locals.flash) { %>
     <script>

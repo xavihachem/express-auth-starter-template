@@ -17,7 +17,10 @@ module.exports.signin = function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/');
     }
-    return res.render('sign_in', { site_key: process.env.RECAPTCHA_SITE_KEY });
+    return res.render('sign_in', { 
+        site_key: process.env.RECAPTCHA_SITE_KEY,
+        page: 'sign_in' // Set page variable for cosmic theme
+    })
 };
 
 // Rendering the sign-up page, if already logged in go to home page
@@ -25,7 +28,10 @@ module.exports.signup = function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/');
     }
-    return res.render('sign_up', { site_key: process.env.RECAPTCHA_SITE_KEY });
+    return res.render('sign_up', { 
+        site_key: process.env.RECAPTCHA_SITE_KEY,
+        page: 'sign_up' // Set page variable for cosmic theme
+    })
 };
 
 // Check invitation code and return inviter's name
