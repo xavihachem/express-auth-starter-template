@@ -1,27 +1,22 @@
 <h3 class="mb-5 cosmic-title">Sign up</h3>
 <form action="/create-user" id="create-user-form" method="post">
     <div class="form-outline mb-4">
-        <input type="text" name="name" id="name" required placeholder="Name" class="form-control cosmic-input" />
+        <input type="text" name="name" id="name" required placeholder="Name" class="form-control cosmic-input" autocomplete="name" />
     </div>
     <div class="form-outline mb-4">
-        <input type="email" name="email" id="email" required placeholder="Email" class="form-control cosmic-input" />
+        <input type="email" name="email" id="email" required placeholder="Email" class="form-control cosmic-input" autocomplete="email" />
     </div>
     <div class="form-outline mb-4">
-        <input type="password" name="password" id="password" required placeholder="Password" class="form-control cosmic-input" />
+        <input type="password" name="password" id="password" required placeholder="Password" class="form-control cosmic-input" autocomplete="new-password" />
     </div>
     <div class="form-outline mb-4">
-        <input type="password" name="confirm_password" id="confirm_password" required placeholder="Confirm password" class="form-control cosmic-input" />
+        <input type="password" name="confirm_password" id="confirm_password" required placeholder="Confirm password" class="form-control cosmic-input" autocomplete="new-password" />
     </div>
     <div class="form-outline mb-4">
         <input type="text" name="invitation_code" id="invitation_code" placeholder="Invitation Code (Optional)" class="form-control cosmic-input" />
         <div id="inviter-info" class="mt-2 small cosmic-text"></div>
     </div>
     <button type="submit" class="btn cosmic-btn btn-lg btn-block" value="Sign up">Sign up</button>
-    <div class="divider d-flex align-items-center my-4 cosmic-divider">
-        <p class="text-center fw-bold mx-3 mb-0">OR</p>
-    </div>
-    <a href="/auth/google" class="btn btn-lg btn-block cosmic-google-btn">
-        <i class="fab fa-google me-2"></i> Sign up with google</a>
     <br>
     <div class="d-flex align-items-center justify-content-center mt-4">
         <p class="mb-0 me-2 cosmic-text">Already have an account?</p>

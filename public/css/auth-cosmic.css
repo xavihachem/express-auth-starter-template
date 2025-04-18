@@ -49,9 +49,40 @@
     box-shadow: 0 0 15px rgba(95, 145, 255, 0.3) !important;
 }
 
+/* Ensure placeholders are always visible with proper styling */
 .cosmic-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
 }
+
+/* Fix for WebKit browsers */
+.cosmic-input::-webkit-input-placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+}
+
+/* Fix for Firefox */
+.cosmic-input::-moz-placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+}
+
+/* Fix for IE/Edge */
+.cosmic-input:-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+}
+
+/* Fix for floating labels if any */
+.form-outline .form-control:focus ~ .form-label,
+.form-outline .form-control:not(:placeholder-shown) ~ .form-label {
+    transform: translateY(-1.5rem) scale(0.8);
+    background-color: transparent;
+    padding: 0 0.2rem;
+    color: rgba(95, 145, 255, 0.9) !important;
+}
+
+/* Additional form styling */
 
 /* Button styling */
 .cosmic-btn {
