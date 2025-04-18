@@ -84,6 +84,16 @@
 
 /* Additional form styling */
 
+/* Phone input styling to match other fields */
+.iti {
+    width: 100%;
+    display: block;
+}
+
+.iti__flag-container {
+    z-index: 10;
+}
+
 /* Button styling */
 .cosmic-btn {
     background: rgba(20, 30, 50, 0.5) !important;

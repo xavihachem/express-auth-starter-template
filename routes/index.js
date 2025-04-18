@@ -87,18 +87,23 @@ router.get('/cancel-withdrawal/:requestId', passport.checkAuthentication, invest
 router.get('/home', passport.checkAuthentication, authController.home); // Original home page
 router.get('/sign-in', authController.signin); // Signin page
 router.get('/sign-up', authController.signup); // Signup page
+router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
+router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
 
 router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
 router.post('/create-user', authController.createUser); // Create a new user
 
-router.post(
-    '/create-session',
-    passport.authenticate('local', {
-        failureRedirect: '/sign-in',
-        failureFlash: true,
-    }),
-    authController.createSession
-); // Create a new session for the user after authentication
+// Add middleware to fix the email field if it's an array
+router.post('/create-session', function(req, res, next) {
+    // Fix the email field if it's an array
+    if (Array.isArray(req.body.email)) {
+        req.body.email = req.body.email[0]; // Take the first email value
+    }
+    next();
+}, passport.authenticate('local', {
+    failureRedirect: '/sign-in',
+    failureFlash: true,
+}), authController.createSession); // Create a new session for the user after authentication
 
 router.get('/sign-out', authController.destroySession); // Destroy the current session
 

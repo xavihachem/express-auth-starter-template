@@ -1,5 +1,5 @@
 <h3 class="mb-5 cosmic-title">Sign in</h3>
-<form action="/create-session" id="create-sesion-form" method="post">
+<form action="/create-session" id="create-session-form" method="post">
     <div class="form-outline mb-4">
         <input type="email" name="email" id="email" required placeholder="Email" class="form-control cosmic-input" autocomplete="email" />
     </div>
@@ -8,12 +8,59 @@
     </div>
     <button type="submit" class="btn cosmic-btn btn-lg btn-block" value="Sign in">Sign in</button>
 
-    <br>
-    <div class="text-center pt-5 mb-3 pb-1">
-        <a class="cosmic-link" href="/forgot-password">Forgot password?</a>
-    </div>
-    <div class="d-flex align-items-center justify-content-center pb-2">
+    <div class="d-flex align-items-center justify-content-center mt-4 pb-2">
         <p class="mb-0 me-2 cosmic-text">Don't have an account?</p>
         <a href="/sign-up" class="btn cosmic-btn">Sign up</a>
     </div>
 </form>
+
+<div class="text-center mt-3">
+    <p><a href="/forgot-password" class="cosmic-link">Forgot password?</a></p>
+    <p><a href="#" id="show-verification-form" class="cosmic-link">Didn't receive verification email?</a></p>
+</div>
+
+<!-- Verification Email Request Form -->
+<div id="verification-form" class="mt-4" style="display: none;">
+    <h5 class="cosmic-text mb-3">Resend Verification Email</h5>
+    <form action="/resend-verification" method="POST">
+        <div class="form-outline mb-4">
+            <input type="email" name="email" id="verification-email" placeholder="Enter your email" class="form-control cosmic-input" autocomplete="email" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mb-4 cosmic-btn">Send Verification Link</button>
+    </form>
+</div>
+
+<script>
+    // Only run this code if the elements exist on the page
+    const showVerificationFormBtn = document.getElementById('show-verification-form');
+    const verificationForm = document.getElementById('verification-form');
+    const emailField = document.getElementById('verification-email');
+    const resendForm = document.querySelector('form[action="/resend-verification"]');
+    
+    // Add event listener for the show/hide form button
+    if (showVerificationFormBtn && verificationForm && emailField) {
+        showVerificationFormBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (verificationForm.style.display === 'none') {
+                verificationForm.style.display = 'block';
+                // Add required attribute when form is visible
+                emailField.setAttribute('required', '');
+            } else {
+                verificationForm.style.display = 'none';
+                // Remove required attribute when form is hidden
+                emailField.removeAttribute('required');
+            }
+        });
+    }
+    
+    // Add event listener for form submission
+    if (resendForm && emailField) {
+        resendForm.addEventListener('submit', function(e) {
+            if (!emailField.value) {
+                e.preventDefault();
+                alert('Please enter your email address');
+            }
+        });
+    }
+</script>

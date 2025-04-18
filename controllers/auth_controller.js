@@ -141,9 +141,25 @@ module.exports.createUser = async function (req, res) {
             }
         }
         
-        // Create new user with explicit userCode and redirect to sign in page
-        await User.create(userData);
-        req.flash('success', 'User created.');
+        // Create new user with explicit userCode
+        const newUser = await User.create(userData);
+        
+        // Generate verification token
+        const token = crypto.randomBytes(32).toString('hex');
+        
+        // Save token to database
+        await Token.create({
+            user: newUser._id,
+            token: token
+        });
+        
+        // Create verification link
+        const verificationLink = `${process.env.BASE_URL}/verify-email/${newUser._id}/${token}`;
+        
+        // Send verification email
+        authMailer.emailVerificationMail(newUser, verificationLink);
+        
+        req.flash('success', 'Account created successfully! Please check your email to verify your account.');
         res.redirect('/sign-in');
     } catch (err) {
         console.log('Error:', err);
@@ -156,6 +172,139 @@ module.exports.createUser = async function (req, res) {
 module.exports.createSession = function (req, res) {
     req.flash('success', 'Signed in successfully.');
     return res.redirect('/');
+};
+
+// Handle email verification
+module.exports.verifyEmail = async function (req, res) {
+    try {
+        // Get user ID and token from params
+        const { userId, token } = req.params;
+        
+        // Find the user
+        const user = await User.findById(userId);
+        if (!user) {
+            req.flash('error', 'Invalid verification link.');
+            return res.redirect('/sign-in');
+        }
+        
+        // If user is already verified
+        if (user.isEmailVerified) {
+            req.flash('success', 'Email already verified. Please sign in.');
+            return res.redirect('/sign-in');
+        }
+        
+        // Find the token
+        const verificationToken = await Token.findOne({
+            user: userId,
+            token: token
+        });
+        
+        if (!verificationToken) {
+            req.flash('error', 'Invalid or expired verification link. Please sign in and request a new verification email.');
+            return res.redirect('/sign-in');
+        }
+        
+        // Verify the user's email
+        await User.findByIdAndUpdate(userId, { isEmailVerified: true });
+        
+        // Delete the token
+        await Token.findByIdAndDelete(verificationToken._id);
+        
+        req.flash('success', 'Email verified successfully! You can now sign in.');
+        return res.redirect('/sign-in');
+    } catch (err) {
+        console.log('Error in email verification:', err);
+        req.flash('error', 'Something went wrong. Please try again.');
+        return res.redirect('/sign-in');
+    }
+};
+
+// Store for rate limiting verification emails
+const verificationAttempts = {};
+
+// Resend verification email with rate limiting
+module.exports.resendVerificationEmail = async function (req, res) {
+    try {
+        const { email } = req.body;
+        
+        if (!email || !validator.isEmail(email)) {
+            req.flash('error', 'Please provide a valid email address.');
+            return res.redirect('/sign-in');
+        }
+        
+        // Rate limiting check
+        const clientIp = req.ip || req.connection.remoteAddress;
+        const key = `${email}:${clientIp}`;
+        const now = Date.now();
+        
+        if (verificationAttempts[key]) {
+            const lastAttempt = verificationAttempts[key];
+            const timeSinceLastAttempt = now - lastAttempt;
+            
+            // Limit to one request per 5 minutes (300,000 ms)
+            if (timeSinceLastAttempt < 300000) {
+                const timeLeft = Math.ceil((300000 - timeSinceLastAttempt) / 60000);
+                req.flash('error', `Please wait ${timeLeft} minute(s) before requesting another verification email.`);
+                return res.redirect('/sign-in');
+            }
+        }
+        
+        // Find the user
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            // Don't reveal that the email doesn't exist for security reasons
+            // But still update rate limit to prevent email enumeration attacks
+            verificationAttempts[key] = now;
+            
+            // Clean up old entries every hour
+            setTimeout(() => {
+                delete verificationAttempts[key];
+            }, 3600000); // 1 hour
+            
+            req.flash('success', 'If your email exists in our system, a verification link has been sent.');
+            return res.redirect('/sign-in');
+        }
+        
+        // If user is already verified
+        if (user.isEmailVerified) {
+            req.flash('success', 'Your email is already verified. Please sign in.');
+            return res.redirect('/sign-in');
+        }
+        
+        // Update rate limiting
+        verificationAttempts[key] = now;
+        
+        // Clean up old entries after 1 hour
+        setTimeout(() => {
+            delete verificationAttempts[key];
+        }, 3600000); // 1 hour
+        
+        // Delete any existing tokens for this user
+        await Token.deleteMany({ user: user._id });
+        
+        // Generate new verification token
+        const token = crypto.randomBytes(32).toString('hex');
+        
+        // Save token to database
+        await Token.create({
+            user: user._id,
+            token: token
+        });
+        
+        // Create verification link
+        const verificationLink = `${process.env.BASE_URL}/verify-email/${user._id}/${token}`;
+        
+        // Send verification email
+        authMailer.emailVerificationMail(user, verificationLink);
+        
+        req.flash('success', 'A new verification link has been sent to your email.');
+        return res.redirect('/sign-in');
+    } catch (err) {
+        console.log('Error in resending verification email:', err);
+        req.flash('error', 'Something went wrong. Please try again.');
+        return res.redirect('/sign-in');
+    }
 };
 
 // to logout user using passports's logout method

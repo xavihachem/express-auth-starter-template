@@ -52,3 +52,30 @@ exports.passwordResetLinkMail = (user) => {
         }
     );
 };
+
+// Export a function that sends an email verification link to the user
+exports.emailVerificationMail = (user, verificationLink) => {
+    // Render the email content using a template and the user's details
+    let mailContent = nodeMailer.renderTemplate(
+        { user: user, verificationLink: verificationLink },
+        '/auth/email_verification.ejs'
+    );
+    // Send the email using nodemailer's transporter object, including the email content and necessary details
+    nodeMailer.transporter.sendMail(
+        {
+            from: '"Moonfy" <hachem03000@gmail.com>',
+            to: user.email,
+            subject: 'Verify Your Email Address',
+            html: mailContent,
+        },
+        // Log any errors encountered during the process
+        function (err, info) {
+            if (err) {
+                console.log('Error sending verification email: ', err);
+            } else {
+                console.log('Verification email sent successfully to: ' + user.email);
+            }
+            return;
+        }
+    );
+};

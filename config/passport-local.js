@@ -17,9 +17,15 @@ passport.use(
         async function (req, email, password, done) {
             // passport authentication callback function
             try {
+                // Check if email and password are provided
+                if (!email || !password) {
+                    req.flash('error', 'Email and password are required.');
+                    return done(null, false);
+                }
+                
                 if (!validator.isEmail(email)) {
                     // validate email using validator module
-                    req.flash('error', 'Invalid email. '); // flash error message
+                    req.flash('error', 'Invalid email format.'); // flash error message
                     return done(null, false); // return authentication failure
                 }
 
@@ -41,6 +47,7 @@ passport.use(
 
                 // Compare password with hashed password in database
                 
+                
                 // Ensure consistent password handling by trimming whitespace
                 const cleanPassword = password.trim();
                 
@@ -51,11 +58,25 @@ passport.use(
                 if (!matchPassword && cleanPassword !== password) {
                     matchPassword = await bcrypt.compare(password, user.password);
                 }
+                
 
                 if (!matchPassword) {
                     // If password doesn't match, flash error message and return authentication failure
                     req.flash('error', 'Invalid Username or Password!');
                     return done(null, false);
+                }
+                
+                // Check if email is verified
+                if (user.isEmailVerified === false) {
+                    req.flash('error', 'Please verify your email before signing in. Check your inbox for the verification link.');
+                    return done(null, false);
+                }
+                
+                // For existing accounts without the isEmailVerified field, automatically mark them as verified
+                if (user.isEmailVerified === undefined) {
+                    console.log('Auto-verifying legacy account:', user.email);
+                    // Update the user to set isEmailVerified to true
+                    await User.findByIdAndUpdate(user._id, { isEmailVerified: true });
                 }
 
                 // Return authentication success with user object

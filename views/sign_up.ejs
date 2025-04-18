@@ -13,6 +13,11 @@
         <input type="password" name="confirm_password" id="confirm_password" required placeholder="Confirm password" class="form-control cosmic-input" autocomplete="new-password" />
     </div>
     <div class="form-outline mb-4">
+        <input type="tel" name="phone" id="phone" placeholder="Phone Number" class="form-control cosmic-input" />
+        <input type="hidden" name="full_phone" id="full_phone" />
+        <div class="mt-2 small cosmic-text text-start">We'll send a verification code to this number</div>
+    </div>
+    <div class="form-outline mb-4">
         <input type="text" name="invitation_code" id="invitation_code" placeholder="Invitation Code (Optional)" class="form-control cosmic-input" />
         <div id="inviter-info" class="mt-2 small cosmic-text"></div>
     </div>
@@ -25,6 +30,54 @@
 </form>
 
 <script>
+    // Initialize phone input with country selector
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+        const fullPhoneInput = document.getElementById('full_phone');
+        
+        if (phoneInput) {
+            // Initialize with IntlTelInput
+            const iti = window.intlTelInput(phoneInput, {
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js",
+                separateDialCode: true,
+                initialCountry: "auto",
+                geoIpLookup: function(callback) {
+                    // Default to US if geolocation fails
+                    callback("us");
+                },
+                preferredCountries: ["us", "gb", "ca", "au", "fr", "de"],
+                customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+                    return "Phone number";
+                }
+            });
+            
+            // Update hidden input with full international number when phone input changes
+            phoneInput.addEventListener('input', function() {
+                if (iti.isValidNumber()) {
+                    fullPhoneInput.value = iti.getNumber();
+                    phoneInput.classList.remove('is-invalid');
+                    phoneInput.classList.add('is-valid');
+                } else {
+                    fullPhoneInput.value = '';
+                    phoneInput.classList.remove('is-valid');
+                    if (phoneInput.value.trim()) {
+                        phoneInput.classList.add('is-invalid');
+                    } else {
+                        phoneInput.classList.remove('is-invalid');
+                    }
+                }
+            });
+            
+            // Style the country selector to match cosmic theme
+            const countrySelectorElements = document.querySelectorAll('.iti__flag-container, .iti__selected-flag');
+            countrySelectorElements.forEach(el => {
+                el.style.backgroundColor = 'rgba(20, 30, 50, 0.3)';
+                el.style.borderRadius = '8px 0 0 8px';
+                el.style.borderRight = '1px solid rgba(95, 145, 255, 0.3)';
+            });
+        }
+    });
+    
     // Function to check invitation code
     document.getElementById('invitation_code').addEventListener('blur', async function() {
         const code = this.value.trim();

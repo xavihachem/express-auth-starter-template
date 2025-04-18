@@ -108,6 +108,10 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: null // Track when the avatar was last changed
         },
+        isEmailVerified: {
+            type: Boolean,
+            default: false // Email verification status
+        },
     },
     {
         timeseries: true,
