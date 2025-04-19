@@ -11,6 +11,7 @@ const profileController = require('../controllers/profile_controller');
 const notificationsController = require('../controllers/notifications_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
+const Token = require('../models/token');
 
 // Define routes and their corresponding handlers
 
@@ -83,17 +84,11 @@ router.post('/update-withdraw-wallet', passport.checkAuthentication, investments
 router.post('/request-withdraw', passport.checkAuthentication, investmentsController.requestWithdraw); // Request withdrawal
 router.get('/cancel-withdrawal/:requestId', passport.checkAuthentication, investmentsController.cancelWithdrawal); // Cancel withdrawal request
 
-// Original home route (can be used as a fallback)
-router.get('/home', passport.checkAuthentication, authController.home); // Original home page
-router.get('/sign-in', authController.signin); // Signin page
-router.get('/sign-up', authController.signup); // Signup page
-router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
-router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
+// Phone verification routes
+router.get('/verify-phone', authController.showPhoneVerificationForm); // Show code entry
+router.post('/verify-phone', authController.handlePhoneVerification); // Process verification
 
-router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
-router.post('/create-user', authController.createUser); // Create a new user
-
-// Add middleware to fix the email field if it's an array
+// Login with phone verification check
 router.post('/create-session', function(req, res, next) {
     // Fix the email field if it's an array
     if (Array.isArray(req.body.email)) {
@@ -103,7 +98,36 @@ router.post('/create-session', function(req, res, next) {
 }, passport.authenticate('local', {
     failureRedirect: '/sign-in',
     failureFlash: true,
-}), authController.createSession); // Create a new session for the user after authentication
+}), async function(req, res, next) {
+    // At this point passport has set req.user
+    if (!req.user.isPhoneVerified) {
+        // generate 6-digit code and store
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const tempId = req.user._id; // capture before logout
+        await Token.create({ user: tempId, token: code });
+        console.log(`🔒 Debug phone verification code for user ${tempId}: ${code}`);
+        // Logout and redirect to verification page
+        return req.logout(function(err) {
+            if (err) return next(err);
+            req.session.tempUserId = tempId;
+            req.flash('info', 'Verification code sent to your phone');
+            return res.redirect('/verify-phone');
+        });
+    }
+    // proceed to login user
+    req.logIn(req.user, err => {
+        if (err) return next(err);
+        return res.redirect('/dashboard');
+    });
+});
+
+router.get('/sign-in', authController.signin); // Signin page
+router.get('/sign-up', authController.signup); // Signup page
+router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
+router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
+
+router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
+router.post('/create-user', authController.createUser); // Create a new user
 
 router.get('/sign-out', authController.destroySession); // Destroy the current session
 

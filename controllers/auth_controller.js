@@ -514,3 +514,34 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
         return res.redirect('/forgot-password'); 
     }
 };
+
+// Render phone verification form
+module.exports.showPhoneVerificationForm = function(req, res) {
+    res.render('verify_phone', { messages: req.flash() });
+};
+
+// Process phone verification code
+module.exports.handlePhoneVerification = async function(req, res) {
+    try {
+        const userId = req.session.tempUserId;
+        const { code } = req.body;
+        if (!userId) {
+            req.flash('error','Session expired. Please sign in again.');
+            return res.redirect('/sign-in');
+        }
+        const record = await Token.findOne({ user: userId, token: code });
+        if (!record) {
+            req.flash('error','Invalid or expired code');
+            return res.redirect('back');
+        }
+        await User.findByIdAndUpdate(userId, { isPhoneVerified: true });
+        await record.deleteOne();
+        delete req.session.tempUserId;
+        req.flash('success','Phone verified! Please log in.');
+        return res.redirect('/sign-in');
+    } catch (err) {
+        console.error('Phone verify error:', err);
+        req.flash('error','An unexpected error occurred');
+        return res.redirect('back');
+    }
+};

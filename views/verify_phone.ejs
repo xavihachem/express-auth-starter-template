@@ -1,0 +1,19 @@
+<% if (messages.error) { %>
+  <div class="text-danger"><%= messages.error %></div>
+<% } %>
+<% if (messages.success) { %>
+  <div class="text-success"><%= messages.success %></div>
+<% } %>
+
+<h3 class="mb-4 cosmic-title">Verify Your Phone</h3>
+<form action="/verify-phone" method="post">
+  <input
+    type="text"
+    name="code"
+    placeholder="Enter SMS code"
+    required
+    class="form-control cosmic-input mb-3"
+  />
+  <button type="submit" class="cosmic-btn w-100">Verify</button>
+</form>
+<a href="/sign-in" class="cosmic-link mt-2 d-block text-center">Back to Sign In</a>
