@@ -112,9 +112,20 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false // Email verification status
         },
+        // Phone verification fields
+        phoneNumber: {
+            type: String,
+            default: null, // User's phone number
+            unique: true,
+            sparse: true // allow multiple docs with null
+        },
+        isPhoneVerified: {
+            type: Boolean,
+            default: false // Phone verification status
+        },
     },
     {
-        timeseries: true,
+        timestamps: true,
     }
 );
 

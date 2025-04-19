@@ -73,6 +73,8 @@ module.exports.createUser = async function (req, res) {
             password,
             confirm_password,
             invitation_code,
+            phoneNumber,
+            phone,
             'g-recaptcha-response': recaptchaResponse,
         } = req.body;
         let errorMsg = '';
@@ -126,6 +128,19 @@ module.exports.createUser = async function (req, res) {
             userCode: userCode, // Explicitly set the user code
             // role is automatically set to 'user' by default
         };
+        // Use intlTelInput value or fallback raw phone input
+        const finalPhone = phoneNumber && phoneNumber.trim()
+            ? phoneNumber.trim()
+            : (phone && phone.trim() ? phone.trim() : null);
+        if (finalPhone) {
+            userData.phoneNumber = finalPhone;
+            // Ensure phone number is unique
+            const existingUser = await User.findOne({ phoneNumber: finalPhone });
+            if (existingUser) {
+                req.flash('error', 'Phone number already in use');
+                return res.redirect('back');
+            }
+        }
         
         // If invitation code is provided, find the inviter and update user data
         if (invitation_code) {
@@ -141,7 +156,6 @@ module.exports.createUser = async function (req, res) {
             }
         }
         
-        // Create new user with explicit userCode
         const newUser = await User.create(userData);
         
         // Generate verification token

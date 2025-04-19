@@ -13,9 +13,12 @@
         <input type="password" name="confirm_password" id="confirm_password" required placeholder="Confirm password" class="form-control cosmic-input" autocomplete="new-password" />
     </div>
     <div class="form-outline mb-4">
-        <input type="tel" name="phone" id="phone" placeholder="Phone Number" class="form-control cosmic-input" />
-        <input type="hidden" name="full_phone" id="full_phone" />
-        <div class="mt-2 small cosmic-text text-start">We'll send a verification code to this number</div>
+        <!-- UI entry: national number only -->
+        <input type="tel" id="phone" placeholder="Phone Number" class="form-control cosmic-input" aria-describedby="phone-error" aria-invalid="false" />
+        <!-- Hidden e164 value sent to server -->
+        <input type="hidden" name="phoneNumber" id="full_phone" />
+        <div id="phone-info" class="mt-2 small cosmic-text text-start">We'll send a verification code to this number</div>
+        <div id="phone-error" class="mt-2 small cosmic-text text-danger" style="display:none;">Please enter a valid phone number</div>
     </div>
     <div class="form-outline mb-4">
         <input type="text" name="invitation_code" id="invitation_code" placeholder="Invitation Code (Optional)" class="form-control cosmic-input" />
@@ -41,9 +44,18 @@
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js",
                 separateDialCode: true,
                 initialCountry: "auto",
+                // Auto-detect country via IP
                 geoIpLookup: function(callback) {
-                    // Default to US if geolocation fails
-                    callback("us");
+                    fetch('https://ipapi.co/json/')
+                        .then(res => res.json())
+                        .then(data => {
+                            callback(data.country_code.toLowerCase());
+                        })
+                        .catch(err => {
+                            const lang = navigator.language || navigator.userLanguage || '';
+                            const region = lang.includes('-') ? lang.split('-')[1] : lang;
+                            callback(region.toLowerCase() || 'us');
+                        });
                 },
                 preferredCountries: ["us", "gb", "ca", "au", "fr", "de"],
                 customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
@@ -51,21 +63,37 @@
                 }
             });
             
-            // Update hidden input with full international number when phone input changes
-            phoneInput.addEventListener('input', function() {
-                if (iti.isValidNumber()) {
-                    fullPhoneInput.value = iti.getNumber();
-                    phoneInput.classList.remove('is-invalid');
-                    phoneInput.classList.add('is-valid');
+            // Initial formatting & log after country detection
+            updateFullPhone();
+            
+            // Central update function for full phone and styling
+            function updateFullPhone() {
+                // Try explicit E.164 format
+                let number = '';
+                if (window.intlTelInputUtils && window.intlTelInputUtils.numberFormat) {
+                    number = iti.getNumber(window.intlTelInputUtils.numberFormat.E164);
                 } else {
-                    fullPhoneInput.value = '';
-                    phoneInput.classList.remove('is-valid');
-                    if (phoneInput.value.trim()) {
-                        phoneInput.classList.add('is-invalid');
-                    } else {
-                        phoneInput.classList.remove('is-invalid');
-                    }
+                    number = iti.getNumber();
                 }
+                fullPhoneInput.value = number || '';
+                const hasRaw = phoneInput.value.trim() !== '';
+                const valid = number && iti.isValidNumber();
+                // Toggle classes and error message
+                phoneInput.classList.toggle('is-valid', valid);
+                phoneInput.classList.toggle('is-invalid', hasRaw && !valid);
+                const errorDiv = document.getElementById('phone-error');
+                if (hasRaw && !valid) {
+                    errorDiv.style.display = 'block';
+                    phoneInput.setAttribute('aria-invalid','true');
+                } else {
+                    errorDiv.style.display = 'none';
+                    phoneInput.setAttribute('aria-invalid','false');
+                };
+            }
+            // On user input or country change, update hidden E.164
+            phoneInput.addEventListener('input', updateFullPhone);
+            phoneInput.addEventListener('countrychange', function() {
+                updateFullPhone();
             });
             
             // Style the country selector to match cosmic theme
@@ -74,6 +102,11 @@
                 el.style.backgroundColor = 'rgba(20, 30, 50, 0.3)';
                 el.style.borderRadius = '8px 0 0 8px';
                 el.style.borderRight = '1px solid rgba(95, 145, 255, 0.3)';
+            });
+            
+            // ensure hidden e164 is current
+            document.getElementById('create-user-form').addEventListener('submit', function() {
+                updateFullPhone();
             });
         }
     });
@@ -110,7 +143,6 @@
                     inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
                 }
             } catch (error) {
-                console.error('Error checking invitation code:', error);
                 inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Error checking invitation code</span>';
             }
         }
