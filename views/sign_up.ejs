@@ -104,47 +104,44 @@
                 el.style.borderRight = '1px solid rgba(95, 145, 255, 0.3)';
             });
             
-            // ensure hidden e164 is current
-            document.getElementById('create-user-form').addEventListener('submit', function() {
+            // ensure hidden e164 is current and validate invitation code before submit
+            const form = document.getElementById('create-user-form');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
                 updateFullPhone();
-            });
-        }
-    });
-    
-    // Function to check invitation code
-    document.getElementById('invitation_code').addEventListener('blur', async function() {
-        const code = this.value.trim();
-        const inviterInfoDiv = document.getElementById('inviter-info');
-        
-        // Clear previous message
-        inviterInfoDiv.innerHTML = '';
-        
-        if (code) {
-            try {
-                // Show loading message
-                inviterInfoDiv.innerHTML = '<span class="text-muted">Checking invitation code...</span>';
-                
-                // Send request to check invitation code
-                const response = await fetch('/check-invitation-code', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ code })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Show success message with inviter's name
-                    inviterInfoDiv.innerHTML = `<span class="text-success"><i class="fas fa-check-circle me-1"></i> You were invited by <strong>${data.inviterName}</strong></span>`;
-                } else {
-                    // Show error message
-                    inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
+                // client-side phone validation
+                const phoneInput = document.getElementById('phone');
+                if (!iti.isValidNumber()) {
+                    const errorDiv = document.getElementById('phone-error');
+                    errorDiv.style.display = 'block';
+                    phoneInput.setAttribute('aria-invalid', 'true');
+                    return;
                 }
-            } catch (error) {
-                inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Error checking invitation code</span>';
-            }
+                const code = document.getElementById('invitation_code').value.trim();
+                const inviterInfoDiv = document.getElementById('inviter-info');
+                inviterInfoDiv.innerHTML = '';
+                if (code) {
+                    inviterInfoDiv.innerHTML = '<span class="text-muted">Checking invitation code...</span>';
+                    try {
+                        const response = await fetch('/check-invitation-code', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code })
+                        });
+                        const data = await response.json();
+                        if (!data.success) {
+                            inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
+                            return;
+                        }
+                        // valid, allow submit
+                    } catch (err) {
+                        inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Error checking invitation code</span>';
+                        return;
+                    }
+                }
+                // no code or valid, proceed
+                form.submit();
+            });
         }
     });
 </script>

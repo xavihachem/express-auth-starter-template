@@ -17,5 +17,8 @@ const tokenSchema = new mongoose.Schema({
     },
 });
 
+// Ensure one token per user at a time
+tokenSchema.index({ user: 1 }, { unique: true });
+
 const Token = mongoose.model('token', tokenSchema);
 module.exports = Token;

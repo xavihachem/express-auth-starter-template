@@ -12,6 +12,13 @@ const notificationsController = require('../controllers/notifications_controller
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 const Token = require('../models/token');
+const axios = require('axios'); // for SMS sending
+
+// Ensure SMS API key is set
+if (!process.env.EASY_SMS_API_KEY) {
+    console.error('Missing EASY_SMS_API_KEY environment variable');
+    process.exit(1);
+}
 
 // Define routes and their corresponding handlers
 
@@ -79,14 +86,51 @@ router.post('/update-avatar', passport.checkAuthentication, function(req, res, n
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
 router.post('/request-investment-access', passport.checkAuthentication, investmentsController.requestInvestmentAccess); // Request investment access
-// Deposit wallet can only be set by admins now
-router.post('/update-withdraw-wallet', passport.checkAuthentication, investmentsController.updateWithdrawWallet); // Update withdraw wallet
+// Withdraw wallet update protected by phone OTP
+router.post('/update-withdraw-wallet', passport.checkAuthentication, async (req, res) => {
+    // block if wallet already set
+    if (req.user.withdrawWallet) {
+        req.flash('error', 'Withdraw wallet is already set. Contact support to change it.');
+        return res.redirect('/investments');
+    }
+    const userId = req.user._id;
+    // check for existing token in last 10 minutes
+    const ttlDate = new Date(Date.now() - 600000);
+    let record = await Token.findOne({ user: userId, createdAt: { $gt: ttlDate } });
+    let code;
+    if (record) {
+        code = record.token;
+        req.flash('info', 'Reusing existing verification code');
+    } else {
+        code = Math.floor(100000 + Math.random() * 900000).toString();
+        await Token.create({ user: userId, token: code, createdAt: new Date() });
+        // send SMS only when new code
+        try {
+            await axios.post(
+                'https://restapi.easysendsms.app/v1/rest/sms/send',
+                { from: 'Moonify', to: req.user.phoneNumber.replace(/^\+|^00/, ''), text: 'Your wallet verification code is ' + code, type: '0' },
+                { headers: { apikey: process.env.EASY_SMS_API_KEY, 'Content-Type': 'application/json', Accept: 'application/json' } }
+            );
+        } catch (smsError) {
+            console.error('Wallet SMS error:', smsError.response?.status, smsError.response?.data || smsError.message);
+        }
+        req.flash('info', 'Verification code sent to your phone');
+    }
+    console.log('🔒 Wallet OTP for user', userId, ':', code);
+    // stash and redirect to verify page
+    req.session.pendingWithdrawWallet = req.body.withdrawWallet;
+    return res.redirect('/verify-wallet');
+});
 router.post('/request-withdraw', passport.checkAuthentication, investmentsController.requestWithdraw); // Request withdrawal
 router.get('/cancel-withdrawal/:requestId', passport.checkAuthentication, investmentsController.cancelWithdrawal); // Cancel withdrawal request
 
 // Phone verification routes
 router.get('/verify-phone', authController.showPhoneVerificationForm); // Show code entry
 router.post('/verify-phone', authController.handlePhoneVerification); // Process verification
+
+// Wallet verification routes for withdraw wallet update
+router.get('/verify-wallet', passport.checkAuthentication, investmentsController.showWalletVerificationForm);
+router.post('/verify-wallet', passport.checkAuthentication, investmentsController.handleWalletVerification);
 
 // Login with phone verification check
 router.post('/create-session', function(req, res, next) {
@@ -101,16 +145,59 @@ router.post('/create-session', function(req, res, next) {
 }), async function(req, res, next) {
     // At this point passport has set req.user
     if (!req.user.isPhoneVerified) {
-        // generate 6-digit code and store
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        const tempId = req.user._id; // capture before logout
-        await Token.create({ user: tempId, token: code });
+        const tempId = req.user._id;
+        const now = Date.now();
+        const tenMinAgo = new Date(now - 600000);
+        // Atomic upsert: reuse existing token or insert new
+        const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const preRecord = await Token.findOneAndUpdate(
+            { user: tempId, createdAt: { $gt: tenMinAgo } },
+            { $setOnInsert: { user: tempId, token: newCode, createdAt: new Date() } },
+            { new: false, upsert: true }
+        );
+        let code;
+        if (preRecord) {
+            // Existing token found: skip SMS
+            code = preRecord.token;
+            console.log(`🔒 Reusing SMS code for user ${tempId}: ${code}`);
+            req.flash('info', `Your verification code is: ${code}`);
+            return req.logout(function(err) {
+                if (err) return next(err);
+                req.session.tempUserId = tempId;
+                return res.redirect('/verify-phone');
+            });
+        }
+        // New token created: send SMS
+        code = newCode;
         console.log(`🔒 Debug phone verification code for user ${tempId}: ${code}`);
+        try {
+            const smsKey = process.env.EASY_SMS_API_KEY;
+            await axios.post(
+                'https://restapi.easysendsms.app/v1/rest/sms/send',
+                {
+                    from: 'Moonify',
+                    to: req.user.phoneNumber.replace(/^\+|^00/, ''),
+                    text: `Your verification code is ${code}`,
+                    type: '0'
+                },
+                {
+                    headers: {
+                        apikey: smsKey,
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json'
+                    }
+                }
+            );
+        } catch (smsError) {
+            // Log detailed error response from EasySendSMS
+            console.error('Failed to send SMS:', smsError.response?.status, smsError.response?.data || smsError.message);
+            req.flash('error', 'Unable to send SMS; please try again or contact support.');
+            req.flash('info', `Your verification code is: ${code}`);
+        }
         // Logout and redirect to verification page
         return req.logout(function(err) {
             if (err) return next(err);
             req.session.tempUserId = tempId;
-            req.flash('info', 'Verification code sent to your phone');
             return res.redirect('/verify-phone');
         });
     }

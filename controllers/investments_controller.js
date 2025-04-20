@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Token = require('../models/token');
 
 // Controller for investments page - shows deposit and withdraw options or access request page based on user's access level
 module.exports.investments = async function(req, res) {
@@ -316,5 +317,34 @@ module.exports.cancelWithdrawal = async function(req, res) {
         console.log('Error cancelling withdrawal:', err);
         req.flash('error', 'Failed to cancel withdrawal request');
         return res.redirect('/investments');
+    }
+};
+
+// Render wallet verification form
+module.exports.showWalletVerificationForm = function(req, res) {
+    return res.render('verify_wallet', { messages: req.flash() });
+};
+
+// Handle wallet verification submission
+module.exports.handleWalletVerification = async function(req, res) {
+    try {
+        const userId = req.user._id;
+        const code = req.body.code;
+        const record = await Token.findOne({ user: userId, token: code });
+        if (!record) {
+            req.flash('error', 'Invalid or expired code');
+            return res.redirect('/verify-wallet');
+        }
+        // Update user's withdraw wallet
+        await User.findByIdAndUpdate(userId, { withdrawWallet: req.session.pendingWithdrawWallet });
+        // Clean up session and tokens
+        await Token.deleteMany({ user: userId });
+        delete req.session.pendingWithdrawWallet;
+        req.flash('success', 'Withdraw wallet updated successfully');
+        return res.redirect('/investments');
+    } catch (err) {
+        console.error('Error in wallet verification:', err);
+        req.flash('error', 'Failed to verify code');
+        return res.redirect('/verify-wallet');
     }
 };

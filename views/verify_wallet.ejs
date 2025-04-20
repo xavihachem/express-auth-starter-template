@@ -1,0 +1,22 @@
+<% if (messages.error) { %>
+  <div class="text-danger"><%= messages.error %></div>
+<% } %>
+<% if (messages.success) { %>
+  <div class="text-success"><%= messages.success %></div>
+<% } %>
+<% if (messages.info) { %>
+  <div class="text-info"><%= messages.info %></div>
+<% } %>
+
+<h3 class="mb-4 cosmic-title">Verify Wallet Change</h3>
+<form action="/verify-wallet" method="post">
+  <input
+    type="text"
+    name="code"
+    placeholder="Enter verification code"
+    required
+    class="form-control cosmic-input mb-3"
+  />
+  <button type="submit" class="cosmic-btn w-100">Verify</button>
+</form>
+<a href="/investments" class="cosmic-link mt-2 d-block text-center">Back to Investments</a>
