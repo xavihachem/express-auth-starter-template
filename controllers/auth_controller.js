@@ -135,18 +135,19 @@ module.exports.createUser = async function (req, res) {
             }
         }
         
-        // If invitation code is provided, find the inviter and update user data
+        // If invitation code is provided, validate it on server
         if (invitation_code) {
             const inviter = await User.findOne({ userCode: invitation_code });
-            if (inviter) {
-                userData.invitedBy = inviter._id;
-                
-                // Increment the inviter's userInvites count
-                await User.findByIdAndUpdate(
-                    inviter._id,
-                    { $inc: { userInvites: 1 } }
-                );
+            if (!inviter) {
+                req.flash('error', 'Invalid invitation code.');
+                return res.redirect('back');
             }
+            userData.invitedBy = inviter._id;
+            // Increment the inviter's userInvites count
+            await User.findByIdAndUpdate(
+                inviter._id,
+                { $inc: { userInvites: 1 } }
+            );
         }
         
         const newUser = await User.create(userData);

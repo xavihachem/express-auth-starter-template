@@ -169,14 +169,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .animate-fade-in {
+        body.play-animations .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
         
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
+        body.play-animations .delay-1 { animation-delay: 0.1s; }
+        body.play-animations .delay-2 { animation-delay: 0.2s; }
+        body.play-animations .delay-3 { animation-delay: 0.3s; }
+        body.play-animations .delay-4 { animation-delay: 0.4s; }
         
         /* Profile badge */
         .profile-badge {
@@ -297,6 +297,18 @@
                 });
             }
         });
+    </script>
+
+    <!-- Guard animations: only on first load -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!sessionStorage.getItem('firstLoadDone')) {
+            document.body.classList.add('play-animations');
+            sessionStorage.setItem('firstLoadDone', 'true');
+        } else {
+            document.body.classList.remove('play-animations');
+        }
+    });
     </script>
 
     <!-- Insert dynamic CSS -->
