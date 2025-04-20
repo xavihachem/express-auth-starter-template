@@ -346,6 +346,10 @@ module.exports.updatePassword = async function (req, res) {
             req.flash('error', 'Passwords do not match. Please check and try again.');
             return res.redirect('back');
         }
+        if (req.body.new_password.length < 8) {
+            req.flash('error', 'Password must be at least 8 characters long.');
+            return res.redirect('back');
+        }
         let user = await User.findOne({ _id: req.user.id })
             .select('+password')
             .exec();
@@ -477,6 +481,12 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
         // Checking if new password and confirm password fields match.
         if (new_password !== confirm_new_password) {
             req.flash('error', 'Passwords do not match. Please try again.');
+            return res.redirect('back');
+        }
+
+        // Enforce minimum password length
+        if (new_password.length < 8) {
+            req.flash('error', 'Password must be at least 8 characters long.');
             return res.redirect('back');
         }
 

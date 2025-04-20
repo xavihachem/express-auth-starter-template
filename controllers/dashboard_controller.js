@@ -10,13 +10,8 @@ module.exports.dashboard = async function(req, res) {
             return res.redirect('/sign-in');
         }
 
-        // Fetch the complete user data from the database to ensure we have the stored userCode
-        const user = await User.findById(req.user._id);
-        
-        if (!user) {
-            req.flash('error', 'User not found');
-            return res.redirect('/sign-out');
-        }
+        // Retrieve user from session (passport) to avoid extra DB hit
+        const user = req.user;
         
         // If user doesn't have a userCode yet, generate and save one
         if (!user.userCode) {
@@ -672,8 +667,8 @@ module.exports.updateUserPassword = async function(req, res) {
         }
         
         // Validate password strength
-        if (newPassword.length < 6) {
-            req.flash('error', 'Password must be at least 6 characters long');
+        if (newPassword.length < 8) {
+            req.flash('error', 'Password must be at least 8 characters long');
             return res.redirect(`/admin/update-password/${userId}`);
         }
         
