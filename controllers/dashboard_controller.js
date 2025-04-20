@@ -586,6 +586,12 @@ module.exports.changeRole = async function(req, res) {
             req.flash('error', 'User not found');
             return res.redirect('/admin');
         }
+
+        // Prevent self-demotion
+        if (user._id.toString() === req.user._id.toString() && newRole !== 'admin') {
+            req.flash('error', 'You cannot remove your own admin rights');
+            return res.redirect('/admin');
+        }
         
         // Update the user's role
         await User.findByIdAndUpdate(userId, { role: newRole });

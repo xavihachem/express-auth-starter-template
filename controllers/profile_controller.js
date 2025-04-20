@@ -156,17 +156,12 @@ module.exports.updateAvatar = async function(req, res) {
         const user = await User.findById(req.user._id);
         
         if (!user) {
-            // Delete the uploaded file if user not found
-            fs.unlinkSync(req.file.path);
             req.flash('error', 'User not found');
             return res.redirect('/');
         }
         
         // Check if user has changed their avatar in the last week
         if (user.lastAvatarChange && ((new Date() - new Date(user.lastAvatarChange)) / (1000 * 60 * 60 * 24) < 7)) {
-            // Delete the uploaded file since we're not using it
-            fs.unlinkSync(req.file.path);
-            
             const daysLeft = Math.ceil(7 - ((new Date() - new Date(user.lastAvatarChange)) / (1000 * 60 * 60 * 24)));
             req.flash('error', `You can only change your profile picture once every 7 days. Please wait ${daysLeft} more day${daysLeft !== 1 ? 's' : ''}.`);
             return res.redirect('/profile');
