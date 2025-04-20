@@ -17,3 +17,26 @@
   <button type="submit" class="cosmic-btn w-100">Verify</button>
 </form>
 <a href="/sign-in" class="cosmic-link mt-2 d-block text-center">Back to Sign In</a>
+
+<script>
+  (function() {
+    const form = document.querySelector('form[action="/verify-phone"]');
+    if (!form) return;
+    const btn = form.querySelector('button[type="submit"]');
+    const TTL = 600; // seconds
+    form.addEventListener('submit', function() {
+      btn.disabled = true;
+      let remaining = TTL;
+      btn.textContent = 'Retry in ' + Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+      const interval = setInterval(() => {
+        remaining--;
+        btn.textContent = 'Retry in ' + Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+        if (remaining <= 0) {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.textContent = 'Verify';
+        }
+      }, 1000);
+    });
+  })();
+</script>

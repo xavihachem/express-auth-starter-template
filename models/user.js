@@ -123,6 +123,15 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false // Phone verification status
         },
+        // Lockout fields
+        failedLoginAttempts: {
+            type: Number,
+            default: 0
+        },
+        lockUntil: {
+            type: Date,
+            default: null
+        },
     },
     {
         timestamps: true,
@@ -154,6 +163,25 @@ userSchema.statics.changePassword = async function(userId, newPassword) {
     } catch (error) {
         throw error;
     }
+};
+
+// Account lockout virtual & methods
+userSchema.virtual('isLocked').get(function() {
+    return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+userSchema.methods.incrementLoginFailures = async function() {
+    this.failedLoginAttempts++;
+    if (this.failedLoginAttempts >= 5) {
+        this.lockUntil = Date.now() + 30 * 60 * 1000; // 30 min
+    }
+    await this.save();
+};
+
+userSchema.methods.resetLoginFailures = async function() {
+    this.failedLoginAttempts = 0;
+    this.lockUntil = null;
+    await this.save();
 };
 
 const User = mongoose.model('User', userSchema);

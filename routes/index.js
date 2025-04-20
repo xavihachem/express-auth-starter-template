@@ -12,7 +12,9 @@ const notificationsController = require('../controllers/notifications_controller
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 const Token = require('../models/token');
+const OtpToken = require('../models/otpToken');
 const axios = require('axios'); // for SMS sending
+const rateLimit = require('express-rate-limit');
 
 // Ensure SMS API key is set
 if (!process.env.EASY_SMS_API_KEY) {
@@ -86,38 +88,31 @@ router.post('/update-avatar', passport.checkAuthentication, function(req, res, n
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
 router.post('/request-investment-access', passport.checkAuthentication, investmentsController.requestInvestmentAccess); // Request investment access
+// OTP rate limiter: max 3 requests per 15 minutes, skipped in non-production
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  skip: (req, res) => process.env.NODE_ENV !== 'production',
+  message: 'You’ve requested too many OTP requests. Please try again in 15 minutes.'
+});
 // Withdraw wallet update protected by phone OTP
-router.post('/update-withdraw-wallet', passport.checkAuthentication, async (req, res) => {
+router.post('/update-withdraw-wallet', passport.checkAuthentication, otpLimiter, async (req, res) => {
     // block if wallet already set
     if (req.user.withdrawWallet) {
-        req.flash('error', 'Withdraw wallet is already set. Contact support to change it.');
+        req.flash('error', 'Wallet already set.');
         return res.redirect('/investments');
     }
     const userId = req.user._id;
-    // check for existing token in last 10 minutes
-    const ttlDate = new Date(Date.now() - 600000);
-    let record = await Token.findOne({ user: userId, createdAt: { $gt: ttlDate } });
-    let code;
-    if (record) {
-        code = record.token;
-        req.flash('info', 'Reusing existing verification code');
-    } else {
-        code = Math.floor(100000 + Math.random() * 900000).toString();
-        await Token.create({ user: userId, token: code, createdAt: new Date() });
-        // send SMS only when new code
-        try {
-            await axios.post(
-                'https://restapi.easysendsms.app/v1/rest/sms/send',
-                { from: 'Moonify', to: req.user.phoneNumber.replace(/^\+|^00/, ''), text: 'Your wallet verification code is ' + code, type: '0' },
-                { headers: { apikey: process.env.EASY_SMS_API_KEY, 'Content-Type': 'application/json', Accept: 'application/json' } }
-            );
-        } catch (smsError) {
-            console.error('Wallet SMS error:', smsError.response?.status, smsError.response?.data || smsError.message);
-        }
-        req.flash('info', 'Verification code sent to your phone');
+    // Use separate OTP collection for wallet verification
+    const existingW = await OtpToken.findOne({ user: userId });
+    const code = existingW
+        ? existingW.token
+        : Math.floor(100000 + Math.random() * 900000).toString();
+    if (!existingW) {
+        await OtpToken.create({ user: userId, token: code });
     }
-    console.log('🔒 Wallet OTP for user', userId, ':', code);
-    // stash and redirect to verify page
+    console.log(' (Test mode) Wallet OTP for user ' + userId + ': ' + code);
+    req.flash('info', 'Your wallet verification code is: ' + code);
     req.session.pendingWithdrawWallet = req.body.withdrawWallet;
     return res.redirect('/verify-wallet');
 });
@@ -133,7 +128,7 @@ router.get('/verify-wallet', passport.checkAuthentication, investmentsController
 router.post('/verify-wallet', passport.checkAuthentication, investmentsController.handleWalletVerification);
 
 // Login with phone verification check
-router.post('/create-session', function(req, res, next) {
+router.post('/create-session', otpLimiter, function(req, res, next) {
     // Fix the email field if it's an array
     if (Array.isArray(req.body.email)) {
         req.body.email = req.body.email[0]; // Take the first email value
@@ -146,55 +141,16 @@ router.post('/create-session', function(req, res, next) {
     // At this point passport has set req.user
     if (!req.user.isPhoneVerified) {
         const tempId = req.user._id;
-        const now = Date.now();
-        const tenMinAgo = new Date(now - 600000);
-        // Atomic upsert: reuse existing token or insert new
-        const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const preRecord = await Token.findOneAndUpdate(
-            { user: tempId, createdAt: { $gt: tenMinAgo } },
-            { $setOnInsert: { user: tempId, token: newCode, createdAt: new Date() } },
-            { new: false, upsert: true }
-        );
-        let code;
-        if (preRecord) {
-            // Existing token found: skip SMS
-            code = preRecord.token;
-            console.log(`🔒 Reusing SMS code for user ${tempId}: ${code}`);
-            req.flash('info', `Your verification code is: ${code}`);
-            return req.logout(function(err) {
-                if (err) return next(err);
-                req.session.tempUserId = tempId;
-                return res.redirect('/verify-phone');
-            });
+        // Use separate OTP collection for phone verification
+        const existing = await OtpToken.findOne({ user: tempId });
+        const code = existing
+            ? existing.token
+            : Math.floor(100000 + Math.random() * 900000).toString();
+        if (!existing) {
+            await OtpToken.create({ user: tempId, token: code });
         }
-        // New token created: send SMS
-        code = newCode;
-        console.log(`🔒 Debug phone verification code for user ${tempId}: ${code}`);
-        try {
-            const smsKey = process.env.EASY_SMS_API_KEY;
-            await axios.post(
-                'https://restapi.easysendsms.app/v1/rest/sms/send',
-                {
-                    from: 'Moonify',
-                    to: req.user.phoneNumber.replace(/^\+|^00/, ''),
-                    text: `Your verification code is ${code}`,
-                    type: '0'
-                },
-                {
-                    headers: {
-                        apikey: smsKey,
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json'
-                    }
-                }
-            );
-        } catch (smsError) {
-            // Log detailed error response from EasySendSMS
-            console.error('Failed to send SMS:', smsError.response?.status, smsError.response?.data || smsError.message);
-            req.flash('error', 'Unable to send SMS; please try again or contact support.');
-            req.flash('info', `Your verification code is: ${code}`);
-        }
-        // Logout and redirect to verification page
+        console.log(' (Test mode) phone OTP for user ' + tempId + ': ' + code);
+        req.flash('info', 'Your verification code is: ' + code);
         return req.logout(function(err) {
             if (err) return next(err);
             req.session.tempUserId = tempId;

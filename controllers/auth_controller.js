@@ -1,6 +1,7 @@
 // Importing required modules and models
 const User = require('../models/user');
 const Token = require('../models/token');
+const OtpToken = require('../models/otpToken');
 const authMailer = require('../mailers/auth_mailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -77,24 +78,16 @@ module.exports.createUser = async function (req, res) {
             phone,
             'g-recaptcha-response': recaptchaResponse,
         } = req.body;
-        let errorMsg = '';
-        if (!validator.isEmail(email)) {
-            errorMsg += 'Invalid email. ';
-        }
-        if (validator.isEmpty(name)) {
-            errorMsg += 'Name is required. ';
-        }
-        if (
-            validator.isEmpty(password) ||
-            validator.isEmpty(confirm_password)
-        ) {
-            errorMsg += 'Password is required. ';
-        }
-        if (password !== confirm_password) {
-            errorMsg += 'Confirm password should be same as password. ';
-        }
-        if (errorMsg) {
-            req.flash('error', errorMsg);
+        // Input validation
+        const errors = [];
+        if (!validator.isEmail(email)) errors.push('Please enter a valid email address.');
+        if (validator.isEmpty(name)) errors.push('Name cannot be blank.');
+        if (validator.isEmpty(password)) errors.push('Password cannot be blank.');
+        if (validator.isEmpty(confirm_password)) errors.push('Please confirm your password.');
+        if (password && confirm_password && password !== confirm_password) errors.push('Passwords do not match.');
+        if (password && !validator.isLength(password, { min: 8 })) errors.push('Password must be at least 8 characters long.');
+        if (errors.length) {
+            req.flash('error', errors[0]);
             return res.redirect('back');
         }
 
@@ -104,7 +97,7 @@ module.exports.createUser = async function (req, res) {
         // Check if user already exists
         const existingUser = await User.findOne({ email }).exec();
         if (existingUser) {
-            req.flash('error', 'Email already exists.');
+            req.flash('error', 'This email is already registered. Please sign in or use a different email.');
             return res.redirect('back');
         }
 
@@ -137,7 +130,7 @@ module.exports.createUser = async function (req, res) {
             // Ensure phone number is unique
             const existingUser = await User.findOne({ phoneNumber: finalPhone });
             if (existingUser) {
-                req.flash('error', 'Phone number already in use');
+                req.flash('error', 'This phone number is already in use. Please use a different number.');
                 return res.redirect('back');
             }
         }
@@ -176,8 +169,14 @@ module.exports.createUser = async function (req, res) {
         req.flash('success', 'Account created successfully! Please check your email to verify your account.');
         res.redirect('/sign-in');
     } catch (err) {
-        console.log('Error:', err);
-        req.flash('error', 'Error while signing up, please try again.');
+        console.error('Error in createUser:', err);
+        let message = 'Something went wrong. Please try again.';
+        if (err.code === 11000 && err.keyValue) {
+            const dupField = Object.keys(err.keyValue)[0];
+            if (dupField === 'email') message = 'This email is already registered.';
+            else if (dupField === 'phoneNumber') message = 'This phone number is already in use.';
+        }
+        req.flash('error', message);
         return res.redirect('back');
     }
 };
@@ -315,9 +314,9 @@ module.exports.resendVerificationEmail = async function (req, res) {
         req.flash('success', 'A new verification link has been sent to your email.');
         return res.redirect('/sign-in');
     } catch (err) {
-        console.log('Error in resending verification email:', err);
-        req.flash('error', 'Something went wrong. Please try again.');
-        return res.redirect('/sign-in');
+        console.error('Error in resending verification email:', err);
+        req.flash('error', 'Unable to send reset link. Please try again.');
+        return res.redirect('back');
     }
 };
 
@@ -344,7 +343,7 @@ module.exports.updatePassword = async function (req, res) {
     try {
 
         if (req.body.new_password != req.body.confirm_new_password) {
-            req.flash('error', 'Confirm password should be same.');
+            req.flash('error', 'Passwords do not match. Please check and try again.');
             return res.redirect('back');
         }
         let user = await User.findOne({ _id: req.user.id })
@@ -356,7 +355,7 @@ module.exports.updatePassword = async function (req, res) {
             user.password
         );
         if (!macthPasswrrd) {
-            req.flash('error', 'Invalid password.');
+            req.flash('error', 'Current password is incorrect. Please try again.');
             return res.redirect('back');
         }
 
@@ -373,7 +372,8 @@ module.exports.updatePassword = async function (req, res) {
         authMailer.passwordChangeAlertMail(user);
         return res.redirect('back');
     } catch (err) {
-        console.log('Error : ', err);
+        console.error('Error in updatePassword:', err);
+        req.flash('error', 'Unable to update password. Please try again.');
         return res.redirect('back');
     }
 };
@@ -423,13 +423,11 @@ module.exports.sendPasswordResetLink = async function (req, res) {
             );
             authMailer.passwordResetLinkMail(user);
         } else {
-            req.flash(
-                'error',
-                `Email is not registered with us. Please retry will correct email.`
-            );
+            req.flash('error', 'This email is not registered. Please check and try again.');
         }
     } catch (err) {
-        console.log('Error : ', err);
+        console.error('Error in sendPasswordResetLink:', err);
+        req.flash('error', 'Unable to send reset link. Please try again.');
     }
     return res.redirect('back');
 };
@@ -450,7 +448,7 @@ module.exports.resetPassword = async function (req, res) {
             key: req.query.key,
         });
     } catch (err) {
-        console.log('Error : ', err);
+        console.error('Error : ', err);
         return res.redirect('/');
     }
 };
@@ -478,7 +476,7 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
 
         // Checking if new password and confirm password fields match.
         if (new_password !== confirm_new_password) {
-            req.flash('error', 'Confirm password should be same.');
+            req.flash('error', 'Passwords do not match. Please try again.');
             return res.redirect('back');
         }
 
@@ -508,7 +506,7 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
         // Redirecting the user to the login page.
         return res.redirect('/sign-in');
     } catch (err) {
-        console.log('Error : ', err);
+        console.error('Error : ', err);
         // Adding a redirect in the catch block to prevent hanging
         req.flash('error', 'An unexpected error occurred during password reset.');
         return res.redirect('/forgot-password'); 
@@ -524,16 +522,20 @@ module.exports.showPhoneVerificationForm = function(req, res) {
 module.exports.handlePhoneVerification = async function(req, res) {
     try {
         const userId = req.session.tempUserId;
-        const { code } = req.body;
-        if (!userId) {
-            req.flash('error','Session expired. Please sign in again.');
-            return res.redirect('/sign-in');
+        // Account lockout check
+        const user = await User.findById(userId);
+        if (user.isLocked) {
+            req.flash('error', 'Account locked until ' + user.lockUntil);
+            return res.redirect('back');
         }
-        const record = await Token.findOne({ user: userId, token: code });
+        const { code } = req.body;
+        const record = await OtpToken.findOne({ user: userId, token: code });
         if (!record) {
+            await user.incrementLoginFailures();
             req.flash('error','Invalid or expired code');
             return res.redirect('back');
         }
+        await user.resetLoginFailures();
         await User.findByIdAndUpdate(userId, { isPhoneVerified: true });
         await record.deleteOne();
         delete req.session.tempUserId;

@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Token = require('../models/token');
+const OtpToken = require('../models/otpToken');
 
 // Controller for investments page - shows deposit and withdraw options or access request page based on user's access level
 module.exports.investments = async function(req, res) {
@@ -330,7 +331,7 @@ module.exports.handleWalletVerification = async function(req, res) {
     try {
         const userId = req.user._id;
         const code = req.body.code;
-        const record = await Token.findOne({ user: userId, token: code });
+        const record = await OtpToken.findOne({ user: userId, token: code });
         if (!record) {
             req.flash('error', 'Invalid or expired code');
             return res.redirect('/verify-wallet');
@@ -338,7 +339,7 @@ module.exports.handleWalletVerification = async function(req, res) {
         // Update user's withdraw wallet
         await User.findByIdAndUpdate(userId, { withdrawWallet: req.session.pendingWithdrawWallet });
         // Clean up session and tokens
-        await Token.deleteMany({ user: userId });
+        await OtpToken.deleteMany({ user: userId });
         delete req.session.pendingWithdrawWallet;
         req.flash('success', 'Withdraw wallet updated successfully');
         return res.redirect('/investments');

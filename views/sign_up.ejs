@@ -108,6 +108,8 @@
             const form = document.getElementById('create-user-form');
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
                 updateFullPhone();
                 // client-side phone validation
                 const phoneInput = document.getElementById('phone');
@@ -131,11 +133,13 @@
                         const data = await response.json();
                         if (!data.success) {
                             inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
+                            submitBtn.disabled = false;
                             return;
                         }
                         // valid, allow submit
                     } catch (err) {
                         inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Error checking invitation code</span>';
+                        submitBtn.disabled = false;
                         return;
                     }
                 }
