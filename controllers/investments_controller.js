@@ -180,16 +180,18 @@ module.exports.requestWithdraw = async function(req, res) {
             return res.redirect('/investments');
         }
         
-        // Check if user has made a withdrawal request in the last 24 hours
-        const lastWithdrawalRequest = user.withdrawalRequests && user.withdrawalRequests.length > 0 ? 
-            user.withdrawalRequests[user.withdrawalRequests.length - 1] : null;
-            
-        if (lastWithdrawalRequest && 
-            ((new Date() - new Date(lastWithdrawalRequest.requestDate)) / (1000 * 60 * 60) < 24)) {
-            
-            const hoursLeft = Math.ceil(24 - ((new Date() - new Date(lastWithdrawalRequest.requestDate)) / (1000 * 60 * 60)));
-            req.flash('error', `You can only make one withdrawal request per day. Please wait ${hoursLeft} more hour${hoursLeft !== 1 ? 's' : ''}.`);
-            return res.redirect('/investments');
+        // Check if user has made a withdrawal request in the last 4 days (96 hours)
+        const lastWithdrawalRequest = user.withdrawalRequests && user.withdrawalRequests.length > 0
+            ? user.withdrawalRequests[user.withdrawalRequests.length - 1]
+            : null;
+        const THRESHOLD_HOURS = 4 * 24;
+        if (lastWithdrawalRequest) {
+            const hoursSince = (Date.now() - new Date(lastWithdrawalRequest.requestDate)) / (1000 * 60 * 60);
+            if (hoursSince < THRESHOLD_HOURS) {
+                const hoursLeft = Math.ceil(THRESHOLD_HOURS - hoursSince);
+                req.flash('error', `You can only make one withdrawal request every 4 days. Please wait ${hoursLeft} more hour${hoursLeft !== 1 ? 's' : ''}.`);
+                return res.redirect('/investments');
+            }
         }
         
         // Create a new withdrawal request

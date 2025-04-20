@@ -313,6 +313,7 @@
 
     <!-- Insert dynamic CSS -->
     <%- style %>
+    <meta name="csrf-token" content="<%= csrfToken %>">
 </head>
 
 <body>
@@ -601,6 +602,21 @@
     <!-- IntlTelInput JS for phone number input with country codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" referrerpolicy="no-referrer"></script>
-</body>
+    
+    <!-- Auto-inject CSRF token into all POST forms -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('form').forEach(function(form) {
+          if (form.method && form.method.toLowerCase() === 'post') {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = '<%= csrfToken %>';
+            form.prepend(input);
+          }
+        });
+      });
+    </script>
+  </body>
 
 </html>

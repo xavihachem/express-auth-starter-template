@@ -2,6 +2,7 @@
 const express = require('express'); // web application framework for Node.js
 const path = require('path'); // utility module to work with file and directory paths
 const cookieParser = require('cookie-parser'); // middleware to parse cookies
+const csrf = require('csurf'); // CSRF protection middleware
 const session = require('express-session'); // middleware for handling sessions
 const passport = require('passport'); // authentication middleware for Node.js
 const MongoStore = require('connect-mongo'); // MongoDB session store for Express and Connect
@@ -55,6 +56,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Add JSON parsing middleware for API endpoints
 app.use(cookieParser());
 
+// CSRF protection: skip file uploads (multipart/form-data)
+const csrfProtection = csrf({ cookie: true });
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.is('multipart/form-data')) {
+    return next();
+  }
+  csrfProtection(req, res, next);
+});
+// Expose CSRF token to views if available
+app.use((req, res, next) => {
+  if (typeof req.csrfToken === 'function') {
+    res.locals.csrfToken = req.csrfToken();
+  }
+  next();
+});
+
 // Use middleware to serve static files
 app.use(express.static('assets'));
 app.use(express.static('public')); // Serve files from public directory for uploads
@@ -71,6 +88,20 @@ challengesController.initializeChallenges();
 
 // Use routes
 app.use('/', require('./routes'));
+
+// Global CSRF error handler
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    // AJAX requests get JSON error
+    if (req.xhr || req.headers.accept.includes('json')) {
+      return res.status(403).json({ success: false, message: 'Invalid CSRF token' });
+    }
+    // Fallback for non-AJAX
+    req.flash('error', 'Session expired. Please try again.');
+    return res.redirect('back');
+  }
+  next(err);
+});
 
 app.listen(process.env.PORT, (err) => {
     if (err) {

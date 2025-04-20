@@ -64,6 +64,7 @@ router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ra
 // Notifications routes - only accessible by authenticated users
 router.get('/notifications', passport.checkAuthentication, notificationsController.notifications); // Notifications page
 router.post('/mark-notifications-read', passport.checkAuthentication, notificationsController.markAllAsRead); // Mark all notifications as read
+router.post('/ajax/mark-notifications-read', passport.checkAuthentication, notificationsController.markAllAsRead); // AJAX endpoint to mark all notifications as read
 
 // Import multer for file uploads
 const upload = require('../config/multer');

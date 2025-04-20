@@ -3,17 +3,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 // Set storage engine
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, path.join(__dirname, '../public/uploads/avatars'));
-    },
-    filename: function(req, file, cb) {
-        // Create a unique filename with original extension
-        const fileExt = path.extname(file.originalname);
-        const fileName = `${uuidv4()}${fileExt}`;
-        cb(null, fileName);
-    }
-});
+const storage = multer.memoryStorage();
 
 // Check file type
 function checkFileType(file, cb) {

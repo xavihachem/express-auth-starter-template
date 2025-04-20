@@ -2,6 +2,7 @@ const User = require('../models/user');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Determines user rank based on challenge points
@@ -174,14 +175,13 @@ module.exports.updateAvatar = async function(req, res) {
         // Process the image - crop to square and resize
         const { cropX, cropY, cropWidth, cropHeight } = req.body;
         
-        // Create output filename (processed version)
-        const filename = path.basename(req.file.filename, path.extname(req.file.filename));
-        const outputFilename = `${filename}-processed.jpg`;
+        // Generate unique output filename
+        const outputFilename = `${uuidv4()}.jpg`;
         const outputPath = path.join('public/uploads/avatars', outputFilename);
         const fullOutputPath = path.join(__dirname, '..', outputPath);
         
-        // Use sharp to process the image
-        await sharp(req.file.path)
+        // Use sharp to process the image from memory buffer
+        await sharp(req.file.buffer)
             .extract({
                 left: parseInt(cropX) || 0,
                 top: parseInt(cropY) || 0,
@@ -192,14 +192,6 @@ module.exports.updateAvatar = async function(req, res) {
             .jpeg({ quality: 90 })
             .toFile(fullOutputPath);
             
-        // Delete the original uploaded file with error handling
-        try {
-            fs.unlinkSync(req.file.path);
-        } catch (err) {
-            console.log('Warning: Could not delete original file:', err.message);
-            // Continue processing even if we can't delete the original file
-        }
-        
         // If user already had an avatar, delete the old one
         if (user.avatar) {
             try {
