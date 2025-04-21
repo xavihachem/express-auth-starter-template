@@ -1,20 +1,37 @@
 <style>
-  /* Notifications page custom card sizing */
+  /* Mobile-first approach for notifications */
   .notifications-card {
-    width: 95% !important;
-    max-width: 100% !important;
-    height: 80vh !important;
-    margin: 0 auto !important;
+    width: 100%;
+    border-radius: 1rem;
+    margin-bottom: 20px;
   }
-  .notifications-card .card-body {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    max-height: 75vh !important;
+  
+  /* Fix for scrolling container */
+  .notification-scroll-container {
+    height: 400px; /* Fixed height for mobile */
+    overflow-y: scroll; /* Always show scroll */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    overscroll-behavior: contain; /* Prevent scroll chaining */
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
-  @media (max-width: 991px) {
+  
+  /* Make list items more touch-friendly */
+  .notification-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  /* Desktop adjustments */
+  @media (min-width: 992px) {
     .notifications-card {
-      width: 100% !important;
-      height: 75vh !important;
+      width: 95%;
+      max-width: 100%;
+      margin: 0 auto 30px auto;
+    }
+    
+    .notification-scroll-container {
+      height: 500px; /* Taller on desktop */
     }
   }
 </style>
@@ -37,11 +54,12 @@
                     </button>
                 </div>
                 <div class="card-body p-0">
+                    <div class="notification-scroll-container">
                     <div class="list-group list-group-flush" id="notificationsList">
                         <% if (notifications && notifications.items && notifications.items.length > 0) { %>
                             <% notifications.items.forEach(function(notification) { %>
                                 <!-- Notification Item -->
-                                <div class="list-group-item border-0 border-bottom <%= notification.read ? 'text-muted bg-light' : '' %>" data-id="<%= notification.id %>">
+                                <div class="list-group-item notification-item border-0 <%= notification.read ? 'text-muted bg-light' : '' %>" data-id="<%= notification.id %>">
                                     <div class="d-flex">
                                         <div class="rounded-circle bg-<%= notification.bgColor %> p-2 me-3 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-<%= notification.icon %>"></i>
@@ -61,6 +79,7 @@
                                 <p class="mb-0 text-muted">No notifications to display</p>
                             </div>
                         <% } %>
+                    </div>
                     </div>
                 </div>
                 <div class="card-footer text-center bg-light">
