@@ -167,11 +167,14 @@
             .dashboard-main-card .card .card-body {
                 overflow: hidden !important;
             }
-            /* Rankings page mobile: reduced further */
-            .rankings-page .rankings-card { min-height: 50vh !important; }
-            .rankings-page .p-3.border.rounded.bg-light {
-                min-height: 30vh !important;
-                max-height: 30vh !important;
+            /* Rankings page mobile: enable scroll for Available Ranks */
+            .rankings-page .col-md-7 .rankings-card {
+                display: flex !important;
+                flex-direction: column !important;
+                height: 60vh !important;
+            }
+            .rankings-page .col-md-7 .rankings-card .card-body {
+                flex: 1 1 auto !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
             }
