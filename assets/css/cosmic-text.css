@@ -1,0 +1,58 @@
+/* Cosmic theme text colors */
+body.platform {
+    color: #E0E0FF !important; /* Brighter, more readable light text */
+}
+
+body.platform h1, 
+body.platform h2, 
+body.platform h3, 
+body.platform h4, 
+body.platform h5, 
+body.platform h6 {
+    color: #FFFFFF !important; /* Bright white for headings */
+}
+
+body.platform .text-muted {
+    color: #B0BEC5 !important; /* Light gray with blue tint for muted text */
+}
+
+body.platform .card-header {
+    color: #FFFFFF !important;
+}
+
+/* Interactive elements */
+body.platform .btn-primary {
+    background-color: #7B9CFF !important;
+    border-color: #7B9CFF !important;
+    color: #0D192A !important;
+}
+
+body.platform .btn-outline-primary {
+    border-color: #7B9CFF !important;
+    color: #7B9CFF !important;
+}
+
+body.platform .btn-outline-primary:hover {
+    background-color: rgba(123, 156, 255, 0.1) !important;
+}
+
+/* Accent elements */
+body.platform .badge {
+    background-color: #5E72EB !important;
+}
+
+body.platform .badge.bg-warning,
+body.platform .badge.bg-danger {
+    background-color: #FFD54F !important;
+    color: #0D192A !important;
+}
+
+/* Links */
+body.platform a:not(.btn):not(.nav-link) {
+    color: #7B9CFF !important;
+    text-decoration: none;
+}
+
+body.platform a:not(.btn):not(.nav-link):hover {
+    text-decoration: underline;
+}
