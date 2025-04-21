@@ -31,6 +31,23 @@
     
     <!-- Custom styles for modern UI with animations -->
     <style>
+        /* Logo styling */
+        .navbar-logo-container {
+            display: inline-block;
+            position: relative;
+            height: 50px;
+            overflow: visible;
+        }
+        
+        .navbar-logo {
+            height: 85px;
+            width: auto;
+            position: absolute;
+            top: -10px; /* Push logo above the navbar top edge */
+            left: -70px; /* Push logo much further left */
+            object-fit: contain;
+        }
+        
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
@@ -490,7 +507,9 @@
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
             <a class="navbar-brand animate-fade-in" href="/">
-                <i class="fas fa-shield-alt me-2"></i>Express Auth
+                <div class="navbar-logo-container">
+                    <img src="/css/images/Moonify1.png" alt="Moonify Logo" class="navbar-logo">
+                </div>
             </a>
             
             <!-- Mobile-visible user controls - Only visible on small screens -->
