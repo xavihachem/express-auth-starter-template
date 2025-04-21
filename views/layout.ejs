@@ -167,9 +167,14 @@
             .dashboard-main-card .card .card-body {
                 overflow: hidden !important;
             }
-            /* Rankings page mobile: extra tall cards */
-            .rankings-page .rankings-card { min-height: 120vh !important; }
-            .rankings-page .p-3.border.rounded.bg-light { min-height: 100vh !important; }
+            /* Rankings page mobile: reduced further */
+            .rankings-page .rankings-card { min-height: 50vh !important; }
+            .rankings-page .p-3.border.rounded.bg-light {
+                min-height: 30vh !important;
+                max-height: 30vh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
         }
         
         /* Reduce nested cards inside the glass card */
