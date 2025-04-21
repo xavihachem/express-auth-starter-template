@@ -626,6 +626,11 @@
                             <i class="fas fa-medal me-2"></i>Rankings
                         </a>
                     </li>
+                    <li class="nav-item animate-fade-in delay-5">
+                        <a class="nav-link" href="/offers">
+                            <i class="fas fa-gem me-2"></i>VIP Offers
+                        </a>
+                    </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
                     <!-- Admin Dashboard link only visible to admin users -->
                     <li class="nav-item animate-fade-in delay-4">
@@ -743,15 +748,16 @@
     </section>
     <% } else { %>
     <!-- Original section for ALL other pages (unchanged) -->
-    <section class="vh-100" style="<%= !locals.user ? 'background-color: #508bfc;' : '' %>">
-        <div class="container py-5 h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
+    <section class="min-vh-100" style="<%= !locals.user ? 'background-color: #508bfc;' : '' %>">
+        <div class="container py-5">
+            <div class="row d-flex justify-content-center">
                 <div class="col-12 <%= locals.user ? 'col-lg-10' : 'col-md-8 col-lg-6 col-xl-5' %>">
                     <div class="card shadow-2-strong dashboard-main-card" style="border-radius: 1rem;">
                         <div class="card-body p-5 <%= !locals.user ? 'text-center' : '' %>">
                             <%- body %>
                         </div>
                     </div>
+                    <div class="mb-5"></div><!-- Extra space at the bottom for better scrolling -->
                 </div>
             </div>
         </div>

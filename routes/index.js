@@ -9,6 +9,7 @@ const challengesController = require('../controllers/challenges_controller');
 const ranksController = require('../controllers/ranks_controller');
 const profileController = require('../controllers/profile_controller');
 const notificationsController = require('../controllers/notifications_controller');
+const offersController = require('../controllers/offers_controller');
 const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 const Token = require('../models/token');
@@ -53,6 +54,9 @@ router.post('/admin/update-password', passport.checkAuthentication, roleMiddlewa
 
 // Team page route - only accessible by authenticated users
 router.get('/team', passport.checkAuthentication, teamController.team); // Team page
+
+// Offers page route - accessible by all users
+router.get('/offers', offersController.offers); // Offers page
 
 // Challenges routes - only accessible by authenticated users
 router.get('/challenges', passport.checkAuthentication, challengesController.challenges); // Challenges page
