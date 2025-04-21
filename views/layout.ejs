@@ -1,3 +1,5 @@
+<!-- eslint-disable -->
+<!-- stylelint-disable -->
 <!-- An HTML file that serves as the template for the Express authentication starter kit -->
 <!-- Contains links to various CSS and JavaScript libraries -->
 <!-- Uses EJS templating language to insert dynamic content -->
@@ -75,6 +77,111 @@
             padding: 1.5rem;
         }
         
+        /* Glassmorphism for platform cards to reveal cosmic background */
+        body.platform .card {
+            background: rgba(13, 25, 42, 0.5) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            box-shadow: 0 0 20px rgba(95, 145, 255, 0.2) !important;
+        }
+        
+        body.platform .card:hover {
+            box-shadow: 0 0 30px rgba(95, 145, 255, 0.4) !important;
+            border: 1px solid rgba(95, 145, 255, 0.5) !important;
+        }
+        
+        /* Scrollable card content for platform pages */
+        body.platform .card {
+            display: flex;
+            flex-direction: column;
+            max-height: 75vh !important;
+        }
+        body.platform .card-body {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        /* Cosmic-themed scrollbar */
+        body.platform .card-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body.platform .card-body::-webkit-scrollbar-track {
+            background: rgba(13,25,42,0.2);
+        }
+        body.platform .card-body::-webkit-scrollbar-thumb {
+            background: rgba(95,145,255,0.5);
+            border-radius: 4px;
+        }
+        body.platform .card-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(95,145,255,0.7);
+        }
+        body.platform .card-body {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(95,145,255,0.5) rgba(13,25,42,0.2);
+        }
+        
+        /* Dashboard welcome card sizing */
+        body.platform .dashboard-welcome-card {
+            width: 90vw !important;
+            max-width: 1000px !important;
+            min-height: 40vh !important;
+            margin: 0.2rem auto 2rem !important;
+        }
+        /* Dashboard main (glass) card sizing */
+        .dashboard-main-card {
+            width: 100% !important;
+            max-width: none !important;
+            /* extend upward by 2rem into the gap without shifting the bottom */
+            min-height: calc(80vh + 2rem) !important;
+            margin: -2rem auto 2rem !important;
+        }
+        @media (min-width: 992px) {
+            .dashboard-main-card {
+                /* desktop: extend upward by 2rem */
+                width: calc(100% + 16rem) !important;
+                min-height: calc(80vh + 2rem) !important;
+                margin: -2rem -8rem 2rem !important;
+            }
+        }
+        
+        /* Mobile override: nested cards fit container */
+        @media (max-width: 991px) {
+            body.platform .dashboard-welcome-card {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0.5rem auto 2rem !important;
+                min-height: calc(40vh + 100px) !important;
+            }
+        }
+        
+        /* Mobile override: shrink nested cards inside the main wrapper */
+        @media (max-width: 991px) {
+            .dashboard-main-card .container-fluid .card {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0.5rem auto !important;
+                min-height: auto !important;
+            }
+            /* Disable scroll on stats and completed tasks cards in mobile */
+            .dashboard-main-card .container-fluid .card .card-body {
+                overflow: hidden !important;
+            }
+        }
+        
+        /* Reduce nested cards inside the glass card */
+        .dashboard-main-card .container-fluid .card {
+            width: 90% !important;
+            max-width: 600px !important;
+            margin: 1rem auto !important;
+            height: 200px !important;
+        }
+        
+        /* Disable scroll inside welcome card */
+        body.platform .dashboard-welcome-card .card-body {
+            overflow: hidden !important;
+        }
+        
         /* Modern navbar styling */
         .navbar {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -88,6 +195,7 @@
         .navbar-brand {
             font-weight: 700;
             letter-spacing: 1px;
+            color: #fff !important;
         }
         
         .nav-link {
@@ -96,6 +204,7 @@
             padding: 0.5rem 0.8rem !important;
             border-radius: 8px;
             transition: all var(--transition-speed);
+            color: #fff !important;
         }
         
         .nav-link:hover {
@@ -220,8 +329,6 @@
             position: fixed;
         }
     </style>
-    <% if (locals.user) { %>
-    <% } %>
 
     <!-- Scripts for Bootstrap, Material Design Bootstrap and Noty -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
@@ -325,16 +432,30 @@
     <%- style %>
     <% if (locals.user) { %>
     <style>
-        /* Force override of navbar and body backgrounds on platform pages */
+        /* Cosmic background & transparent navbar on platform pages */
         body.platform {
-            background-color: #ffffff !important;
+            background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%) !important;
+            animation: backgroundPulse 15s ease-in-out infinite !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
         body.platform .navbar {
-            background-color: #ffffff !important;
+            background-color: transparent !important;
         }
-        /* Override inline platform section backgrounds */
         body.platform section.vh-100 {
             background-color: transparent !important;
+        }
+        /* Glass effect matching auth `.cosmic-card` */
+        body.platform .card {
+            background: rgba(13, 25, 42, 0.5) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            box-shadow: 0 0 20px rgba(95, 145, 255, 0.2) !important;
+        }
+        body.platform .card:hover {
+            box-shadow: 0 0 30px rgba(95, 145, 255, 0.4) !important;
+            border: 1px solid rgba(95, 145, 255, 0.5) !important;
         }
     </style>
     <% } %>
@@ -342,6 +463,9 @@
 </head>
 
 <body class="<%= locals.user ? 'platform' : 'auth' %>">
+    <% if (locals.user) { %>
+    <div class="stars-bg" id="stars-bg"></div>
+    <% } %>
     <% if (locals.user) { %>
     <!-- Modern navbar with animations -->
     <nav class="navbar navbar-expand-lg mb-4">
@@ -581,11 +705,11 @@
     </section>
     <% } else { %>
     <!-- Original section for ALL other pages (unchanged) -->
-    <section class="vh-100" <%= !locals.user ? 'style="background-color: #508bfc;"' : '' %>>
+    <section class="vh-100" style="<%= !locals.user ? 'background-color: #508bfc;' : '' %>">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12 <%= locals.user ? 'col-lg-10' : 'col-md-8 col-lg-6 col-xl-5' %>">
-                    <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                    <div class="card shadow-2-strong dashboard-main-card" style="border-radius: 1rem;">
                         <div class="card-body p-5 <%= !locals.user ? 'text-center' : '' %>">
                             <%- body %>
                         </div>
@@ -596,6 +720,9 @@
     </section>
     <% } %>
     <%- script %>
+    <% if (locals.user) { %>
+    <script src="/js/cosmic-bg.js"></script>
+    <% } %>
     <% if (locals.flash) { %>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

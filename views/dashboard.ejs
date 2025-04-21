@@ -8,7 +8,7 @@
     <!-- Welcome Card with Glass Morphism -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card animate-fade-in delay-1">
+            <div class="card dashboard-welcome-card animate-fade-in delay-1">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <div class="rounded-circle me-3 overflow-hidden" style="width: 64px; height: 64px;">
@@ -21,15 +21,14 @@
                             <% } %>
                         </div>
                         <div>
-                            <h4 class="mb-0">Welcome back, <%= locals.user.name %>!</h4>
-                            <p class="text-muted mb-0">Last login: <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+                            <h4 class="mb-0" style="font-size:18px;">Welcome back, <%= locals.user.name %>!</h4>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-12 text-center">
-                            <p class="mb-3">Welcome to your dashboard! Here you can see your stats and access quick actions.</p>
+                            <p class="mb-3 d-none d-lg-block">Welcome to your dashboard! Here you can see your stats and access quick actions</p>
                             <a href="/profile" class="btn btn-primary">
                                 <i class="fas fa-user-circle me-2"></i>View Your Profile
                             </a>
