@@ -21,6 +21,14 @@
         padding: 0.75rem !important;
         vertical-align: middle !important;
     }
+    
+    /* Constrain admin panel container on desktop to avoid edge overflow */
+    @media (min-width: 992px) {
+        .dashboard-main-card {
+            width: 100% !important;
+            margin: -2rem auto 2rem !important;
+        }
+    }
 </style>
 
 <div class="card mb-4 shadow-sm">
