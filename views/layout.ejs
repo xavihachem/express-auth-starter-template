@@ -157,20 +157,23 @@
         
         /* Mobile override: shrink nested cards inside the main wrapper */
         @media (max-width: 991px) {
-            .dashboard-main-card .container-fluid .card {
+            .dashboard-main-card .container-fluid .card:not(.rankings-card) {
                 width: 100% !important;
                 max-width: none !important;
                 margin: 0.5rem auto !important;
                 min-height: auto !important;
             }
             /* Disable scroll on stats and completed tasks cards in mobile */
-            .dashboard-main-card .container-fluid .card .card-body {
+            .dashboard-main-card .card .card-body {
                 overflow: hidden !important;
             }
+            /* Rankings page mobile: extra tall cards */
+            .rankings-page .rankings-card { min-height: 120vh !important; }
+            .rankings-page .p-3.border.rounded.bg-light { min-height: 100vh !important; }
         }
         
         /* Reduce nested cards inside the glass card */
-        .dashboard-main-card .container-fluid .card {
+        .dashboard-main-card .container-fluid .card:not(.rankings-card) {
             width: 90% !important;
             max-width: 600px !important;
             margin: 1rem auto !important;
@@ -180,6 +183,12 @@
         /* Disable scroll inside welcome card */
         body.platform .dashboard-welcome-card .card-body {
             overflow: hidden !important;
+        }
+        
+        @media (min-width: 992px) {
+            /* Rankings page: desktop card heights */
+            .rankings-page .rankings-card { min-height: 450px !important; }
+            .rankings-page .p-3.border.rounded.bg-light { min-height: 300px !important; }
         }
         
         /* Modern navbar styling */

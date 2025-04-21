@@ -1,73 +1,75 @@
-<div class="container-fluid animate-fade-in">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="mb-4 animate-fade-in"><i class="fas fa-trophy me-2"></i>User Rankings</h3>
+<div class="container rankings-page">
+    <div class="container-fluid animate-fade-in">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="mb-4 animate-fade-in"><i class="fas fa-trophy me-2"></i>User Rankings</h3>
+            </div>
         </div>
-    </div>
 
-    <!-- User Rank Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card animate-fade-in delay-1">
-                <div class="card-header">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-warning p-3 me-3 text-white">
-                            <i class="fas fa-medal fa-2x"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">Your Current Rank</h4>
-                            <p class="text-muted mb-0">Based on your challenge points</p>
+        <!-- User Rank Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card animate-fade-in delay-1 rankings-card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-warning p-3 me-3 text-white">
+                                <i class="fas fa-medal fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Your Current Rank</h4>
+                                <p class="text-muted mb-0">Based on your challenge points</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 text-center">
-                            <div class="display-1 fw-bold text-warning"><%= currentUserRank %></div>
-                            <p class="text-muted">Your position out of all users</p>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column">
-                                <div class="mb-3">
-                                    <p class="text-muted mb-1">Your Points</p>
-                                    <h3 class="mb-0"><%= locals.user.challengePoints || 0 %> <small class="text-muted">pts</small></h3>
-                                </div>
-                                <div>
-                                    <p class="mb-2">Points needed for next rank:</p>
-                                    <% 
-                                        // Find the user with rank above current user
-                                        const nextRankUser = users.find(function(user, index) { 
-                                            return index === currentUserRank - 2; 
-                                        });
-                                        const pointsNeeded = nextRankUser ? nextRankUser.challengePoints - locals.user.challengePoints : 0;
-                                    %>
-                                    <% if (currentUserRank === 1) { %>
-                                        <div class="alert alert-success">
-                                            <i class="fas fa-crown me-2"></i> Congratulations! You're at the top rank!
-                                        </div>
-                                    <% } else if (pointsNeeded > 0) { %>
-                                        <div class="progress" style="height: 10px;">
-                                            <% 
-                                                var progressPercent = 0;
-                                                if (locals.user.challengePoints > 0 || pointsNeeded > 0) {
-                                                    progressPercent = Math.min(100, (locals.user.challengePoints / (locals.user.challengePoints + pointsNeeded)) * 100);
-                                                }
-                                            %>
-                                            <div class="progress-bar bg-warning" role="progressbar" 
-                                                style="width: <%= progressPercent %>%;" 
-                                                aria-valuenow="<%= progressPercent %>" 
-                                                aria-valuemin="0" 
-                                                aria-valuemax="100"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between mt-1">
-                                            <small class="text-muted">Need <span class="fw-bold text-warning"><%= pointsNeeded %></span> more points</small>
-                                            <small class="text-muted">Next rank: #<%= currentUserRank - 1 %></small>
-                                        </div>
-                                    <% } else { %>
-                                        <div class="alert alert-info">
-                                            <i class="fas fa-info-circle me-2"></i> Complete more challenges to improve your rank!
-                                        </div>
-                                    <% } %>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-center">
+                                <div class="display-1 fw-bold text-warning"><%= currentUserRank %></div>
+                                <p class="text-muted">Your position out of all users</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column">
+                                    <div class="mb-3">
+                                        <p class="text-muted mb-1">Your Points</p>
+                                        <h3 class="mb-0"><%= locals.user.challengePoints || 0 %> <small class="text-muted">pts</small></h3>
+                                    </div>
+                                    <div>
+                                        <p class="mb-2">Points needed for next rank:</p>
+                                        <% 
+                                            // Find the user with rank above current user
+                                            const nextRankUser = users.find(function(user, index) { 
+                                                return index === currentUserRank - 2; 
+                                            });
+                                            const pointsNeeded = nextRankUser ? nextRankUser.challengePoints - locals.user.challengePoints : 0;
+                                        %>
+                                        <% if (currentUserRank === 1) { %>
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-crown me-2"></i> Congratulations! You're at the top rank!
+                                            </div>
+                                        <% } else if (pointsNeeded > 0) { %>
+                                            <div class="progress" style="height: 10px;">
+                                                <% 
+                                                    var progressPercent = 0;
+                                                    if (locals.user.challengePoints > 0 || pointsNeeded > 0) {
+                                                        progressPercent = Math.min(100, (locals.user.challengePoints / (locals.user.challengePoints + pointsNeeded)) * 100);
+                                                    }
+                                                %>
+                                                <div class="progress-bar bg-warning" role="progressbar" 
+                                                    style="width: <%= progressPercent %>%;" 
+                                                    aria-valuenow="<%= progressPercent %>" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-1">
+                                                <small class="text-muted">Need <span class="fw-bold text-warning"><%= pointsNeeded %></span> more points</small>
+                                                <small class="text-muted">Next rank: #<%= currentUserRank - 1 %></small>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i> Complete more challenges to improve your rank!
+                                            </div>
+                                        <% } %>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -75,160 +77,160 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Two Column Layout for Ranks and Leaderboard -->
-    <div class="row">
-        <!-- Available Ranks on Left -->
-        <div class="col-md-7">
-            <div class="card animate-fade-in delay-2">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-award me-2"></i>Available Ranks</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="p-3 border rounded bg-light">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rounded-circle bg-warning p-2 me-2 text-white">
-                                        <i class="fas fa-crown"></i>
+        <!-- Two Column Layout for Ranks and Leaderboard -->
+        <div class="row">
+            <!-- Available Ranks on Left -->
+            <div class="col-md-7">
+                <div class="card animate-fade-in delay-2 rankings-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-award me-2"></i>Available Ranks</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-warning p-2 me-2 text-white">
+                                            <i class="fas fa-crown"></i>
+                                        </div>
+                                        <h5 class="mb-0">Legend</h5>
                                     </div>
-                                    <h5 class="mb-0">Legend</h5>
+                                    <p class="small mb-2">Top player with highest points</p>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-warning" style="width: 100%"></div>
+                                    </div>
+                                    <p class="small text-muted mt-1">500+ points</p>
                                 </div>
-                                <p class="small mb-2">Top player with highest points</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar bg-warning" style="width: 100%"></div>
-                                </div>
-                                <p class="small text-muted mt-1">500+ points</p>
                             </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="p-3 border rounded bg-light">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rounded-circle bg-info p-2 me-2 text-white">
-                                        <i class="fas fa-star"></i>
+                            <div class="col-md-6 mb-4">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-info p-2 me-2 text-white">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <h5 class="mb-0">Master</h5>
                                     </div>
-                                    <h5 class="mb-0">Master</h5>
+                                    <p class="small mb-2">Elite players with exceptional skill</p>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-info" style="width: 80%"></div>
+                                    </div>
+                                    <p class="small text-muted mt-1">300-499 points</p>
                                 </div>
-                                <p class="small mb-2">Elite players with exceptional skill</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar bg-info" style="width: 80%"></div>
-                                </div>
-                                <p class="small text-muted mt-1">300-499 points</p>
                             </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="p-3 border rounded bg-light">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rounded-circle bg-primary p-2 me-2 text-white">
-                                        <i class="fas fa-medal"></i>
+                            <div class="col-md-6 mb-4">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-primary p-2 me-2 text-white">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <h5 class="mb-0">Expert</h5>
                                     </div>
-                                    <h5 class="mb-0">Expert</h5>
+                                    <p class="small mb-2">Highly skilled and experienced players</p>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-primary" style="width: 60%"></div>
+                                    </div>
+                                    <p class="small text-muted mt-1">150-299 points</p>
                                 </div>
-                                <p class="small mb-2">Highly skilled and experienced players</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar bg-primary" style="width: 60%"></div>
-                                </div>
-                                <p class="small text-muted mt-1">150-299 points</p>
                             </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="p-3 border rounded bg-light">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rounded-circle bg-success p-2 me-2 text-white">
-                                        <i class="fas fa-award"></i>
+                            <div class="col-md-6 mb-4">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-success p-2 me-2 text-white">
+                                            <i class="fas fa-award"></i>
+                                        </div>
+                                        <h5 class="mb-0">Intermediate</h5>
                                     </div>
-                                    <h5 class="mb-0">Intermediate</h5>
+                                    <p class="small mb-2">Players with good knowledge and skills</p>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-success" style="width: 40%"></div>
+                                    </div>
+                                    <p class="small text-muted mt-1">50-149 points</p>
                                 </div>
-                                <p class="small mb-2">Players with good knowledge and skills</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar bg-success" style="width: 40%"></div>
-                                </div>
-                                <p class="small text-muted mt-1">50-149 points</p>
                             </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="p-3 border rounded bg-light">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rounded-circle bg-secondary p-2 me-2 text-white">
-                                        <i class="fas fa-user"></i>
+                            <div class="col-md-6 mb-4">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-secondary p-2 me-2 text-white">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <h5 class="mb-0">Beginner</h5>
                                     </div>
-                                    <h5 class="mb-0">Beginner</h5>
+                                    <p class="small mb-2">New players starting their journey</p>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-secondary" style="width: 20%"></div>
+                                    </div>
+                                    <p class="small text-muted mt-1">0-49 points</p>
                                 </div>
-                                <p class="small mb-2">New players starting their journey</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar bg-secondary" style="width: 20%"></div>
-                                </div>
-                                <p class="small text-muted mt-1">0-49 points</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Top 5 Leaderboard on Right -->
-        <div class="col-md-5">
-            <div class="card animate-fade-in delay-2">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top 5 Leaderboard</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <% users.slice(0, 5).forEach((user, index) => { %>
-                            <div class="list-group-item <%= user._id.toString() === locals.user._id.toString() ? 'list-group-item-warning' : '' %>">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="position-relative me-3">
-                                            <!-- User Avatar -->
-                                            <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
-                                                <% if (user.avatar) { %>
-                                                <img src="<%= user.avatar %>" alt="<%= user.name %>" class="w-100 h-100" style="object-fit: cover;">
+            
+            <!-- Top 5 Leaderboard on Right -->
+            <div class="col-md-5">
+                <div class="card animate-fade-in delay-2 rankings-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top 5 Leaderboard</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <% users.slice(0, 5).forEach((user, index) => { %>
+                                <div class="list-group-item <%= user._id.toString() === locals.user._id.toString() ? 'list-group-item-warning' : '' %>">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <!-- User Avatar -->
+                                                <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
+                                                    <% if (user.avatar) { %>
+                                                    <img src="<%= user.avatar %>" alt="<%= user.name %>" class="w-100 h-100" style="object-fit: cover;">
+                                                    <% } else { %>
+                                                    <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                                
+                                                <!-- Rank Badge -->
+                                                <% if (index === 0) { %>
+                                                <div class="position-absolute bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
+                                                    <i class="fas fa-crown fa-xs text-white"></i>
+                                                </div>
+                                                <% } else if (index === 1) { %>
+                                                <div class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
+                                                    <i class="fas fa-medal fa-xs text-white"></i>
+                                                </div>
+                                                <% } else if (index === 2) { %>
+                                                <div class="position-absolute bg-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
+                                                    <i class="fas fa-medal fa-xs text-white"></i>
+                                                </div>
                                                 <% } else { %>
-                                                <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                                    <i class="fas fa-user"></i>
+                                                <div class="position-absolute bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
+                                                    <span class="small text-dark" style="font-size: 10px;"><%= index + 1 %></span>
                                                 </div>
                                                 <% } %>
                                             </div>
-                                            
-                                            <!-- Rank Badge -->
-                                            <% if (index === 0) { %>
-                                            <div class="position-absolute bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
-                                                <i class="fas fa-crown fa-xs text-white"></i>
+                                            <div>
+                                                <h6 class="mb-0">
+                                                    <%= user.name %>
+                                                    <% if (user._id.toString() === locals.user._id.toString()) { %>
+                                                        <span class="badge bg-primary ms-2">You</span>
+                                                    <% } %>
+                                                </h6>
                                             </div>
-                                            <% } else if (index === 1) { %>
-                                            <div class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
-                                                <i class="fas fa-medal fa-xs text-white"></i>
-                                            </div>
-                                            <% } else if (index === 2) { %>
-                                            <div class="position-absolute bg-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
-                                                <i class="fas fa-medal fa-xs text-white"></i>
-                                            </div>
-                                            <% } else { %>
-                                            <div class="position-absolute bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; bottom: -3px; right: -3px;">
-                                                <span class="small text-dark" style="font-size: 10px;"><%= index + 1 %></span>
-                                            </div>
-                                            <% } %>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">
-                                                <%= user.name %>
-                                                <% if (user._id.toString() === locals.user._id.toString()) { %>
-                                                    <span class="badge bg-primary ms-2">You</span>
-                                                <% } %>
-                                            </h6>
+                                            <span class="badge bg-primary rounded-pill"><%= user.challengePoints || 0 %> pts</span>
                                         </div>
                                     </div>
-                                    <div>
-                                        <span class="badge bg-primary rounded-pill"><%= user.challengePoints || 0 %> pts</span>
-                                    </div>
                                 </div>
-                            </div>
-                        <% }) %>
+                            <% }) %>
+                        </div>
                     </div>
-                </div>
-                <div class="card-footer text-center">
-                    <p class="small text-muted mb-0">Complete daily challenges to climb the leaderboard!</p>
+                    <div class="card-footer text-center">
+                        <p class="small text-muted mb-0">Complete daily challenges to climb the leaderboard!</p>
+                    </div>
                 </div>
             </div>
         </div>
