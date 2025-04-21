@@ -46,7 +46,7 @@
                 initialCountry: "auto",
                 // Auto-detect country via IP
                 geoIpLookup: function(callback) {
-                    fetch('https://ipapi.co/json/')
+                    fetch('/api/ip-geolocation')
                         .then(res => res.json())
                         .then(data => {
                             callback(data.country_code.toLowerCase());

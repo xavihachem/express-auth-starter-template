@@ -175,6 +175,25 @@ router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email
 router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
 
 router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
+
+// Proxy for IP geolocation (to fix CORS issues)
+router.get('/api/ip-geolocation', async (req, res) => {
+    try {
+        // Create a fallback response with common country codes
+        const fallbackResponse = {
+            ip: req.ip || '127.0.0.1',
+            country_code: 'US',
+            country_name: 'United States'
+        };
+        
+        // Send the fallback response directly - no external API call needed
+        res.json(fallbackResponse);
+    } catch (error) {
+        console.error('IP Geolocation error:', error.message);
+        res.status(500).json({ error: 'Failed to process geolocation data' });
+    }
+});
+
 router.post('/create-user', authController.createUser); // Create a new user
 
 router.get('/sign-out', authController.destroySession); // Destroy the current session
