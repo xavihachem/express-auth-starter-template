@@ -1,3 +1,38 @@
+<style>
+  /* Constrain notifications wrapper card */
+  @media (min-width: 992px) {
+    .dashboard-main-card {
+      width: 100% !important;
+      margin: -2rem auto 2rem !important;
+    }
+  }
+  @media (max-width: 991px) {
+    .dashboard-main-card {
+      width: 100% !important;
+      margin: 0.5rem auto 2rem !important;
+    }
+  }
+
+  /* Notifications page custom card sizing */
+  .notifications-card {
+    width: 95% !important;
+    max-width: 100% !important;
+    height: 80vh !important;
+    margin: 0 auto !important;
+  }
+  .notifications-card .card-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-height: 75vh !important;
+  }
+  @media (max-width: 991px) {
+    .notifications-card {
+      width: 100% !important;
+      height: 75vh !important;
+    }
+  }
+</style>
+
 <div class="container-fluid animate-fade-in">
     <div class="row mb-4">
         <div class="col-12">
@@ -8,7 +43,7 @@
     <!-- Notifications List -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card animate-fade-in delay-1">
+            <div class="card animate-fade-in delay-1 notifications-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">All Notifications</h5>
                     <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary">
