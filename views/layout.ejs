@@ -483,9 +483,53 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.1/noty.min.js"></script>
     
-    <!-- Custom script for mobile navbar and dropdowns -->
+    <!-- Client-side script to refresh notifications count -->
     <script>
+        // Function to fetch notification count via AJAX
+        function checkForNewNotifications() {
+            fetch('/check-notifications', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    // Include CSRF token for security
+                    'CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update notification badges in both mobile and desktop views
+                    const badgeElements = document.querySelectorAll('.notification-badge');
+                    
+                    badgeElements.forEach(badge => {
+                        // If there are unread notifications, show the count and make badge visible
+                        if (data.unreadCount > 0) {
+                            badge.textContent = data.unreadCount;
+                            badge.style.display = '';
+                        } else {
+                            // Otherwise hide the badge
+                            badge.style.display = 'none';
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error checking notifications:', error));
+        }
+        
+        // Check for new notifications every 30 seconds
+        let notificationInterval;
+        
+        // Custom script for mobile navbar and dropdowns
         document.addEventListener('DOMContentLoaded', function() {
+            // Start the notification check interval if user is logged in
+            if (document.querySelector('.notification-badge')) {
+                // Check immediately and then every 30 seconds
+                checkForNewNotifications();
+                notificationInterval = setInterval(checkForNewNotifications, 30000);
+            }
+            
             // Initialize Bootstrap tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

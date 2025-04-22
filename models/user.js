@@ -74,6 +74,31 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: ''
         },
+        depositHistory: {
+            type: [{
+                amount: Number,
+                status: {
+                    type: String,
+                    enum: ['completed', 'pending', 'failed'],
+                    default: 'completed'
+                },
+                depositDate: {
+                    type: Date,
+                    default: Date.now
+                },
+                reason: {
+                    type: String,
+                    default: 'Admin deposit'
+                },
+                transactionId: {
+                    type: String,
+                    default: function() {
+                        return 'DP' + new Date().getTime().toString();
+                    }
+                }
+            }],
+            default: []
+        },
         invitedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

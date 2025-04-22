@@ -29,13 +29,57 @@ module.exports.investments = async function(req, res) {
         }
         
         // User has access, render the investments page with the user data
+        // Check if request is from mobile device using the mobile query parameter
+        const isMobile = req.query.mobile === 'true';
+        const itemsPerPage = isMobile ? 4 : 5; // 4 items on mobile, 5 on desktop
+
+        // Deposit Pagination
+        const depositPage = parseInt(req.query.depositPage) || 1;
+        const depositHistory = currentUser.depositHistory || [];
+        // Calculate total pages based on full array length
+        const totalDeposits = depositHistory.length;
+        const totalDepositPages = Math.ceil(totalDeposits / itemsPerPage);
+        // Get the slice of data for the current page
+        const depositStartIndex = (depositPage - 1) * itemsPerPage;
+        const depositEndIndex = depositStartIndex + itemsPerPage;
+        // Order by newest first
+        const paginatedDeposits = depositHistory
+            .slice(depositStartIndex, depositEndIndex)
+            .sort((a, b) => new Date(b.depositDate) - new Date(a.depositDate));
+
+        // Withdrawal Pagination
+        const withdrawalPage = parseInt(req.query.withdrawalPage) || 1;
+        const withdrawalRequests = currentUser.withdrawalRequests || [];
+        // We need to count only non-pending withdrawals for history
+        const nonPendingWithdrawals = withdrawalRequests.filter(req => req.status !== 'pending');
+        // Calculate total pages based on full array length
+        const totalWithdrawals = nonPendingWithdrawals.length;
+        const totalWithdrawalPages = Math.ceil(totalWithdrawals / itemsPerPage);
+        
+        // Get the slice of data for the current page
+        const withdrawalStartIndex = (withdrawalPage - 1) * itemsPerPage;
+        const withdrawalEndIndex = withdrawalStartIndex + itemsPerPage;
+        
+        // Order by newest first
+        const paginatedWithdrawals = nonPendingWithdrawals
+            .slice(withdrawalStartIndex, withdrawalEndIndex)
+            .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+
+
         return res.render('investments', {
             currentUser,
             balance: currentUser.balance || 0,
             withdraw: currentUser.withdraw || 0,
             withdrawWallet: currentUser.withdrawWallet || '',
             depositWallet: currentUser.depositWallet || '',
-            withdrawalRequests: currentUser.withdrawalRequests || []
+            // Pass paginated data and pagination info
+            withdrawalRequests: paginatedWithdrawals, // Use paginated data
+            depositHistory: paginatedDeposits, // Use paginated data
+            depositCurrentPage: depositPage,
+            depositTotalPages: totalDepositPages,
+            withdrawalCurrentPage: withdrawalPage,
+            withdrawalTotalPages: totalWithdrawalPages,
+            isMobile: isMobile // Pass mobile flag to template
         });
     } catch (err) {
         console.log('Error in investments controller:', err);
@@ -180,18 +224,13 @@ module.exports.requestWithdraw = async function(req, res) {
             return res.redirect('/investments');
         }
         
-        // Check if user has made a withdrawal request in the last 4 days (96 hours)
-        const lastWithdrawalRequest = user.withdrawalRequests && user.withdrawalRequests.length > 0
-            ? user.withdrawalRequests[user.withdrawalRequests.length - 1]
-            : null;
-        const THRESHOLD_HOURS = 4 * 24;
-        if (lastWithdrawalRequest) {
-            const hoursSince = (Date.now() - new Date(lastWithdrawalRequest.requestDate)) / (1000 * 60 * 60);
-            if (hoursSince < THRESHOLD_HOURS) {
-                const hoursLeft = Math.ceil(THRESHOLD_HOURS - hoursSince);
-                req.flash('error', `You can only make one withdrawal request every 4 days. Please wait ${hoursLeft} more hour${hoursLeft !== 1 ? 's' : ''}.`);
-                return res.redirect('/investments');
-            }
+        // Check if user has any pending withdrawal requests
+        const hasPendingWithdrawals = user.withdrawalRequests && 
+            user.withdrawalRequests.some(request => request.status === 'pending');
+            
+        if (hasPendingWithdrawals) {
+            req.flash('error', 'You can only make a new withdrawal request after your pending request has been processed.');
+            return res.redirect('/investments');
         }
         
         // Create a new withdrawal request

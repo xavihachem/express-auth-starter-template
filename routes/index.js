@@ -235,5 +235,30 @@ router.post('/send-reset-link', authController.sendPasswordResetLink); // Send p
 router.get('/reset-password', authController.resetPassword); // Page to reset the password using a reset link
 router.post('/set-new-password', authController.verifyAndSetNewPassword); // Set a new password after verifying the reset link
 
+// Route to check for unread notifications (called by client-side JS for real-time updates)
+router.get('/check-notifications', passport.checkAuthentication, async (req, res) => {
+    try {
+        if (!req.isAuthenticated()) {
+            return res.status(401).json({ success: false, message: 'Not authenticated' });
+        }
+
+        // Get unread notifications count for current user
+        const Notification = require('../models/notification');
+        const unreadCount = await Notification.countDocuments({ 
+            recipient: req.user._id, 
+            read: false 
+        });
+
+        // Return the count as JSON
+        return res.json({
+            success: true,
+            unreadCount: unreadCount
+        });
+    } catch (error) {
+        console.error('Error checking notifications:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 // Export the router module
 module.exports = router;

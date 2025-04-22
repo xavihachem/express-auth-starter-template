@@ -117,17 +117,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% withdrawalRequests.filter(req => req.status !== 'pending')
-                                .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate))
-                                .slice(0, 5)
-                                .forEach(function(request) { 
-                                    let statusClass = '';
-                                    switch(request.status) {
-                                        case 'approved': statusClass = 'bg-success'; break;
-                                        case 'rejected': statusClass = 'bg-danger'; break;
-                                        case 'cancelled': statusClass = 'bg-secondary'; break;
-                                        default: statusClass = 'bg-info';
-                                    }
+                            <% withdrawalRequests.forEach(function(request) { 
+                                let statusClass = '';
+                                switch(request.status) {
+                                    case 'approved': statusClass = 'bg-success'; break;
+                                    case 'rejected': statusClass = 'bg-danger'; break;
+                                    case 'cancelled': statusClass = 'bg-secondary'; break;
+                                    default: statusClass = 'bg-info';
+                                }
                             %>
                                 <tr>
                                     <td><small class="text-light"><%= request.requestId %></small></td>
@@ -141,7 +138,126 @@
                             <% }); %>
                         </tbody>
                     </table>
+                    
+                    <!-- Withdrawal Pagination Controls -->
+                    <% if (withdrawalTotalPages > 1) { %>
+                    <nav aria-label="Withdrawal History Pagination">
+                        <ul class="pagination justify-content-center mt-3 mb-2">
+                            <li class="page-item <%= withdrawalCurrentPage <= 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?withdrawalPage=<%= withdrawalCurrentPage - 1 %>&depositPage=<%= depositCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% for(let i = 1; i <= withdrawalTotalPages; i++) { %>
+                                <li class="page-item <%= i === withdrawalCurrentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?withdrawalPage=<%= i %>&depositPage=<%= depositCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= withdrawalCurrentPage >= withdrawalTotalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="?withdrawalPage=<%= withdrawalCurrentPage + 1 %>&depositPage=<%= depositCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <% } %>
                 </div>
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted"></small>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Deposit History -->
+<% if (typeof depositHistory !== 'undefined' && depositHistory && depositHistory.length > 0) { %>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-primary dark-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i> Deposit History</h5>
+            </div>
+            <style>
+                .deposit-history-table th,
+                .deposit-history-table td {
+                    color: white !important;
+                }
+                .deposit-history-table small {
+                    color: rgba(255, 255, 255, 0.8) !important;
+                }
+            </style>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 deposit-history-table">
+                        <thead class="text-white">
+                            <tr>
+                                <th class="text-white">Transaction ID</th>
+                                <th class="text-white">Amount</th>
+                                <th class="text-white">Deposit Date</th>
+                                <th class="text-white">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% depositHistory.forEach(function(deposit) { 
+                                let statusClass = '';
+                                switch(deposit.status) {
+                                    case 'completed': statusClass = 'bg-success'; break;
+                                    case 'pending': statusClass = 'bg-warning text-dark'; break;
+                                    case 'failed': statusClass = 'bg-danger'; break;
+                                    default: statusClass = 'bg-info';
+                                }
+                            %>
+                                <tr>
+                                    <td><small class="text-light"><%= deposit.transactionId %></small></td>
+                                    <td><strong class="text-white">$<%= deposit.amount.toFixed(2) %></strong></td>
+                                    <td class="text-white"><%= new Date(deposit.depositDate).toLocaleString() %></td>
+                                    <td>
+                                        <span class="badge <%= statusClass %>"><%= deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1) %></span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Deposit Pagination Controls -->
+                    <% if (depositTotalPages > 1) { %>
+                    <nav aria-label="Deposit History Pagination">
+                        <ul class="pagination justify-content-center mt-3 mb-2">
+                            <li class="page-item <%= depositCurrentPage <= 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?depositPage=<%= depositCurrentPage - 1 %>&withdrawalPage=<%= withdrawalCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% for(let i = 1; i <= depositTotalPages; i++) { %>
+                                <li class="page-item <%= i === depositCurrentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?depositPage=<%= i %>&withdrawalPage=<%= withdrawalCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= depositCurrentPage >= depositTotalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="?depositPage=<%= depositCurrentPage + 1 %>&withdrawalPage=<%= withdrawalCurrentPage || 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } else { %>
+<!-- Deposit History placeholder for when no deposits are available -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-primary dark-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i> Deposit History</h5>
+            </div>
+            <div class="card-body dark-card-body text-center py-4">
+                <p class="text-white mb-0"><i class="fas fa-info-circle me-2"></i> No deposit history available yet. Your deposit transactions will appear here once you make your first deposit.</p>
             </div>
         </div>
     </div>
@@ -624,6 +740,28 @@
         }
     }
 </style>
+
+<!-- Mobile detection for refreshing with correct parameters -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if the device is mobile
+        const isMobile = window.innerWidth < 768;
+        
+        // Add mobile parameter only if device is mobile and we don't already have it
+        if (isMobile && !window.location.href.includes('mobile=true')) {
+            // Only redirect if we need to add the mobile parameter
+            const separator = window.location.href.includes('?') ? '&' : '?';
+            window.location.href = window.location.href + separator + 'mobile=true';
+        } else if (!isMobile && window.location.href.includes('mobile=true')) {
+            // Remove mobile parameter if on desktop but URL contains it
+            let url = new URL(window.location.href);
+            url.searchParams.delete('mobile');
+            window.location.href = url.toString();
+        }
+        // We don't need to modify pagination links anymore since we're using
+        // server-side detection and the isMobile flag in the template
+    });
+</script>
 
 <!-- Direct mobile scroll implementation with inline styles -->
 <script>

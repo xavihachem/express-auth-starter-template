@@ -286,19 +286,86 @@ module.exports.updateBalance = async function(req, res) {
             const oldBalance = user.balance || 0;
             const newBalance = oldBalance + depositValue;
             
+            // Add record to deposit history
+            user.depositHistory.push({
+                amount: depositValue,
+                status: 'completed',
+                depositDate: new Date(),
+                reason: reason || 'Admin deposit',
+                transactionId: 'DP' + new Date().getTime().toString()
+            });
+            
             // Update the user's balance by adding the deposit amount
             user.balance = newBalance;
             await user.save();
             
             // Create a notification for the user about the deposit
             const Notification = require('../models/notification');
-            await Notification.notifyUser(userId, {
-                title: 'Deposit Added',
-                message: `You have received a deposit of $${depositValue.toFixed(2)}.`,
+            const newNotification = await Notification.notifyUser(userId, {
+                title: 'Deposit Added to Your Account',
+                message: `An administrator has made a deposit of $${depositValue.toFixed(2)} to your account. ${reason ? `Reason: ${reason}` : ''}`,
                 type: 'success',
                 icon: 'money-bill-wave',
                 actionType: 'balance_updated'
             });
+            
+            // Update the user's session if they're currently logged in
+            // This ensures the notification badge updates in real-time
+            try {
+                const moment = require('moment');
+                const formatNotificationTime = date => moment(date).fromNow();
+                
+                // Find all active sessions in the session store
+                req.sessionStore.all((err, sessions) => {
+                    if (err) {
+                        console.error('Error accessing session store:', err);
+                        return;
+                    }
+                    
+                    // Look for the user's session
+                    Object.values(sessions).forEach(sessionData => {
+                        if (sessionData.passport && 
+                            sessionData.passport.user && 
+                            sessionData.passport.user.toString() === userId) {
+                            
+                            // Session found - update notifications
+                            const notificationData = {
+                                id: newNotification._id,
+                                icon: newNotification.icon,
+                                title: newNotification.title,
+                                message: newNotification.message,
+                                time: formatNotificationTime(newNotification.createdAt),
+                                read: false,
+                                bgColor: 'success', // Map from notification type
+                                actionType: 'balance_updated', // Make sure to use a valid enum value
+                                actionId: newNotification.actionId
+                            };
+                            
+                            // Initialize or update session notifications
+                            if (!sessionData.notifications) {
+                                sessionData.notifications = {
+                                    hasUnread: true,
+                                    items: [notificationData]
+                                };
+                            } else {
+                                // Add new notification to the beginning of the array
+                                sessionData.notifications.items.unshift(notificationData);
+                                sessionData.notifications.hasUnread = true;
+                            }
+                            
+                            // Save the updated session
+                            req.sessionStore.set(Object.keys(sessions).find(
+                                key => sessions[key] === sessionData
+                            ), sessionData, err => {
+                                if (err) console.error('Error saving session:', err);
+                            });
+                        }
+                    });
+                });
+            } catch (sessionErr) {
+                console.error('Error updating user session notifications:', sessionErr);
+                // Non-critical error, continue execution
+            }
             
             req.flash('success', `Deposit of $${depositValue.toFixed(2)} added successfully to ${user.name}'s account. New balance: $${newBalance.toFixed(2)}`);
             return res.redirect('/admin');
