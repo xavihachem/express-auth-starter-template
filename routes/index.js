@@ -40,8 +40,11 @@ router.get('/', (req, res) => {
 router.get('/admin', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.adminPanel); // Admin panel
 router.post('/admin/grant-investment-access', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.grantInvestmentAccess); // Grant investment access
 router.post('/admin/reject-investment-access', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.rejectInvestmentAccess); // Reject investment access
-router.get('/admin/wallet-form/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.walletForm); // Wallet form
+router.get('/admin/wallet-form/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.walletForm); // Deposit wallet form
 router.post('/admin/set-deposit-wallet', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.setDepositWallet); // Set deposit wallet
+// Withdraw wallet form route
+router.get('/admin/withdraw-wallet-form/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.withdrawWalletForm);
+router.post('/admin/set-withdraw-wallet', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.setWithdrawWallet); // Set withdraw wallet
 router.get('/admin/edit-balance/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.editBalance); // Edit balance form
 router.post('/admin/update-balance', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.updateBalance); // Update user balance
 router.get('/admin/withdrawal-requests', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewWithdrawalRequests); // View all withdrawal requests

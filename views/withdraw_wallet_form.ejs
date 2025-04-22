@@ -1,0 +1,39 @@
+<h3 class="mb-5">Manage Withdrawal Wallet</h3>
+
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h4><i class="fas fa-wallet me-2"></i> <%= user.withdrawWallet ? 'Update' : 'Set' %> Withdrawal Wallet for <%= user.name %></h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <p><i class="fas fa-info-circle me-2"></i> As an admin, you can <%= user.withdrawWallet ? 'update' : 'set' %> the withdrawal wallet address for <strong><%= user.name %></strong>. This will override any address they have set themselves.</p>
+        </div>
+        
+        <form action="/admin/set-withdraw-wallet" method="post">
+            <input type="hidden" name="userId" value="<%= user._id %>">
+            
+            <div class="form-outline mb-4">
+                <label for="withdrawWallet" class="form-label">Withdrawal Wallet Address</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="withdrawWallet" 
+                    name="withdrawWallet" 
+                    required 
+                    placeholder="Enter wallet address"
+                    value="<%= user.withdrawWallet || '' %>"
+                />
+                <div class="form-text">This will be the wallet address that this user's funds will be sent to when they request a withdrawal.</div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="/admin" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Admin Panel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-save me-2"></i> Save Withdrawal Address
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

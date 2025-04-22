@@ -222,6 +222,87 @@ module.exports.setDepositWallet = async function(req, res) {
     }
 };
 
+// Show withdraw wallet form for a user
+module.exports.withdrawWalletForm = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You are not authorized to perform this action');
+            return res.redirect('/');
+        }
+
+        const userId = req.params.userId;
+        
+        if (!userId) {
+            req.flash('error', 'User ID is required');
+            return res.redirect('/admin');
+        }
+        
+        // Find the user
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/admin');
+        }
+        
+        // Render the withdraw wallet form
+        return res.render('withdraw_wallet_form', { user });
+    } catch (err) {
+        console.log('Error showing withdraw wallet form:', err);
+        req.flash('error', 'Failed to load withdraw wallet form');
+        return res.redirect('/admin');
+    }
+};
+
+// Set withdraw wallet for a user
+module.exports.setWithdrawWallet = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You are not authorized to perform this action');
+            return res.redirect('/');
+        }
+
+        const { userId, withdrawWallet } = req.body;
+        
+        if (!userId || !withdrawWallet) {
+            req.flash('error', 'User ID and withdraw wallet are required');
+            return res.redirect('/admin');
+        }
+        
+        // Find the user to get their details
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/admin');
+        }
+        
+        // Update the user's withdraw wallet
+        await User.findByIdAndUpdate(userId, { withdrawWallet });
+        
+        // Create a notification for the user if their wallet was changed
+        if (user.withdrawWallet !== withdrawWallet) {
+            const Notification = require('../models/notification');
+            await Notification.notifyUser(userId, {
+                title: 'Withdraw Wallet Updated',
+                message: 'Your withdraw wallet address has been updated by an administrator.',
+                type: 'info',
+                icon: 'wallet',
+                actionType: 'wallet_updated'
+            });
+        }
+        
+        req.flash('success', 'Withdraw wallet set successfully');
+        return res.redirect('/admin');
+    } catch (err) {
+        console.log('Error setting withdraw wallet:', err);
+        req.flash('error', 'Failed to set withdraw wallet');
+        return res.redirect('/admin');
+    }
+};
+
 // Show form to edit user balance
 module.exports.editBalance = async function(req, res) {
     try {
