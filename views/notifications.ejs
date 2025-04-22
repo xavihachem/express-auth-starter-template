@@ -4,6 +4,7 @@
     width: 100%;
     border-radius: 1rem;
     margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
   
   /* Fix for scrolling container */
@@ -14,12 +15,38 @@
     overscroll-behavior: contain; /* Prevent scroll chaining */
     border-top: 1px solid rgba(255,255,255,0.1);
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    background-color: rgba(33, 37, 41, 0.95);
   }
   
   /* Make list items more touch-friendly */
   .notification-item {
     padding: 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background-color: rgba(33, 37, 41, 0.95);
+    transition: all 0.2s ease;
+  }
+  
+  .notification-item:hover {
+    background-color: rgba(40, 45, 50, 0.95);
+  }
+  
+  /* Override read notification style */
+  .notification-item.text-muted.bg-light {
+    background-color: rgba(50, 55, 60, 0.8) !important;
+  }
+  
+  /* Text colors for better readability */
+  .notification-item h6 {
+    color: white !important;
+  }
+  
+  .notification-item p {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+  
+  .notification-item.text-muted h6,
+  .notification-item.text-muted p {
+    color: rgba(200, 200, 200, 0.8) !important;
   }
   
   /* Desktop adjustments */
@@ -34,6 +61,14 @@
       height: 500px; /* Taller on desktop */
     }
   }
+  
+  /* Icon colors for notifications */
+  .icon-bg-primary { background-color: #0d6efd; }
+  .icon-bg-success { background-color: #198754; }
+  .icon-bg-danger { background-color: #dc3545; }
+  .icon-bg-warning { background-color: #ffc107; }
+  .icon-bg-info { background-color: #0dcaf0; }
+  .icon-bg-secondary { background-color: #6c757d; }
 </style>
 
 <div class="container-fluid animate-fade-in">
@@ -47,9 +82,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card animate-fade-in delay-1 notifications-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">All Notifications</h5>
-                    <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary">
+                <div class="card-header bg-primary d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white"><i class="fas fa-bell me-2 text-white"></i>All Notifications</h5>
+                    <button id="markAllReadBtn" class="btn btn-sm btn-light">
                         <i class="fas fa-check-double me-1"></i>Mark all as read
                     </button>
                 </div>
@@ -59,15 +94,15 @@
                         <% if (notifications && notifications.items && notifications.items.length > 0) { %>
                             <% notifications.items.forEach(function(notification) { %>
                                 <!-- Notification Item -->
-                                <div class="list-group-item notification-item border-0 <%= notification.read ? 'text-muted bg-light' : '' %>" data-id="<%= notification.id %>">
+                                <div class="list-group-item notification-item border-0 <%= notification.read ? 'text-muted' : '' %>" data-id="<%= notification.id %>">
                                     <div class="d-flex">
-                                        <div class="rounded-circle bg-<%= notification.bgColor %> p-2 me-3 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <div class="rounded-circle icon-bg-<%= notification.bgColor %> p-2 me-3 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-<%= notification.icon %>"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <h6 class="mb-0 <%= notification.read ? '' : 'fw-bold' %>"><%= notification.title %></h6>
-                                                <small class="text-muted"><%= notification.time %></small>
+                                                <small style="color: rgba(255, 255, 255, 0.6) !important;"><%= notification.time %></small>
                                             </div>
                                             <p class="mb-0"><%= notification.message %></p>
                                         </div>
@@ -75,15 +110,15 @@
                                 </div>
                             <% }); %>
                         <% } else { %>
-                            <div class="list-group-item border-0 border-bottom text-center py-4">
-                                <p class="mb-0 text-muted">No notifications to display</p>
+                            <div class="list-group-item border-0 border-bottom text-center py-4" style="background-color: rgba(33, 37, 41, 0.95);">
+                                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7) !important;">No notifications to display</p>
                             </div>
                         <% } %>
                     </div>
                     </div>
                 </div>
-                <div class="card-footer text-center bg-light">
-                    <small class="text-muted">You've reached the end of your notifications</small>
+                <div class="card-footer text-center bg-dark">
+                    <small style="color: rgba(255, 255, 255, 0.7) !important;">You've reached the end of your notifications</small>
                 </div>
             </div>
         </div>
@@ -119,7 +154,8 @@
                         // Update UI to show all notifications as read
                         const notificationItems = document.querySelectorAll('#notificationsList .list-group-item');
                         notificationItems.forEach(item => {
-                            item.classList.add('text-muted', 'bg-light');
+                            item.classList.add('text-muted');
+                            item.classList.remove('bg-light'); // Remove light background to keep dark theme
                             const title = item.querySelector('h6');
                             if (title) title.classList.remove('fw-bold');
                         });

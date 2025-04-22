@@ -364,6 +364,104 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             position: fixed;
         }
+        
+        /* Notification dropdown styling */
+        .notification-dropdown {
+            background-color: rgba(33, 37, 41, 0.95) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
+            padding: 0.5rem 0 !important;
+            border-radius: 0.5rem !important;
+        }
+        
+        .notification-dropdown .dropdown-header {
+            color: white !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .notification-dropdown .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            margin: 0.25rem 0 !important;
+        }
+        
+        .notification-dropdown .dropdown-item {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.2s ease !important;
+            padding: 0.7rem 1rem !important;
+            overflow: hidden !important;
+        }
+        
+        /* Fix for notification message overflow */
+        .notification-dropdown .dropdown-item small.text-muted,
+        .notification-dropdown .dropdown-item p.small {
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            max-width: 200px !important;
+            display: block !important;
+        }
+        
+        .notification-dropdown .dropdown-item:hover {
+            background-color: rgba(95, 145, 255, 0.2) !important;
+        }
+        
+        .notification-dropdown .dropdown-item.text-muted {
+            color: rgba(200, 200, 200, 0.7) !important;
+        }
+        
+        .notification-dropdown .dropdown-item small.text-muted {
+            color: rgba(200, 200, 200, 0.6) !important;
+        }
+        
+        .notification-dropdown .dropdown-item:last-child,
+        .profile-dropdown .dropdown-item:last-child {
+            background-color: rgba(13, 25, 42, 0.5) !important;
+            margin-top: 0.25rem !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Profile dropdown styling */
+        .profile-dropdown {
+            background-color: rgba(33, 37, 41, 0.95) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
+            padding: 0.5rem 0 !important;
+            border-radius: 0.5rem !important;
+        }
+        
+        .profile-dropdown .dropdown-header {
+            color: white !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .profile-dropdown .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            margin: 0.25rem 0 !important;
+        }
+        
+        .profile-dropdown .dropdown-item {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.2s ease !important;
+            padding: 0.7rem 1rem !important;
+        }
+        
+        .profile-dropdown .dropdown-item:hover {
+            background-color: rgba(95, 145, 255, 0.2) !important;
+        }
+        
+        /* Icon colors for notification dropdown */
+        .icon-bg-primary { background-color: #0d6efd !important; }
+        .icon-bg-success { background-color: #198754 !important; }
+        .icon-bg-danger { background-color: #dc3545 !important; }
+        .icon-bg-warning { background-color: #ffc107 !important; }
+        .icon-bg-info { background-color: #0dcaf0 !important; }
+        .icon-bg-secondary { background-color: #6c757d !important; }
     </style>
 
     <!-- Scripts for Bootstrap, Material Design Bootstrap and Noty -->
@@ -527,20 +625,20 @@
                                 <span class="visually-hidden">unread notifications</span>
                             </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; max-width: 95vw; right: 0; left: auto; z-index: 9999 !important;">
-                            <li><h6 class="dropdown-header py-1">Notifications</h6></li>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; max-width: 95vw; right: 0; left: auto; z-index: 9999 !important;">
+                            <li><h6 class="dropdown-header py-1"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <!-- Notification items -->
                             <% if (locals.notifications && locals.notifications.items && locals.notifications.items.length > 0) { %>
                                 <% locals.notifications.items.slice(0, 3).forEach(function(notification) { %>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center py-1 <%= notification.read ? 'text-muted' : '' %>" href="#">
-                                            <div class="rounded-circle bg-<%= notification.bgColor %> p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="rounded-circle icon-bg-<%= notification.bgColor %> p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-<%= notification.icon %> fa-sm"></i>
                                             </div>
-                                            <div>
-                                                <p class="mb-0 small <%= notification.read ? '' : 'fw-bold' %>"><%= notification.title %></p>
-                                                <small class="text-muted" style="font-size: 0.7rem;"><%= notification.message %></small>
+                                            <div style="max-width: calc(100% - 30px); overflow: hidden;">
+                                                <p class="mb-0 small <%= notification.read ? '' : 'fw-bold' %>" title="<%= notification.title %>"><%= notification.title %></p>
+                                                <small class="text-muted" style="font-size: 0.7rem;" title="<%= notification.message %>"><%= notification.message %></small>
                                             </div>
                                         </a>
                                     </li>
@@ -551,10 +649,10 @@
                             <% } else { %>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center py-1 text-muted" href="#">
-                                        <div class="rounded-circle bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <div class="rounded-circle icon-bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-bell-slash fa-sm"></i>
                                         </div>
-                                        <div>
+                                        <div style="max-width: calc(100% - 30px); overflow: hidden;">
                                             <p class="mb-0 small">No notifications</p>
                                             <small class="text-muted" style="font-size: 0.7rem;">You're all caught up!</small>
                                         </div>
@@ -562,7 +660,7 @@
                                 </li>
                             <% } %>
                             <li><hr class="dropdown-divider my-1"></li>
-                            <li><a class="dropdown-item text-center py-1 small" href="/notifications">View all notifications</a></li>
+                            <li><a class="dropdown-item text-center py-1 small" href="/notifications"><i class="fas fa-external-link-alt me-1"></i>View all notifications</a></li>
                         </ul>
                     </div>
                     
@@ -579,16 +677,26 @@
                                 <% } %>
                             </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="userDropdownMobile" style="z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdownMobile" style="min-width: 200px; z-index: 9999 !important;">
                             <li>
                                 <a class="dropdown-item py-1 small" href="/profile">
-                                    <i class="fas fa-user-circle me-2 text-primary"></i>My Profile
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle icon-bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-user-circle fa-sm"></i>
+                                        </div>
+                                        <span>My Profile</span>
+                                    </div>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <li>
                                 <a class="dropdown-item py-1 small" href="/sign-out">
-                                    <i class="fas fa-sign-out-alt me-2 text-danger"></i>Sign Out
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle icon-bg-danger p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-sign-out-alt fa-sm"></i>
+                                        </div>
+                                        <span>Sign Out</span>
+                                    </div>
                                 </a>
                             </li>
                         </ul>
@@ -653,19 +761,19 @@
                                 <span class="visually-hidden">unread notifications</span>
                             </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="notificationDropdown" style="min-width: 300px; z-index: 9999 !important;">
-                            <li><h6 class="dropdown-header py-1">Notifications</h6></li>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdown" style="min-width: 300px; z-index: 9999 !important;">
+                            <li><h6 class="dropdown-header py-1"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <% if (locals.notifications && locals.notifications.items && locals.notifications.items.length > 0) { %>
                                 <% locals.notifications.items.slice(0, 3).forEach(function(notification) { %>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center py-1 <%= notification.read ? 'text-muted' : '' %>" href="#">
-                                            <div class="rounded-circle bg-<%= notification.bgColor %> p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="rounded-circle icon-bg-<%= notification.bgColor %> p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-<%= notification.icon %> fa-sm"></i>
                                             </div>
-                                            <div>
-                                                <p class="mb-0 small <%= notification.read ? '' : 'fw-bold' %>"><%= notification.title %></p>
-                                                <small class="text-muted" style="font-size: 0.7rem;"><%= notification.message %></small>
+                                            <div style="max-width: calc(100% - 30px); overflow: hidden;">
+                                                <p class="mb-0 small <%= notification.read ? '' : 'fw-bold' %>" title="<%= notification.title %>"><%= notification.title %></p>
+                                                <small class="text-muted" style="font-size: 0.7rem;" title="<%= notification.message %>"><%= notification.message %></small>
                                             </div>
                                         </a>
                                     </li>
@@ -676,10 +784,10 @@
                             <% } else { %>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center py-1 text-muted" href="#">
-                                        <div class="rounded-circle bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <div class="rounded-circle icon-bg-secondary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-bell-slash fa-sm"></i>
                                         </div>
-                                        <div>
+                                        <div style="max-width: calc(100% - 30px); overflow: hidden;">
                                             <p class="mb-0 small">No notifications</p>
                                             <small class="text-muted" style="font-size: 0.7rem;">You're all caught up!</small>
                                         </div>
@@ -687,7 +795,7 @@
                                 </li>
                             <% } %>
                             <li><hr class="dropdown-divider my-1"></li>
-                            <li><a class="dropdown-item text-center py-1 small" href="/notifications">View all notifications</a></li>
+                            <li><a class="dropdown-item text-center py-1 small" href="/notifications"><i class="fas fa-external-link-alt me-1"></i>View all notifications</a></li>
                         </ul>
                     </div>
                     
@@ -705,17 +813,27 @@
                             </div>
                             <span class="d-none d-md-inline"><%= locals.user.name.split(' ')[0] %></span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="userDropdown" style="z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdown" style="min-width: 200px; z-index: 9999 !important;">
                             <li>
                                 <a class="dropdown-item py-1 small" href="/profile">
-                                    <i class="fas fa-user-circle me-2 text-primary"></i>My Profile
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle icon-bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-user-circle fa-sm"></i>
+                                        </div>
+                                        <span>My Profile</span>
+                                    </div>
                                 </a>
                             </li>
                             <!-- Change Password option removed -->
                             <li><hr class="dropdown-divider my-1"></li>
                             <li>
                                 <a class="dropdown-item py-1 small" href="/sign-out">
-                                    <i class="fas fa-sign-out-alt me-2 text-danger"></i>Sign Out
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle icon-bg-danger p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-sign-out-alt fa-sm"></i>
+                                        </div>
+                                        <span>Sign Out</span>
+                                    </div>
                                 </a>
                             </li>
                         </ul>
