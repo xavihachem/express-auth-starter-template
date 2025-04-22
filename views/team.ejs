@@ -87,6 +87,29 @@
                         <% }); %>
                     </tbody>
                 </table>
+                
+                <!-- Team Members Pagination Controls -->
+                <% if (typeof teamTotalPages !== 'undefined' && teamTotalPages > 1) { %>
+                <nav aria-label="Team Members Pagination">
+                    <ul class="pagination justify-content-center mt-3 mb-2">
+                        <li class="page-item <%= teamCurrentPage <= 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?teamPage=<%= teamCurrentPage - 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <% for(let i = 1; i <= teamTotalPages; i++) { %>
+                            <li class="page-item <%= i === teamCurrentPage ? 'active' : '' %>">
+                                <a class="page-link" href="?teamPage=<%= i %><%= isMobile ? '&mobile=true' : '' %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= teamCurrentPage >= teamTotalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?teamPage=<%= teamCurrentPage + 1 %><%= isMobile ? '&mobile=true' : '' %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <% } %>
             </div>
         </div>
     </div>

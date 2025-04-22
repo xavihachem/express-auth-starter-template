@@ -50,10 +50,9 @@ module.exports.investments = async function(req, res) {
         // Withdrawal Pagination
         const withdrawalPage = parseInt(req.query.withdrawalPage) || 1;
         const withdrawalRequests = currentUser.withdrawalRequests || [];
-        // We need to count only non-pending withdrawals for history
-        const nonPendingWithdrawals = withdrawalRequests.filter(req => req.status !== 'pending');
+        // Show all withdrawal requests including pending ones
         // Calculate total pages based on full array length
-        const totalWithdrawals = nonPendingWithdrawals.length;
+        const totalWithdrawals = withdrawalRequests.length;
         const totalWithdrawalPages = Math.ceil(totalWithdrawals / itemsPerPage);
         
         // Get the slice of data for the current page
@@ -61,7 +60,7 @@ module.exports.investments = async function(req, res) {
         const withdrawalEndIndex = withdrawalStartIndex + itemsPerPage;
         
         // Order by newest first
-        const paginatedWithdrawals = nonPendingWithdrawals
+        const paginatedWithdrawals = withdrawalRequests
             .slice(withdrawalStartIndex, withdrawalEndIndex)
             .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
 
@@ -121,6 +120,12 @@ module.exports.updateWithdrawWallet = async function(req, res) {
         }
 
         const { withdrawWallet } = req.body;
+        
+        // Validate the withdraw wallet address is not empty
+        if (!withdrawWallet || withdrawWallet.trim() === '') {
+            req.flash('error', 'Please enter a valid withdraw wallet address');
+            return res.redirect('/investments');
+        }
         
         // Update the user's withdraw wallet
         await User.findByIdAndUpdate(req.user._id, { withdrawWallet });
