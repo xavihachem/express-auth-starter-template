@@ -1,3 +1,35 @@
+<style type="text/css">
+    /* Make text black in the rank cards */
+    .rankings-card .card-body p,
+    .rankings-card .card-body h5,
+    .rankings-card .card-body h6,
+    .rankings-card .card-body .small,
+    .rankings-card .card-body .text-muted,
+    .rankings-card .list-group-item:not(.list-group-item-warning) {
+        color: #000 !important;
+    }
+    
+    /* Ensure headers are also black */
+    .rankings-card .card-header h5 {
+        color: #000 !important;
+    }
+    
+    /* Keep special elements with their original colors */
+    .rankings-card .badge,
+    .rankings-card .progress-bar,
+    .rankings-card .text-white,
+    .rankings-card .list-group-item-warning {
+        color: inherit !important;
+    }
+    
+    /* Force text to black on specific elements */
+    .rankings-card .small.text-muted,
+    .rankings-card .small.mb-2,
+    .rankings-card p.small {
+        color: #000 !important;
+    }
+</style>
+
 <div class="container rankings-page">
     <div class="container-fluid animate-fade-in">
         <div class="row mb-4">
@@ -10,14 +42,14 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card animate-fade-in delay-1 rankings-card">
-                    <div class="card-header">
+                    <div class="card-header bg-primary">
                         <div class="d-flex align-items-center">
                             <div class="rounded-circle bg-warning p-3 me-3 text-white">
                                 <i class="fas fa-medal fa-2x"></i>
                             </div>
                             <div>
-                                <h4 class="mb-0">Your Current Rank</h4>
-                                <p class="text-muted mb-0">Based on your challenge points</p>
+                                <h4 class="mb-0 text-white">Your Current Rank</h4>
+                                <p class="text-white mb-0">Based on your challenge points</p>
                             </div>
                         </div>
                     </div>
@@ -25,16 +57,16 @@
                         <div class="row align-items-center">
                             <div class="col-md-6 text-center">
                                 <div class="display-1 fw-bold text-warning"><%= currentUserRank %></div>
-                                <p class="text-muted">Your position out of all users</p>
+                                <p style="color: white !important;">Your position out of all users</p>
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex flex-column">
                                     <div class="mb-3">
-                                        <p class="text-muted mb-1">Your Points</p>
-                                        <h3 class="mb-0"><%= locals.user.challengePoints || 0 %> <small class="text-muted">pts</small></h3>
+                                        <p style="color: white !important;" class="mb-1">Your Points</p>
+                                        <h3 style="color: white !important;" class="mb-0"><%= locals.user.challengePoints || 0 %> <small style="color: white !important;">pts</small></h3>
                                     </div>
                                     <div>
-                                        <p class="mb-2">Points needed for next rank:</p>
+                                        <p style="color: white !important;" class="mb-2">Points needed for next rank:</p>
                                         <% 
                                             // Find the user with rank above current user
                                             const nextRankUser = users.find(function(user, index) { 
@@ -61,8 +93,8 @@
                                                     aria-valuemax="100"></div>
                                             </div>
                                             <div class="d-flex justify-content-between mt-1">
-                                                <small class="text-muted">Need <span class="fw-bold text-warning"><%= pointsNeeded %></span> more points</small>
-                                                <small class="text-muted">Next rank: #<%= currentUserRank - 1 %></small>
+                                                <small style="color: white !important;">Need <span class="fw-bold text-warning"><%= pointsNeeded %></span> more points</small>
+                                                <small style="color: white !important;">Next rank: #<%= currentUserRank - 1 %></small>
                                             </div>
                                         <% } else { %>
                                             <div class="alert alert-info">
@@ -83,8 +115,8 @@
             <!-- Available Ranks on Left -->
             <div class="col-md-7">
                 <div class="card animate-fade-in delay-2 rankings-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-award me-2"></i>Available Ranks</h5>
+                    <div class="card-header bg-primary">
+                        <h5 class="mb-0 text-white"><i class="fas fa-award me-2 text-white"></i>Available Ranks</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -171,8 +203,8 @@
             <!-- Top 5 Leaderboard on Right -->
             <div class="col-md-5">
                 <div class="card animate-fade-in delay-2 rankings-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top 5 Leaderboard</h5>
+                    <div class="card-header bg-primary">
+                        <h5 class="mb-0 text-white"><i class="fas fa-list-ol me-2 text-white"></i>Top 5 Leaderboard</h5>
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
@@ -228,8 +260,8 @@
                             <% }) %>
                         </div>
                     </div>
-                    <div class="card-footer text-center">
-                        <p class="small text-muted mb-0">Complete daily challenges to climb the leaderboard!</p>
+                    <div class="card-footer text-center bg-primary">
+                        <p style="color: white !important;" class="small mb-0">Complete daily challenges to climb the leaderboard!</p>
                     </div>
                 </div>
             </div>
