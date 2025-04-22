@@ -7,12 +7,12 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm mb-4 animate-fade-in delay-1">
+            <div class="card shadow-sm mb-4 animate-fade-in delay-1 vip-levels-card">
                 <div class="card-header bg-primary text-white">
                     <h2 class="mb-0 text-center">VIP Levels <span class="emoji">✅😎</span></h2>
                 </div>
-                <div class="card-body">
-                    <div class="row">
+                <div class="card-body dark-theme-card">
+                    <div class="vip-levels-scrollable">
                         <!-- VIP Level I -->
                         <div class="col-md-6 col-lg-3 mb-4">
                             <div class="card h-100 border-primary hover-card">
@@ -118,59 +118,45 @@
                 </div>
             </div>
 
-            <!-- Additional Information Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h3 class="mb-0">Special Announcements</h3>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="fas fa-coins me-2"></i>Moonify Coin Coming Soon! 🔸✅</h5>
-                        <p>This special VIP level will get our cryptocurrency, Moonify on BNB Smart Chain Soon.</p>
-                        <p>We will have a pre-sale at Q4 Of the Year. 👑</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Referral Program Card -->
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow-sm mb-4 vip-levels-card">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Referral Program</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body dark-theme-card">
                     <div class="row">
                         <div class="col-md-6">
                             <h4 class="mb-3">Invite Friends & Earn Points</h4>
                             <p>Earn points when your friends deposit:</p>
-                            <ul class="list-group mb-4">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <ul class="list-group mb-4 dark-list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
                                     VIP Level I Deposit
                                     <span class="badge bg-primary rounded-pill">100 Points</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
                                     VIP Level II Deposit
-                                    <span class="badge bg-primary rounded-pill">200 Points</span>
+                                    <span class="badge bg-info rounded-pill">200 Points</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
                                     VIP Level III Deposit
-                                    <span class="badge bg-primary rounded-pill">300 Points</span>
+                                    <span class="badge bg-success rounded-pill">300 Points</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
                                     VIP Level IV Deposit
-                                    <span class="badge bg-primary rounded-pill">400 Points</span>
+                                    <span class="badge bg-warning text-dark rounded-pill">400 Points</span>
                                 </li>
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <div class="card bg-light">
+                            <div class="card conversion-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Points to USDT Conversion</h5>
                                     <p class="card-text">Each 100 Points = $10 USDT</p>
                                     <p class="card-text">You can transfer your points to USDT after 60 days from your deposit date.</p>
                                     <% if (locals.user) { %>
-                                        <a href="/team" class="btn btn-primary">View My Referrals</a>
+                                        <a href="/team" class="btn btn-primary btn-glow">View My Referrals</a>
                                     <% } else { %>
-                                        <a href="/sign-up" class="btn btn-primary">Join Now</a>
+                                        <a href="/sign-up" class="btn btn-primary btn-glow">Join Now</a>
                                     <% } %>
                                 </div>
                             </div>
@@ -188,18 +174,123 @@
         font-size: 1.2em;
     }
     
+    /* VIP Levels Card Redesign */
+    .vip-levels-card {
+        background-color: rgba(33, 37, 41, 0.8) !important;
+        border: 1px solid rgba(95, 145, 255, 0.3) !important;
+        border-radius: 10px !important;
+        overflow: hidden;
+    }
+    
+    .dark-theme-card {
+        background-color: rgba(33, 37, 41, 0.95) !important;
+        color: #fff;
+        padding: 1.5rem;
+    }
+    
+    /* VIP levels scrollable container */
+    .vip-levels-scrollable {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(95, 145, 255, 0.5) rgba(33, 37, 41, 0.3);
+    }
+    
+    /* Desktop horizontal scrolling */
+    @media (min-width: 768px) {
+        .vip-levels-scrollable {
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar-track {
+            background: rgba(33, 37, 41, 0.3);
+            border-radius: 10px;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar-thumb {
+            background-color: rgba(95, 145, 255, 0.5);
+            border-radius: 10px;
+        }
+    }
+    
+    /* Mobile vertical scrolling */
+    @media (max-width: 767.98px) {
+        .vip-levels-scrollable {
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 500px;
+            padding-right: 0.5rem;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar-track {
+            background: rgba(33, 37, 41, 0.3);
+            border-radius: 10px;
+        }
+        
+        .vip-levels-scrollable::-webkit-scrollbar-thumb {
+            background-color: rgba(95, 145, 255, 0.5);
+            border-radius: 10px;
+        }
+    }
+    
+    /* VIP Level cards */
+    .vip-levels-scrollable .col-md-6.col-lg-3 {
+        flex: 0 0 280px;
+        max-width: 280px;
+        width: 280px;
+        padding: 0;
+    }
+    
+    /* Mobile VIP card adjustments */
+    @media (max-width: 767.98px) {
+        .vip-levels-scrollable .col-md-6.col-lg-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+    }
+    
     .hover-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: rgba(33, 37, 41, 0.7) !important;
+        border: 1px solid rgba(95, 145, 255, 0.3) !important;
+    }
+    
+    .hover-card .card-body {
+        background-color: rgba(33, 37, 41, 0.7) !important;
+        color: #e0e0e0;
+    }
+    
+    .hover-card .list-group-item {
+        background-color: rgba(33, 37, 41, 0.6) !important;
+        color: #e0e0e0;
+        border-color: rgba(95, 145, 255, 0.2);
     }
     
     .hover-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
     
     .special-vip {
         position: relative;
         overflow: hidden;
+        background: linear-gradient(135deg, rgba(33, 37, 41, 0.9), rgba(33, 37, 41, 0.7)) !important;
+    }
+    
+    .special-vip .card-body {
+        background: linear-gradient(135deg, rgba(33, 37, 41, 0.9), rgba(33, 37, 41, 0.7)) !important;
     }
     
     .special-vip:before {
@@ -216,6 +307,7 @@
         z-index: 1;
     }
     
+    /* Responsive styles */
     @media (max-width: 767.98px) {
         .card-header h4 {
             font-size: 1.1rem;
@@ -223,6 +315,10 @@
         
         .price-range .lead {
             font-size: 1rem;
+        }
+        
+        .vip-levels-card .card-body {
+            padding: 1rem 0.5rem;
         }
     }
     
@@ -235,5 +331,54 @@
     
     .special-vip {
         animation: glow 2s infinite;
+    }
+    
+    /* Price range styling */
+    .price-range {
+        background-color: rgba(20, 30, 50, 0.5);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .price-range .lead {
+        color: #fff;
+        font-weight: 600;
+    }
+    
+    .price-range .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    /* Dark list items */
+    .dark-list-group {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .dark-list-item {
+        background-color: rgba(33, 37, 41, 0.6) !important;
+        color: #e0e0e0 !important;
+        border-color: rgba(95, 145, 255, 0.2) !important;
+        margin-bottom: 2px;
+    }
+    
+    /* Conversion card */
+    .conversion-card {
+        background: linear-gradient(135deg, rgba(33, 37, 41, 0.9), rgba(20, 30, 50, 0.8)) !important;
+        border: 1px solid rgba(95, 145, 255, 0.3) !important;
+        color: #e0e0e0;
+    }
+    
+    .btn-glow {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(95, 145, 255, 0.5);
+    }
+    
+    .btn-glow:hover {
+        box-shadow: 0 0 20px rgba(95, 145, 255, 0.8);
+        transform: translateY(-2px);
     }
 </style>

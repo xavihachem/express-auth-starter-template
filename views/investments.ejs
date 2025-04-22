@@ -3,11 +3,11 @@
 <div class="row">
     <!-- Balance Overview Card -->
     <div class="col-md-12">
-        <div class="card mb-4 border-primary">
+        <div class="card mb-4 dark-card balance-card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-wallet me-2"></i> Balance Overview</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body dark-card-body">
                 <div class="row">
                     <div class="col-md-4 text-center border-end">
                         <h6 class="text-muted mb-2">Current Balance</h6>
@@ -151,33 +151,33 @@
 <div class="row">
     <!-- Deposit Section -->
     <div class="col-md-6">
-        <div class="card mb-4 border-success">
+        <div class="card mb-4 dark-card deposit-card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i> Deposit</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body dark-card-body">
                 <p class="mb-3">To make a deposit, please send funds to your deposit wallet address assigned by the admin:</p>
                 
                 <% if (depositWallet) { %>
-                    <div class="alert alert-success">
+                    <div class="wallet-card deposit-wallet">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1 wallet-address" style="word-break: break-all;">
                                 <code><%= depositWallet %></code>
                             </div>
-                            <button class="btn btn-sm btn-outline-success ms-2" onclick="copyToClipboard('<%= depositWallet %>')">
+                            <button class="btn btn-sm btn-glow-success ms-2" onclick="copyToClipboard('<%= depositWallet %>')">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
                 <% } else { %>
-                    <div class="alert alert-warning">
-                        <p class="mb-0">No deposit wallet address has been assigned to you yet. Please contact an admin.</p>
+                    <div class="wallet-card wallet-warning">
+                        <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> No deposit wallet address has been assigned to you yet. Please contact an admin.</p>
                     </div>
                 <% } %>
                 
-                <div class="mt-4">
-                    <h6>Deposit Instructions:</h6>
-                    <ol class="mb-0">
+                <div class="mt-4 instruction-box">
+                    <h6 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Deposit Instructions:</h6>
+                    <ol class="mb-0 instruction-list">
                         <li>Copy your assigned deposit wallet address</li>
                         <li>Send funds to this address from your external wallet</li>
                         <li>Your balance will be updated once the transaction is confirmed</li>
@@ -191,51 +191,51 @@
     
     <!-- Withdraw Section -->
     <div class="col-md-6">
-        <div class="card mb-4 border-danger">
+        <div class="card mb-4 dark-card withdraw-card" id="withdrawCard">
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i> Withdraw</h5>
             </div>
-            <div class="card-body">
-                <p class="mb-3">Request a withdrawal to your personal withdraw wallet address:</p>
+            <div class="card-body dark-card-body" id="withdrawCardBody">
+                <p class="mb-3 text-white">Request a withdrawal to your personal withdraw wallet address:</p>
                 
                 <% if (withdrawWallet) { %>
-                    <div class="alert alert-info">
+                    <div class="wallet-card withdraw-wallet">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1 wallet-address" style="word-break: break-all;">
                                 <code><%= withdrawWallet %></code>
                             </div>
-                            <button class="btn btn-sm btn-outline-info ms-2" onclick="copyToClipboard('<%= withdrawWallet %>')">
+                            <button class="btn btn-sm btn-glow-info ms-2" onclick="copyToClipboard('<%= withdrawWallet %>')">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
                 <% } else { %>
-                    <div class="alert alert-warning">
-                        <p class="mb-0">You need to set up a withdraw wallet address before requesting withdrawals.</p>
+                    <div class="wallet-card wallet-warning">
+                        <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> You need to set up a withdraw wallet address before requesting withdrawals.</p>
                     </div>
                 <% } %>
                 
                 <form action="/update-withdraw-wallet" method="post" class="mt-3">
                     <div class="form-outline mb-3">
-                        <label for="withdrawWallet" class="form-label">Update Withdraw Wallet Address</label>
+                        <label for="withdrawWallet" class="form-label fw-bold" style="color: #17a2b8 !important; background-color: transparent !important;">Update Withdraw Wallet Address</label>
                         <input 
                             type="text" 
-                            class="form-control" 
+                            class="form-control dark-input" 
                             id="withdrawWallet" 
                             name="withdrawWallet" 
                             value="<%= withdrawWallet %>" 
                             placeholder="Enter your withdraw wallet address"
                         >
                     </div>
-                    <button type="submit" class="btn btn-info">Update Withdraw Wallet</button>
+                    <button type="submit" class="btn btn-glow-info">Update Withdraw Wallet</button>
                 </form>
                 
                 <form action="/request-withdraw" method="post" class="mt-4" id="withdrawForm">
                     <div class="form-outline mb-3">
-                        <label for="amount" class="form-label">Withdraw Amount (USD)</label>
+                        <label for="amount" class="form-label fw-bold" style="color: #17a2b8 !important; background-color: transparent !important;">Withdraw Amount (USD)</label>
                         <input 
                             type="number" 
-                            class="form-control" 
+                            class="form-control dark-input" 
                             id="amount" 
                             name="amount" 
                             min="40" 
@@ -250,7 +250,7 @@
                     </div>
                     <button 
                         type="submit" 
-                        class="btn btn-danger" 
+                        class="btn btn-glow-danger" 
                         id="withdrawButton"
                         <%= !withdrawWallet || balance < 40 ? 'disabled' : '' %>
                     >
@@ -258,17 +258,17 @@
                     </button>
                     
                     <% if (!withdrawWallet) { %>
-                        <small class="d-block mt-2 text-muted">Please set a withdraw wallet address first.</small>
+                        <small class="d-block mt-2 text-info">Please set a withdraw wallet address first.</small>
                     <% } else if (balance < 40) { %>
-                        <small class="d-block mt-2 text-muted">Minimum withdrawal amount is $40. Your balance is insufficient.</small>
+                        <small class="d-block mt-2 text-warning">Minimum withdrawal amount is $40. Your balance is insufficient.</small>
                     <% } else { %>
-                        <small class="d-block mt-2 text-muted">Minimum withdrawal: $40. Maximum: $<%= balance.toFixed(2) %></small>
+                        <small class="d-block mt-2 text-info">Minimum withdrawal: $40. Maximum: $<%= balance.toFixed(2) %></small>
                     <% } %>
                 </form>
                 
-                <div class="mt-4">
-                    <h6>Withdrawal Information:</h6>
-                    <ul class="mb-0">
+                <div class="mt-4 instruction-box">
+                    <h6 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Withdrawal Information:</h6>
+                    <ul class="mb-0 instruction-list">
                         <li>Minimum withdrawal: 40 USD</li>
                         <li>Processing time: 24-48 hours</li>
                         <li>Withdrawal fee: 2%</li>
@@ -281,7 +281,7 @@
 </div>
 
 <div class="text-center mt-4">
-    <a href="/" class="btn btn-primary">
+    <a href="/" class="btn btn-primary btn-glow">
         <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
     </a>
 </div>
@@ -361,5 +361,307 @@
                 }
             });
         }
+    });
+</script>
+
+<!-- Custom CSS for dark theme investment cards -->
+<style>
+    /* Dark theme cards */
+    .dark-card {
+        background-color: rgba(33, 37, 41, 0.8) !important;
+        border: 1px solid rgba(95, 145, 255, 0.3) !important;
+        border-radius: 10px !important;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .dark-card-body {
+        background-color: rgba(33, 37, 41, 0.95) !important;
+        color: #e0e0e0 !important;
+    }
+    
+    /* Fix withdraw card text colors */
+    .withdraw-card {
+        color: #ffffff !important;
+    }
+    
+    .withdraw-card p,
+    .withdraw-card h6,
+    .withdraw-card li,
+    .withdraw-card .instruction-title {
+        color: #ffffff !important;
+    }
+    
+    .withdraw-card .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    .withdraw-card .dark-input {
+        background-color: rgba(20, 30, 50, 0.7) !important;
+        color: #ffffff !important;
+    }
+    
+    /* Card specific stylings */
+    .balance-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Form label styling */
+    .withdraw-card .form-label {
+        color: #17a2b8 !important;
+        background-color: transparent !important;
+        display: inline-block;
+        padding: 2px 0;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .deposit-card {
+        border-left: 4px solid #28a745 !important;
+    }
+    
+    .withdraw-card {
+        border-left: 4px solid #dc3545 !important;
+        box-shadow: 0 2px 10px rgba(220, 53, 69, 0.2);
+    }
+    
+    /* Custom wallet cards */
+    .wallet-card {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        word-break: break-all;
+    }
+    
+    .deposit-wallet {
+        background-color: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.4);
+    }
+    
+    .withdraw-wallet {
+        background-color: rgba(23, 162, 184, 0.2);
+        border: 1px solid rgba(23, 162, 184, 0.4);
+    }
+    
+    .wallet-warning {
+        background-color: rgba(255, 193, 7, 0.2);
+        border: 1px solid rgba(255, 193, 7, 0.4);
+    }
+    
+    /* Form elements */
+    .dark-input {
+        background-color: rgba(33, 37, 41, 0.6) !important;
+        border: 1px solid rgba(95, 145, 255, 0.3) !important;
+        color: #fff !important;
+    }
+    
+    .dark-input::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Instruction boxes */
+    .instruction-box {
+        background-color: rgba(20, 30, 50, 0.5);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .instruction-title {
+        color: #adb5bd;
+        margin-bottom: 0.75rem;
+    }
+    
+    .instruction-list li {
+        margin-bottom: 0.3rem;
+        color: #e0e0e0;
+    }
+    
+    /* Fix specific elements in withdraw card */
+    .withdraw-card .instruction-box {
+        background-color: rgba(20, 30, 50, 0.7);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .withdraw-card .instruction-title {
+        color: #fff;
+    }
+    
+    .withdraw-card .instruction-list li {
+        color: #fff;
+    }
+    
+    /* Glow buttons */
+    .btn-glow-success {
+        background-color: rgba(40, 167, 69, 0.3);
+        border: 1px solid rgba(40, 167, 69, 0.6);
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-glow-success:hover {
+        background-color: rgba(40, 167, 69, 0.5);
+        box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        color: #fff;
+    }
+    
+    .btn-glow-info {
+        background-color: rgba(23, 162, 184, 0.3);
+        border: 1px solid rgba(23, 162, 184, 0.6);
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-glow-info:hover {
+        background-color: rgba(23, 162, 184, 0.5);
+        box-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
+        color: #fff;
+    }
+    
+    .btn-glow-danger {
+        background-color: rgba(220, 53, 69, 0.3);
+        border: 1px solid rgba(220, 53, 69, 0.6);
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-glow-danger:hover {
+        background-color: rgba(220, 53, 69, 0.5);
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        color: #fff;
+    }
+    
+    .btn-glow {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(95, 145, 255, 0.5);
+    }
+    
+    .btn-glow:hover {
+        box-shadow: 0 0 20px rgba(95, 145, 255, 0.8);
+        transform: translateY(-2px);
+    }
+    
+    /* Code styling */
+    code {
+        background-color: rgba(33, 37, 41, 0.7);
+        color: #e0e0e0;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+    }
+    
+    /* Mobile scrolling styles */
+    @media (max-width: 767.98px) {
+        #withdrawCardBody {
+            overflow-y: auto !important;
+            max-height: 400px !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+    }
+    
+    /* Force mobile scrolling with !important flags */
+    @media (max-width: 767.98px) {
+        .withdraw-card {
+            margin-bottom: 2rem !important;
+            display: flex !important;
+            flex-direction: column !important;
+            max-height: 80vh !important;
+        }
+        
+        .withdraw-card .card-header {
+            flex-shrink: 0 !important;
+        }
+        
+        .withdraw-card .card-body {
+            height: 400px !important;
+            max-height: 400px !important;
+            overflow-y: scroll !important;
+            padding: 1rem !important;
+            display: block !important;
+            overflow-x: hidden !important;
+        }
+        
+        /* Improve spacing on mobile */
+        .withdraw-card .instruction-box {
+            margin-bottom: 1rem !important;
+        }
+        
+        .withdraw-card form {
+            margin-bottom: 1.5rem !important;
+        }
+        
+        /* Custom scrollbar styling */
+        .withdraw-card .card-body::-webkit-scrollbar {
+            width: 5px !important;
+        }
+        
+        .withdraw-card .card-body::-webkit-scrollbar-track {
+            background: rgba(33, 37, 41, 0.3) !important;
+            border-radius: 10px !important;
+        }
+        
+        .withdraw-card .card-body::-webkit-scrollbar-thumb {
+            background-color: rgba(220, 53, 69, 0.5) !important;
+            border-radius: 10px !important;
+        }
+        
+        /* Firefox scrollbar */
+        .withdraw-card .card-body {
+            scrollbar-width: thin !important;
+            scrollbar-color: rgba(220, 53, 69, 0.5) rgba(33, 37, 41, 0.3) !important;
+        }
+        
+        .instruction-box {
+            padding: 0.75rem;
+        }
+        
+        .instruction-list {
+            padding-left: 1.5rem;
+        }
+        
+        .dark-card-body {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<!-- Direct mobile scroll implementation with inline styles -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const withdrawBody = document.getElementById('withdrawCardBody');
+        
+        // Add direct inline styles that override everything
+        function applyMobileScrolling() {
+            if (window.innerWidth <= 767.98) {
+                // Force scrollable container properties
+                withdrawBody.style.setProperty('max-height', '400px', 'important');
+                withdrawBody.style.setProperty('overflow-y', 'scroll', 'important');
+                withdrawBody.style.setProperty('-webkit-overflow-scrolling', 'touch', 'important');
+                withdrawBody.style.setProperty('padding-right', '10px', 'important');
+                withdrawBody.style.setProperty('padding-bottom', '20px', 'important');
+                withdrawBody.style.setProperty('height', 'auto', 'important');
+            } else {
+                // Reset for desktop
+                withdrawBody.style.removeProperty('max-height');
+                withdrawBody.style.removeProperty('overflow-y');
+                withdrawBody.style.removeProperty('-webkit-overflow-scrolling');
+                withdrawBody.style.removeProperty('padding-right');
+                withdrawBody.style.removeProperty('padding-bottom');
+                withdrawBody.style.removeProperty('height');
+            }
+        }
+        
+        // Apply immediately
+        applyMobileScrolling();
+        
+        // Apply on window resize
+        window.addEventListener('resize', applyMobileScrolling);
+        
+        // Apply after window load (for safety)
+        window.addEventListener('load', applyMobileScrolling);
+        
+        // Also apply after a delay to capture any lazy-loaded content
+        setTimeout(applyMobileScrolling, 500);
+        setTimeout(applyMobileScrolling, 1000);
     });
 </script>
