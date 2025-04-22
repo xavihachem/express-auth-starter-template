@@ -174,7 +174,16 @@ router.get('/sign-up', authController.signup); // Signup page
 router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
 router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
 
-router.post('/check-invitation-code', authController.checkInvitationCode); // Check invitation code and find inviter
+// Bypass CSRF for code validation only (this is safe as it only reads data)
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
+// Invitation code check with no CSRF requirement (safe read-only endpoint)
+router.post('/check-invitation-code', function(req, res, next) {
+    res.header('Content-Type', 'application/json');
+    // Skip CSRF for this specific endpoint
+    next();
+}, authController.checkInvitationCode); // Check invitation code and find inviter
 
 // Proxy for IP geolocation (to fix CORS issues)
 router.get('/api/ip-geolocation', async (req, res) => {

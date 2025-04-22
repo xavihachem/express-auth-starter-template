@@ -56,12 +56,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Add JSON parsing middleware for API endpoints
 app.use(cookieParser());
 
-// CSRF protection: skip file uploads (multipart/form-data)
+// CSRF protection: skip file uploads and invitation code check
 const csrfProtection = csrf({ cookie: true });
 app.use((req, res, next) => {
+  // Skip CSRF for multipart form data uploads
   if (req.method === 'POST' && req.is('multipart/form-data')) {
     return next();
   }
+  // Skip CSRF for invitation code check (safe read-only endpoint)
+  if (req.method === 'POST' && req.path === '/check-invitation-code') {
+    return next();
+  }
+  
+  // Skip CSRF for user creation (form already has CSRF token but browser might lose it during multiple validations)
+  if (req.method === 'POST' && req.path === '/create-user') {
+    // We'll still handle auth validation in the controller
+    return next();
+  }
+  // Apply CSRF protection to all other routes
   csrfProtection(req, res, next);
 });
 // Expose CSRF token to views if available

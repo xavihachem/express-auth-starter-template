@@ -365,6 +365,20 @@
             position: fixed;
         }
         
+        /* Mobile dropdown positioning fix */
+        @media (max-width: 991px) {
+            .notification-dropdown,
+            .profile-dropdown {
+                position: fixed !important;
+                top: 60px !important;
+                right: 10px !important;
+                left: auto !important;
+                max-width: calc(100vw - 20px) !important;
+                width: 280px !important;
+                transform: none !important;
+            }
+        }
+        
         /* Notification dropdown styling */
         .notification-dropdown {
             background-color: rgba(33, 37, 41, 0.95) !important;
@@ -518,13 +532,25 @@
                                 
                                 if (isUserDropdown) {
                                     // Position the user dropdown to the right of the toggle button
-                                    dropdown.style.left = toggleRect.left + 'px';
+                                        // Position the user dropdown correctly based on screen size
+                                    if (window.innerWidth < 992) {
+                                        dropdown.style.left = 'auto';
+                                        dropdown.style.right = '10px';
+                                    } else {
+                                        dropdown.style.left = toggleRect.left + 'px';
+                                    }
                                     dropdown.style.maxHeight = '200px';
                                     dropdown.style.overflowY = 'auto';
                                     dropdown.style.width = '200px';
                                 } else {
                                     // For notification dropdown, position it more to the right
-                                    dropdown.style.left = (toggleRect.left - 50) + 'px';
+                                        // For notification dropdown, position it more to the right on desktop, centered on mobile
+                                    if (window.innerWidth < 992) {
+                                        dropdown.style.left = 'auto';
+                                        dropdown.style.right = '10px';
+                                    } else {
+                                        dropdown.style.left = (toggleRect.left - 50) + 'px';
+                                    }
                                     dropdown.style.maxHeight = '400px';
                                     dropdown.style.overflowY = 'auto';
                                     dropdown.style.width = '280px';
@@ -625,7 +651,7 @@
                                 <span class="visually-hidden">unread notifications</span>
                             </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; max-width: 95vw; right: 0; left: auto; z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; max-width: 280px; right: 0; left: auto; transform: translateX(-70%); z-index: 9999 !important;">
                             <li><h6 class="dropdown-header py-1"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <!-- Notification items -->
@@ -677,7 +703,7 @@
                                 <% } %>
                             </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdownMobile" style="min-width: 200px; z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdownMobile" style="min-width: 200px; max-width: 200px; right: 0; left: auto; transform: translateX(-50%); z-index: 9999 !important;">
                             <li>
                                 <a class="dropdown-item py-1 small" href="/profile">
                                     <div class="d-flex align-items-center">

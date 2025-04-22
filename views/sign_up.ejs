@@ -1,5 +1,6 @@
 <h3 class="mb-5 cosmic-title">Sign up</h3>
 <form action="/create-user" id="create-user-form" method="post">
+    <input type="hidden" name="_csrf" id="csrf_token" value="<%= csrfToken %>" />
     <div class="form-outline mb-4">
         <input type="text" name="name" id="name" required placeholder="Name" class="form-control cosmic-input" autocomplete="name" />
     </div>
@@ -104,6 +105,92 @@
                 el.style.borderRight = '1px solid rgba(95, 145, 255, 0.3)';
             });
             
+            // Set up invitation code validation on blur
+            const invitationCodeInput = document.getElementById('invitation_code');
+            const inviterInfoDiv = document.getElementById('inviter-info');
+            
+            // Function to validate invitation code
+            async function validateInvitationCode(code) {
+                if (!code || code.trim() === '') {
+                    inviterInfoDiv.innerHTML = '';
+                    return { valid: true }; // Empty code is valid (it's optional)
+                }
+                
+                inviterInfoDiv.innerHTML = '<span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Checking invitation code...</span>';
+                
+                try {
+                    // Add a timestamp to prevent caching
+                    const timestamp = new Date().getTime();
+                    // Get CSRF token from the form
+                    const csrfToken = document.getElementById('csrf_token') ? document.getElementById('csrf_token').value : '';
+                    
+                    const response = await fetch(`/check-invitation-code`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache',
+                            'CSRF-Token': csrfToken,
+                            'X-CSRF-Token': csrfToken
+                        },
+                        body: JSON.stringify({ 
+                            code: code.trim(),
+                            _csrf: csrfToken
+                        })
+                    });
+                    
+                    // Handle HTTP errors
+                    // Check if response is valid JSON
+                    let data;
+                    try {
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            const errorText = await response.text().catch(() => 'Unknown error');
+                            console.error('Invalid content type:', contentType, 'Response:', errorText);
+                            inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> Server error - please try again</span>';
+                            return { valid: false, message: 'Server error - invalid response' };
+                        }
+                        
+                        data = await response.json();
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> Invalid response from server</span>';
+                        return { valid: false, message: 'Invalid response' };
+                    }
+                    
+                    if (!response.ok) {
+                        console.error('Server error:', response.status, data);
+                        inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> Server error - please try again</span>';
+                        return { valid: false, message: 'Server error' };
+                    }
+                    
+                    // Log the response
+                    console.log('Invitation code response:', data);
+                    
+                    if (!data.success) {
+                        inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
+                        return { valid: false, message: data.message };
+                    }
+                    
+                    // Success!
+                    inviterInfoDiv.innerHTML = `<span class="text-success"><i class="fas fa-check-circle me-1"></i> ${data.message}</span>`;
+                    return { valid: true, data };
+                    
+                } catch (err) {
+                    console.error('Error checking invitation code:', err);
+                    inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Network error - please check your connection</span>';
+                    return { valid: false, message: 'Network error' };
+                }
+            }
+            
+            // Add blur event for real-time validation
+            if (invitationCodeInput) {
+                invitationCodeInput.addEventListener('blur', function() {
+                    const code = invitationCodeInput.value.trim();
+                    validateInvitationCode(code);
+                });
+            }
+            
             // ensure hidden e164 is current and validate invitation code before submit
             const form = document.getElementById('create-user-form');
             form.addEventListener('submit', async function(e) {
@@ -123,25 +210,13 @@
                 const inviterInfoDiv = document.getElementById('inviter-info');
                 inviterInfoDiv.innerHTML = '';
                 if (code) {
-                    inviterInfoDiv.innerHTML = '<span class="text-muted">Checking invitation code...</span>';
-                    try {
-                        const response = await fetch('/check-invitation-code', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ code })
-                        });
-                        const data = await response.json();
-                        if (!data.success) {
-                            inviterInfoDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${data.message}</span>`;
-                            submitBtn.disabled = false;
-                            return;
-                        }
-                        // valid, allow submit
-                    } catch (err) {
-                        inviterInfoDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Error checking invitation code</span>';
+                    // Use our validation function
+                    const result = await validateInvitationCode(code);
+                    if (!result.valid) {
                         submitBtn.disabled = false;
                         return;
                     }
+                    // Valid code, proceed with form submission
                 }
                 // no code or valid, proceed
                 form.submit();
