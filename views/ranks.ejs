@@ -30,6 +30,15 @@
     }
 </style>
 
+<style>
+/* Force specific rank colors */
+.rank-golden h5, .rank-golden p { color: #ffc107 !important; }
+.rank-cyan h5, .rank-cyan p { color: #0dcaf0 !important; }
+.rank-blue h5, .rank-blue p { color: #0d6efd !important; }
+.rank-green h5, .rank-green p { color: #198754 !important; }
+.rank-grey h5, .rank-grey p { color: #6c757d !important; }
+</style>
+
 <div class="container rankings-page">
     <div class="container-fluid animate-fade-in">
         <div class="row mb-4">
@@ -114,85 +123,101 @@
         <div class="row">
             <!-- Available Ranks on Left -->
             <div class="col-md-7">
-                <div class="card animate-fade-in delay-2 rankings-card">
+                <div class="card animate-fade-in delay-2 rankings-card border-primary">
                     <div class="card-header bg-primary">
                         <h5 class="mb-0 text-white"><i class="fas fa-award me-2 text-white"></i>Available Ranks</h5>
                     </div>
+                    <style>
+                        /* Available Ranks styling */
+                        .rank-card {
+                            background-color: rgba(33, 37, 41, 0.9) !important;
+                            border-color: rgba(255, 255, 255, 0.1) !important;
+                        }
+                        .rank-card h5 {
+                            color: white !important;
+                        }
+                        .rank-card p.small {
+                            color: white !important;
+                        }
+                        .rank-card .small.text-muted {
+                            color: white !important;
+                        }
+                    </style>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-4">
-                                <div class="p-3 border rounded bg-light">
+                                <div class="p-3 border rounded rank-card" style="background-color: rgba(33, 37, 41, 0.9) !important; border: 2px solid #ffc107 !important;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="rounded-circle bg-warning p-2 me-2 text-white">
                                             <i class="fas fa-crown"></i>
                                         </div>
-                                        <h5 class="mb-0">Legend</h5>
+                                        <h5 class="mb-0" style="color: #ffc107 !important; font-weight: bold;">Legend</h5>
                                     </div>
-                                    <p class="small mb-2">Top player with highest points</p>
+                                    <p class="small mb-2" style="color: white !important;">Top player with highest points</p>
                                     <div class="progress" style="height: 5px;">
                                         <div class="progress-bar bg-warning" style="width: 100%"></div>
                                     </div>
-                                    <p class="small text-muted mt-1">500+ points</p>
+                                    <p class="small mt-1" style="color: white !important; font-weight: 500;">500+ points</p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <div class="p-3 border rounded bg-light">
+                                <div class="p-3 border rounded rank-card" style="background-color: rgba(33, 37, 41, 0.9) !important; border: 2px solid #0dcaf0 !important;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="rounded-circle bg-info p-2 me-2 text-white">
                                             <i class="fas fa-star"></i>
                                         </div>
-                                        <h5 class="mb-0">Master</h5>
+                                        <h5 class="mb-0" style="color: #0dcaf0 !important; font-weight: bold;">Master</h5>
                                     </div>
-                                    <p class="small mb-2">Elite players with exceptional skill</p>
+                                    <p class="small mb-2" style="color: white !important;">Elite players with exceptional skill</p>
                                     <div class="progress" style="height: 5px;">
                                         <div class="progress-bar bg-info" style="width: 80%"></div>
                                     </div>
-                                    <p class="small text-muted mt-1">300-499 points</p>
+                                    <p class="small mt-1" style="color: white !important; font-weight: 500;">300-499 points</p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <div class="p-3 border rounded bg-light">
+                                <div class="p-3 border rounded rank-card" style="background-color: rgba(33, 37, 41, 0.9) !important; border: 2px solid #0d6efd !important;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="rounded-circle bg-primary p-2 me-2 text-white">
                                             <i class="fas fa-medal"></i>
                                         </div>
-                                        <h5 class="mb-0">Expert</h5>
+                                        <h5 class="mb-0" style="color: #0d6efd !important; font-weight: bold;">Expert</h5>
                                     </div>
-                                    <p class="small mb-2">Highly skilled and experienced players</p>
+                                    <p class="small mb-2" style="color: white !important;">Highly skilled and experienced players</p>
                                     <div class="progress" style="height: 5px;">
                                         <div class="progress-bar bg-primary" style="width: 60%"></div>
                                     </div>
-                                    <p class="small text-muted mt-1">150-299 points</p>
+                                    <p class="small mt-1" style="color: white !important; font-weight: 500;">150-299 points</p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <div class="p-3 border rounded bg-light">
+                                <div class="p-3 border rounded rank-card" style="background-color: rgba(33, 37, 41, 0.9) !important; border: 2px solid #198754 !important;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="rounded-circle bg-success p-2 me-2 text-white">
                                             <i class="fas fa-award"></i>
                                         </div>
-                                        <h5 class="mb-0">Intermediate</h5>
+                                        <h5 class="mb-0" style="color: #198754 !important; font-weight: bold;">Intermediate</h5>
                                     </div>
-                                    <p class="small mb-2">Players with good knowledge and skills</p>
+                                    <p class="small mb-2" style="color: white !important;">Players with good knowledge and skills</p>
                                     <div class="progress" style="height: 5px;">
                                         <div class="progress-bar bg-success" style="width: 40%"></div>
                                     </div>
-                                    <p class="small text-muted mt-1">50-149 points</p>
+                                    <p class="small mt-1" style="color: white !important; font-weight: 500;">50-149 points</p>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <div class="p-3 border rounded bg-light">
+                                <div class="p-3 border rounded rank-card" style="background-color: rgba(33, 37, 41, 0.9) !important; border: 2px solid #6c757d !important;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="rounded-circle bg-secondary p-2 me-2 text-white">
                                             <i class="fas fa-user"></i>
                                         </div>
-                                        <h5 class="mb-0">Beginner</h5>
+                                        <h5 class="mb-0" style="color: #6c757d !important; font-weight: bold;">Beginner</h5>
                                     </div>
-                                    <p class="small mb-2">New players starting their journey</p>
+                                    <p class="small mb-2" style="color: white !important;">New players starting their journey</p>
                                     <div class="progress" style="height: 5px;">
                                         <div class="progress-bar bg-secondary" style="width: 20%"></div>
                                     </div>
-                                    <p class="small text-muted mt-1">0-49 points</p>
+                                    <p class="small mt-1" style="color: white !important; font-weight: 500;">0-49 points</p>
                                 </div>
                             </div>
                         </div>
@@ -202,12 +227,32 @@
             
             <!-- Top 5 Leaderboard on Right -->
             <div class="col-md-5">
-                <div class="card animate-fade-in delay-2 rankings-card">
+                <div class="card animate-fade-in delay-2 rankings-card border-primary">
                     <div class="card-header bg-primary">
                         <h5 class="mb-0 text-white"><i class="fas fa-list-ol me-2 text-white"></i>Top 5 Leaderboard</h5>
                     </div>
+                    <style>
+                        /* Leaderboard styling */
+                        .leaderboard-list .list-group-item {
+                            background-color: rgba(33, 37, 41, 0.9) !important;
+                            color: white !important;
+                            border-color: rgba(255, 255, 255, 0.1) !important;
+                        }
+                        .leaderboard-list .list-group-item h6,
+                        .leaderboard-list .list-group-item .mb-0 {
+                            color: white !important;
+                        }
+                        .leaderboard-list .badge.bg-primary {
+                            background-color: rgba(13, 110, 253, 0.8) !important;
+                        }
+                        /* Keep warning styles for highlighted item */
+                        .leaderboard-list .list-group-item-warning {
+                            background-color: rgba(255, 193, 7, 0.2) !important;
+                            color: white !important;
+                        }
+                    </style>
                     <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush leaderboard-list">
                             <% users.slice(0, 5).forEach((user, index) => { %>
                                 <div class="list-group-item <%= user._id.toString() === locals.user._id.toString() ? 'list-group-item-warning' : '' %>">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -244,7 +289,7 @@
                                                 <% } %>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0">
+                                                <h6 class="mb-0 text-white">
                                                     <%= user.name %>
                                                     <% if (user._id.toString() === locals.user._id.toString()) { %>
                                                         <span class="badge bg-primary ms-2">You</span>
@@ -253,7 +298,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <span class="badge bg-primary rounded-pill"><%= user.challengePoints || 0 %> pts</span>
+                                            <span class="badge rounded-pill" style="background-color: rgba(13, 110, 253, 0.8) !important; color: white !important; font-weight: 600;"><%= user.challengePoints || 0 %> pts</span>
                                         </div>
                                     </div>
                                 </div>

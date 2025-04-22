@@ -95,16 +95,25 @@
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0"><i class="fas fa-history me-2"></i> Withdrawal History</h5>
             </div>
+            <style>
+                .withdrawal-history-table th,
+                .withdrawal-history-table td {
+                    color: white !important;
+                }
+                .withdrawal-history-table small {
+                    color: rgba(255, 255, 255, 0.8) !important;
+                }
+            </style>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead>
+                        <thead class="text-white">
                             <tr>
-                                <th>Request ID</th>
-                                <th>Amount</th>
-                                <th>Request Date</th>
-                                <th>Processed Date</th>
-                                <th>Status</th>
+                                <th class="text-white">Request ID</th>
+                                <th class="text-white">Amount</th>
+                                <th class="text-white">Request Date</th>
+                                <th class="text-white">Processed Date</th>
+                                <th class="text-white">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,10 +130,10 @@
                                     }
                             %>
                                 <tr>
-                                    <td><small class="text-muted"><%= request.requestId %></small></td>
-                                    <td><strong>$<%= request.amount.toFixed(2) %></strong></td>
-                                    <td><%= new Date(request.requestDate).toLocaleString() %></td>
-                                    <td><%= request.processedDate ? new Date(request.processedDate).toLocaleString() : 'N/A' %></td>
+                                    <td><small class="text-light"><%= request.requestId %></small></td>
+                                    <td><strong class="text-white">$<%= request.amount.toFixed(2) %></strong></td>
+                                    <td class="text-white"><%= new Date(request.requestDate).toLocaleString() %></td>
+                                    <td class="text-white"><%= request.processedDate ? new Date(request.processedDate).toLocaleString() : 'N/A' %></td>
                                     <td>
                                         <span class="badge <%= statusClass %>"><%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %></span>
                                     </td>
