@@ -902,13 +902,11 @@ function determineVipLevel(balance) {
 
 // Check if user is eligible for daily reward
 module.exports.checkDailyRewardEligibility = async function(req, res) {
-
     const startTime = Date.now();
     
     try {
         // Check if user is authenticated
         if (!req.isAuthenticated()) {
-
             return res.status(401).json({ 
                 success: false, 
                 message: 'You must be logged in to check reward eligibility' 
@@ -916,29 +914,45 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
         }
 
         const userId = req.user._id;
-
         
         // Get user with current balance
         const user = await User.findById(userId);
         if (!user) {
-
             return res.status(404).json({ 
                 success: false, 
                 message: 'User not found' 
             });
         }
         
-
+        // Check if required daily challenges are completed
+        const completedChallenges = user.completedChallenges || [];
+        const dailyLoginCompleted = completedChallenges.includes('daily-login');
+        const startInvestingCompleted = completedChallenges.includes('start-investing');
+        
+        // Check if both required challenges are completed
+        if (!dailyLoginCompleted || !startInvestingCompleted) {
+            return res.json({
+                success: true,
+                eligible: false,
+                challengesCompleted: false,
+                dailyLoginCompleted,
+                startInvestingCompleted,
+                message: 'You need to complete all daily challenges to claim your reward',
+                vipLevel: 0,
+                reward: 0,
+                timeToNextReward: null
+            });
+        }
         
         // Determine VIP level and reward
         const vipStatus = determineVipLevel(user.balance);
         
         // Check if user qualifies for any VIP level
         if (vipStatus.level === 0) {
-
             return res.json({
                 success: true,
                 eligible: false,
+                challengesCompleted: true,
                 message: 'You need at least $80 balance to qualify for daily rewards',
                 vipLevel: 0,
                 reward: 0,
@@ -946,41 +960,27 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
             });
         }
         
-        // Check if enough time has passed since last claim (1 minute for testing)
+        // Check if enough time has passed since last claim (24 hours)
         const now = new Date();
-        const cooldownPeriod = 1 * 60 * 1000; // 1 minute in milliseconds for testing
+        const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         
         let timeToNextReward = null;
         let canClaim = true;
-        
-
         
         if (user.lastDailyRewardClaim) {
             const lastClaim = new Date(user.lastDailyRewardClaim);
             const timeSinceClaim = now - lastClaim;
             
-
-
-
-
-            
             if (timeSinceClaim < cooldownPeriod) {
                 canClaim = false;
                 timeToNextReward = cooldownPeriod - timeSinceClaim;
-
-            } else {
-
             }
-        } else {
-
         }
-        
-        const executionTime = Date.now() - startTime;
-
         
         return res.json({
             success: true,
             eligible: canClaim,
+            challengesCompleted: true,
             vipLevel: vipStatus.level,
             reward: vipStatus.reward,
             timeToNextReward: timeToNextReward,
@@ -990,7 +990,7 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
         });
         
     } catch (err) {
-        console.error('Error checking reward eligibility:', err);
+        console.error('[DAILY_REWARD_DEBUG] Error checking reward eligibility:', err);
         return res.status(500).json({ 
             success: false, 
             message: 'Failed to check reward eligibility' 
@@ -1000,20 +1000,12 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
 
 // Claim daily reward
 module.exports.claimDailyReward = async function(req, res) {
-
-
-    
-    // Log only necessary headers to avoid cluttering the logs
-    const relevantHeaders = {
-        'csrf-token': req.headers['csrf-token'],
-        'content-type': req.headers['content-type']
-    };
-
-    
-    // Check if CSRF token is present
+    // Check if CSRF token is present and valid
     if (!req.headers['csrf-token'] && !req.body._csrf) {
-
-        // Note: In production, you would want to return an error here
+        return res.status(403).json({
+            success: false,
+            message: 'CSRF token required for this operation'
+        });
     }
     const startTime = Date.now();
     
@@ -1040,27 +1032,46 @@ module.exports.claimDailyReward = async function(req, res) {
             });
         }
         
-        // Log user document to verify fields
 
+        
+        // Check if required daily challenges are completed
+        const completedChallenges = user.completedChallenges || [];
+        const dailyLoginCompleted = completedChallenges.includes('daily-login');
+        const startInvestingCompleted = completedChallenges.includes('start-investing');
+        
+
+        
+        // Check if both required challenges are completed
+        if (!dailyLoginCompleted || !startInvestingCompleted) {
+
+            return res.json({
+                success: false,
+                challengesCompleted: false,
+                dailyLoginCompleted,
+                startInvestingCompleted,
+                message: 'You need to complete all daily challenges before claiming your reward'
+            });
+        }
         
 
         
         // Determine VIP level and reward
         const vipStatus = determineVipLevel(user.balance);
+
         
         // Check if user qualifies for any VIP level
         if (vipStatus.level === 0) {
 
             return res.json({
                 success: false,
+                challengesCompleted: true,
                 message: 'You need at least $80 balance to qualify for daily rewards'
             });
         }
         
-        // Check if enough time has passed since last claim (1 minute for testing)
+        // Check if enough time has passed since last claim (24 hours)
         const now = new Date();
-        const cooldownPeriod = 1 * 60 * 1000; // 1 minute in milliseconds for testing
-        
+        const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
         
         // CRITICAL check to prevent exploit by page refresh
@@ -1069,22 +1080,20 @@ module.exports.claimDailyReward = async function(req, res) {
             const timeSinceClaim = now - lastClaim;
             
 
-
             
             // Strengthen the cooldown check with additional logging
             if (timeSinceClaim < cooldownPeriod) {
                 const timeToNextReward = cooldownPeriod - timeSinceClaim;
 
-
                 
                 return res.json({
                     success: false,
+                    challengesCompleted: true,
                     message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
                 });
             }
-        } else {
 
         }
         
@@ -1094,6 +1103,8 @@ module.exports.claimDailyReward = async function(req, res) {
             const lastClaim = new Date(latestUserData.lastDailyRewardClaim);
             const timeSinceClaim = now - lastClaim;
             
+
+            
             // This check catches any claims that might have happened between our first check and now
             if (timeSinceClaim < cooldownPeriod) {
                 const timeToNextReward = cooldownPeriod - timeSinceClaim;
@@ -1101,6 +1112,7 @@ module.exports.claimDailyReward = async function(req, res) {
                 
                 return res.json({
                     success: false,
+                    challengesCompleted: true,
                     message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
@@ -1110,7 +1122,6 @@ module.exports.claimDailyReward = async function(req, res) {
         
         // Update user balance and last claim time
         const newBalance = parseFloat(user.balance) + parseFloat(vipStatus.reward);
-
 
         
         // Add deposit record
@@ -1122,7 +1133,6 @@ module.exports.claimDailyReward = async function(req, res) {
             reason: `VIP Level ${vipStatus.level} Daily Reward`,
             transactionId: transactionId
         };
-        
 
         
         try {
@@ -1137,7 +1147,6 @@ module.exports.claimDailyReward = async function(req, res) {
                 $push: { depositHistory: depositRecord }
             }, { new: true });
             
-
 
             
             if (!updateResult) {

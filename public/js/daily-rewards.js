@@ -3,6 +3,7 @@
  * 
  * This script handles the daily rewards functionality on the dashboard.
  * It checks eligibility, processes claims, and updates the UI accordingly.
+ * It now also checks if required daily challenges have been completed.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -28,6 +29,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const claimedAmount = document.getElementById('claimed-amount');
     const newBalance = document.getElementById('new-balance');
     const successMessage = document.getElementById('success-message');
+    
+    // Create a new section for incomplete challenges
+    const challengesSection = document.createElement('div');
+    challengesSection.id = 'incomplete-challenges';
+    challengesSection.classList.add('text-center', 'd-none');
+    challengesSection.innerHTML = `
+        <div class="rounded-circle bg-info bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
+            <i class="fas fa-tasks fa-2x text-info"></i>
+        </div>
+        <h4>Complete Daily Challenges First</h4>
+        <p id="challenges-message">You need to complete the required daily challenges before claiming your reward.</p>
+        <div class="mt-3">
+            <div class="d-flex justify-content-center align-items-center mb-2">
+                <div id="challenge-daily-login" class="challenge-status me-2">
+                    <i class="fas fa-circle text-danger"></i>
+                </div>
+                <span>Daily Login Challenge</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-center mb-2">
+                <div id="challenge-start-investing" class="challenge-status me-2">
+                    <i class="fas fa-circle text-danger"></i>
+                </div>
+                <span>Start Investing Challenge</span>
+            </div>
+        </div>
+        <a href="/challenges" class="btn btn-primary mt-2">
+            <i class="fas fa-trophy me-2"></i>Go to Challenges
+        </a>
+    `;
+    
+    // Add the new section to the card body
+    const cardBody = document.querySelector('#daily-reward-card .card-body');
+    cardBody.appendChild(challengesSection);
     
     // State variables
     let countdownInterval = null;
@@ -106,67 +140,107 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 console.log('[DAILY_REWARD_CLIENT] Eligibility response:', data);
-                rewardData = data;
                 
                 if (!data.success) {
-                    // Handle API error
+                    console.log('[DAILY_REWARD_CLIENT] Error checking eligibility:', data.message);
                     showError(data.message || 'Failed to check reward eligibility');
                     return;
                 }
                 
-                // No VIP level
-                if (data.vipLevel === 0) {
-                    showSection(noVipStatus);
+                // Store reward data for later use
+                rewardData = data;
+                
+                // Check if daily challenges have been completed
+                if (data.hasOwnProperty('challengesCompleted') && !data.challengesCompleted) {
+                    console.log('[DAILY_REWARD_CLIENT] Daily challenges not completed');
+                    
+                    // Update challenge indicators
+                    updateChallengeStatus('daily-login', data.dailyLoginCompleted);
+                    updateChallengeStatus('start-investing', data.startInvestingCompleted);
+                    
+                    // Show incomplete challenges section
+                    showSection(document.getElementById('incomplete-challenges'));
                     return;
                 }
                 
-                // Update reward info
-                vipLevelDisplay.textContent = data.vipLevel;
-                rewardAmountDisplay.textContent = data.reward.toFixed(2);
-                
-                // Check if user can claim now
+                // If user is eligible for a reward
                 if (data.eligible) {
+                    console.log('[DAILY_REWARD_CLIENT] User eligible for reward');
+                    
+                    // Update reward display
+                    vipLevelDisplay.textContent = data.vipLevel;
+                    rewardAmountDisplay.textContent = data.reward.toFixed(2);
+                    
+                    // Show the claim section
                     showSection(canClaimReward);
-                } else {
-                    // Start countdown timer if needed
-                    timeToNextReward = data.timeToNextReward;
+                } 
+                // If user doesn't have VIP status yet
+                else if (data.vipLevel === 0) {
+                    console.log('[DAILY_REWARD_CLIENT] User does not have VIP status');
+                    showSection(noVipStatus);
+                }
+                // If user needs to wait for cooldown
+                else if (data.timeToNextReward) {
+                    console.log('[DAILY_REWARD_CLIENT] Cooldown active, time remaining:', data.timeToNextReward);
+                    
+                    // Set time to next reward and start countdown
+                    window.timeToNextReward = data.timeToNextReward;
                     updateCooldownTimer();
                     startCountdown();
+                    
+                    // Show cooldown section
                     showSection(waitingForCooldown);
                 }
             })
             .catch(error => {
-                console.error('[DAILY_REWARD_CLIENT] Error checking eligibility:', error);
+                console.error('[DAILY_REWARD_CLIENT] Error fetching reward eligibility:', error);
                 showError('Failed to connect to the server. Please try again later.');
             });
+    }
+    
+    /**
+     * Update the challenge status indicators
+     */
+    function updateChallengeStatus(challengeId, completed) {
+        const indicator = document.getElementById(`challenge-${challengeId}`);
+        if (indicator) {
+            const icon = indicator.querySelector('i');
+            if (completed) {
+                icon.className = 'fas fa-check-circle text-success';
+            } else {
+                icon.className = 'fas fa-times-circle text-danger';
+            }
+        }
     }
     
     /**
      * Claim the daily reward
      */
     function claimReward() {
-        console.log('[DAILY_REWARD_CLIENT] Claiming reward');
+        console.log('[DAILY_REWARD_CLIENT] Attempting to claim reward');
         
-        // Disable the claim button
+        // Disable the button to prevent double claims
         claimButton.disabled = true;
-        claimButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...';
+        claimButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing';
         
-        // Get CSRF token - check both meta tag and input field methods
+        // Find CSRF token - first try meta tag
         let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         
-        // If not found in meta tag, try to find it in a hidden input field (common Express CSRF pattern)
+        // If not in meta tag, try hidden input field (common in Express apps)
         if (!csrfToken) {
-            csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+            const csrfInput = document.querySelector('input[name="_csrf"]');
+            if (csrfInput) csrfToken = csrfInput.value;
         }
         
-        console.log('[DAILY_REWARD_CLIENT] CSRF Token:', csrfToken);
+        console.log('[DAILY_REWARD_CLIENT] Found CSRF token:', csrfToken ? 'Yes' : 'No');
         
-        // Create form data for the request
+        // Create FormData for the request
         const formData = new FormData();
         if (csrfToken) {
             formData.append('_csrf', csrfToken);
         }
         
+        // Make API request to claim the reward
         fetch('/claim-daily-reward', {
             method: 'POST',
             headers: {
@@ -174,13 +248,54 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            // Check for HTML response (which might indicate an error or CSRF issue)
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                console.error('[DAILY_REWARD_CLIENT] Received HTML response instead of JSON');
+                throw new Error('CSRF token issue or server error. Please refresh the page and try again.');
+            }
+            return response.json();
+        })
         .then(data => {
             console.log('[DAILY_REWARD_CLIENT] Claim response:', data);
             
+            // Reset the button state
+            claimButton.disabled = false;
+            claimButton.innerHTML = '<i class="fas fa-gift me-2"></i>Claim Reward';
+            
             if (!data.success) {
-                // Handle failed claim
-                showError(data.message || 'Failed to claim reward');
+                console.log('[DAILY_REWARD_CLIENT] Error claiming reward:', data.message);
+                
+                // If challenges are not completed, show challenge message
+                if (data.hasOwnProperty('challengesCompleted') && !data.challengesCompleted) {
+                    console.log('[DAILY_REWARD_CLIENT] Daily challenges not completed');
+                    
+                    // Update challenge indicators
+                    updateChallengeStatus('daily-login', data.dailyLoginCompleted);
+                    updateChallengeStatus('start-investing', data.startInvestingCompleted);
+                    
+                    // Show incomplete challenges section
+                    showSection(document.getElementById('incomplete-challenges'));
+                    return;
+                }
+                
+                // If cooldown is active, show cooldown message
+                if (data.cooldownActive && data.timeToNextReward) {
+                    console.log('[DAILY_REWARD_CLIENT] Cooldown active after claim attempt:', data.timeToNextReward);
+                    
+                    // Update the cooldown timer
+                    window.timeToNextReward = data.timeToNextReward;
+                    updateCooldownTimer();
+                    startCountdown();
+                    
+                    // Show the cooldown section
+                    showSection(waitingForCooldown);
+                } else {
+                    // Show generic error message
+                    showError(data.message || 'Failed to claim reward. Please try again later.');
+                }
+                
                 // Re-check eligibility after a failed claim
                 setTimeout(checkRewardEligibility, 1000);
                 return;
@@ -282,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
         canClaimReward.classList.add('d-none');
         claimSuccess.classList.add('d-none');
         rewardError.classList.add('d-none');
+        document.getElementById('incomplete-challenges').classList.add('d-none');
         
         // Show the requested section
         if (section) {
