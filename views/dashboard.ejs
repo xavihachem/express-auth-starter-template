@@ -69,7 +69,7 @@
                     <div class="rounded-circle bg-info bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
                         <i class="fas fa-wallet fa-2x text-info"></i>
                     </div>
-                    <h3 class="stat-counter">$<%= locals.user.balance || 0 %></h3>
+                    <h3 class="stat-counter">$<%= locals.user.balance ? Number(locals.user.balance).toFixed(2) : '0.00' %></h3>
                     <p class="stat-label mb-0">Balance</p>
                 </div>
             </div>

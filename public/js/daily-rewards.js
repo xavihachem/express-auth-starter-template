@@ -96,12 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusLoading.classList.add('d-none');
                 
                 // Update the cooldown timer with a nicer message
-                const seconds = Math.ceil(timeToNextReward / 1000);
-                cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> You've already claimed your reward.<br>Next reward available in <span id="cooldown-timer">${seconds}</span> second${seconds !== 1 ? 's' : ''}.`;
+                const formattedTime = formatMilliseconds(timeToNextReward);
+                cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> You've already claimed your reward.<br>Next reward available in ${formattedTime}.`;
                 
                 // Update the UI
                 window.timeToNextReward = timeToNextReward;
-                updateCooldownTimer();
                 startCountdown();
                 showSection(waitingForCooldown);
                 
@@ -185,7 +184,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Set time to next reward and start countdown
                     window.timeToNextReward = data.timeToNextReward;
-                    updateCooldownTimer();
+                    const formattedTime = formatMilliseconds(data.timeToNextReward);
+                    cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in ${formattedTime}.`;
+                    
+                    // Update the UI
                     startCountdown();
                     
                     // Show cooldown section
@@ -286,8 +288,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update the cooldown timer
                     window.timeToNextReward = data.timeToNextReward;
-                    updateCooldownTimer();
-                    startCountdown();
+                    const formattedTime = formatMilliseconds(data.timeToNextReward);
+                    cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in ${formattedTime}.`;
                     
                     // Show the cooldown section
                     showSection(waitingForCooldown);
@@ -337,23 +339,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
+     * Format milliseconds into a human-readable string (Hours and Minutes)
+     * @param {number} ms - Milliseconds to format
+     * @returns {string} Formatted time string
+     */
+    function formatMilliseconds(ms) {
+        if (ms <= 0) {
+            return "less than a minute";
+        }
+        const totalSeconds = Math.ceil(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+        let parts = [];
+        if (hours > 0) {
+            parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+        }
+        if (minutes > 0) {
+            parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+        }
+
+        // Handle case where only seconds remain (less than a minute)
+        if (parts.length === 0 && totalSeconds > 0) {
+            return "less than a minute";
+        } else if (parts.length === 0) {
+            // Should not happen if ms > 0, but safeguard
+            return "soon"; 
+        }
+        
+        return parts.join(' and ');
+    }
+    
+    /**
      * Update the cooldown timer display
      */
     function updateCooldownTimer() {
         if (window.timeToNextReward === null) return;
         
-        const seconds = Math.ceil(window.timeToNextReward / 1000);
-        
-        // Update just the timer value without changing the whole message
-        const timerElements = document.querySelectorAll('#cooldown-timer');
-        timerElements.forEach(element => {
-            element.textContent = seconds;
-        });
-        
-        // Only update the full message if it doesn't contain our custom message
-        if (!cooldownMessage.innerHTML.includes("You've already claimed your reward")) {
-            cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in <span id="cooldown-timer">${seconds}</span> second${seconds !== 1 ? 's' : ''}.`;
-        }
+        const formattedTime = formatMilliseconds(window.timeToNextReward);
+        cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in ${formattedTime}.`;
     }
     
     /**
@@ -405,4 +429,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-

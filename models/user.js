@@ -129,6 +129,10 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: null
         },
+        highestVipLevelReached: {
+            type: Number,
+            default: 0 // Starts at 0 (no VIP level)
+        },
         avatar: {
             type: String,
             default: null // Path to the user's profile image

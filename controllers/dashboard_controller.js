@@ -378,6 +378,75 @@ module.exports.updateBalance = async function(req, res) {
             
             // Update the user's balance by adding the deposit amount
             user.balance = newBalance;
+            
+            // REFERRAL REWARD SYSTEM:
+            // First, determine the user's new VIP level after deposit
+            const newVipStatus = determineVipLevel(newBalance);
+            const newVipLevel = newVipStatus.level;
+            
+            // Check if this is a higher VIP level than they've ever reached before
+            const previousHighest = user.highestVipLevelReached || 0;
+            
+            if (newVipLevel > previousHighest) {
+                // This is a new milestone! Update their highest level reached
+                user.highestVipLevelReached = newVipLevel;
+                
+                // If they were invited by someone, reward the referrer
+                if (user.invitedBy) {
+                    try {
+                        // Get the referrer user
+                        const referrer = await User.findById(user.invitedBy);
+                        if (referrer) {
+                            // Calculate reward points based on the new VIP level reached
+                            let rewardPoints = 0;
+                            
+                            // We only award points for the *new* levels reached, not previous ones
+                            // e.g., If going from level 0 to 3, points are awarded for levels 1, 2, and 3
+                            for (let level = previousHighest + 1; level <= newVipLevel; level++) {
+                                // Award points based on level achieved
+                                let levelPoints = 0;
+                                switch (level) {
+                                    case 1:
+                                        levelPoints = 100; // +100 points for level 1
+                                        break;
+                                    case 2:
+                                        levelPoints = 200; // +200 points for level 2
+                                        break;
+                                    case 3:
+                                        levelPoints = 300; // +300 points for level 3
+                                        break;
+                                    case 4:
+                                        levelPoints = 400; // +400 points for level 4
+                                        break;
+                                }
+                                rewardPoints += levelPoints;
+                            }
+                            
+                            if (rewardPoints > 0) {
+                                // Add challenge points to the referrer
+                                const previousPoints = referrer.challengePoints || 0;
+                                referrer.challengePoints = previousPoints + rewardPoints;
+                                
+                                // Save the referrer's updated information
+                                await referrer.save();
+                                
+                                // Create a notification for the referrer about the earned points
+                                const Notification = require('../models/notification');
+                                await Notification.notifyUser(referrer._id, {
+                                    title: 'Referral Level Reward',
+                                    message: `You earned ${rewardPoints} points because a user you invited reached VIP Level ${newVipLevel}!`,
+                                    type: 'success',
+                                    icon: 'user-friends',
+                                    actionType: 'balance_updated'
+                                });
+                            }
+                        }
+                    } catch (referralErr) {
+                        // Don't stop the deposit process if referral reward fails
+                    }
+                }
+            }
+            
             await user.save();
             
             // Create a notification for the user about the deposit
@@ -986,7 +1055,7 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
             timeToNextReward: timeToNextReward,
             message: canClaim 
                 ? `You can claim your VIP Level ${vipStatus.level} reward of $${vipStatus.reward}` 
-                : `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`
+                : `You need to wait before claiming the next reward.`
         });
         
     } catch (err) {
@@ -1089,7 +1158,7 @@ module.exports.claimDailyReward = async function(req, res) {
                 return res.json({
                     success: false,
                     challengesCompleted: true,
-                    message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
+                    message: 'You need to wait before claiming the next reward.',
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
                 });
@@ -1113,7 +1182,7 @@ module.exports.claimDailyReward = async function(req, res) {
                 return res.json({
                     success: false,
                     challengesCompleted: true,
-                    message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
+                    message: 'You need to wait before claiming the next reward.',
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
                 });
