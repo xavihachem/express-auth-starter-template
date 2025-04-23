@@ -134,16 +134,20 @@ module.exports.challenges = async function(req, res) {
 
 // Complete a challenge
 module.exports.completeChallenge = async function(req, res) {
+    console.log('[CHALLENGE_DEBUG] Starting challenge completion process');
     try {
         // Check if user is authenticated
         if (!req.isAuthenticated()) {
+            console.log('[CHALLENGE_DEBUG] User not authenticated');
             req.flash('error', 'Please sign in to complete challenges');
             return res.redirect('/sign-in');
         }
         
         const { challengeId } = req.body;
+        console.log(`[CHALLENGE_DEBUG] Processing challenge completion for ID: ${challengeId}`);
         
         if (!challengeId || typeof challengeId !== 'string') {
+            console.log('[CHALLENGE_DEBUG] Invalid challenge ID provided');
             req.flash('error', 'Valid challenge ID is required');
             return res.redirect('/challenges');
         }
@@ -151,28 +155,34 @@ module.exports.completeChallenge = async function(req, res) {
         // Find the challenge within the override list
         const availableChallenges = await getActiveChallengesOverride();
         const challenge = availableChallenges.find(c => c.id === challengeId);
+        console.log(`[CHALLENGE_DEBUG] Challenge found: ${challenge ? 'Yes' : 'No'}`);
         
         if (!challenge) {
+            console.log('[CHALLENGE_DEBUG] Challenge not found or inactive');
             req.flash('error', 'Challenge not found or inactive');
             return res.redirect('/challenges');
         }
         
         // Find the user
         const user = await User.findById(req.user._id);
+        console.log(`[CHALLENGE_DEBUG] User found: ${user ? 'Yes' : 'No'}`);
         
         if (!user) {
+            console.log('[CHALLENGE_DEBUG] User not found');
             req.flash('error', 'User not found');
             return res.redirect('/challenges');
         }
         
         // Check if challenges need to be reset
         const resetResult = await checkAndResetChallenges(user);
+        console.log(`[CHALLENGE_DEBUG] Challenges reset: ${resetResult}`);
         
         // Get updated user if challenges were reset
         const updatedUser = resetResult ? await User.findById(req.user._id) : user;
         
         // Check if user has already completed this challenge
         if (updatedUser.completedChallenges && updatedUser.completedChallenges.includes(challengeId)) {
+            console.log('[CHALLENGE_DEBUG] Challenge already completed');
             req.flash('info', 'You have already completed this challenge');
             return res.redirect('/challenges');
         }
@@ -181,15 +191,27 @@ module.exports.completeChallenge = async function(req, res) {
         const completedChallenges = [...(updatedUser.completedChallenges || []), challengeId];
         const challengePoints = (updatedUser.challengePoints || 0) + (challenge.points || 1);
         
+        console.log(`[CHALLENGE_DEBUG] Updating user - adding challenge ${challengeId} to completed list`);
+        console.log(`[CHALLENGE_DEBUG] New points total will be: ${challengePoints}`);
+        
         const updateResult = await User.findByIdAndUpdate(updatedUser._id, {
             completedChallenges,
             challengePoints
         }, { new: true });
         
+        console.log(`[CHALLENGE_DEBUG] Update successful: ${!!updateResult}`);
+        
+        // Special handling for the start-investing challenge - no redirection, just show success
+        if (challengeId === 'start-investing') {
+            console.log('[CHALLENGE_DEBUG] Start Investing challenge completed - staying on challenges page');
+            req.flash('success', `Challenge completed! You earned ${challenge.points} points. You are now investing!`);
+            return res.redirect('/challenges');
+        }
+        
         req.flash('success', `Challenge completed! You earned ${challenge.points} points.`);
         return res.redirect('/challenges');
     } catch (err) {
-        console.log('Error completing challenge:', err);
+        console.log('[CHALLENGE_DEBUG] Error completing challenge:', err);
         req.flash('error', 'Failed to complete challenge');
         return res.redirect('/challenges');
     }
@@ -240,5 +262,81 @@ module.exports.initializeChallenges = async function() {
         }
     } catch (err) {
         console.log('Error initializing challenges:', err);
+    }
+};
+
+// Testing helper to reset specific challenges for a user
+// This is purely for development and testing purposes
+module.exports.resetTestChallenges = async function(req, res) {
+    try {
+        // Only allow in non-production environments
+        if (process.env.NODE_ENV === 'production') {
+            console.log('[CHALLENGE_DEBUG] Reset attempted in production environment');
+            req.flash('error', 'This feature is not available in production');
+            return res.redirect('/challenges');
+        }
+        
+        // Check authentication
+        if (!req.isAuthenticated()) {
+            req.flash('error', 'Please sign in to reset challenges');
+            return res.redirect('/sign-in');
+        }
+        
+        console.log(`[CHALLENGE_DEBUG] Resetting test challenges for user: ${req.user._id}`);
+        
+        // Get the user
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            console.log('[CHALLENGE_DEBUG] User not found');
+            req.flash('error', 'User not found');
+            return res.redirect('/challenges');
+        }
+        
+        // Get the challenge IDs to reset from query or default to start-investing
+        const challengeIds = req.query.challenges ? 
+            req.query.challenges.split(',') : 
+            ['start-investing'];
+            
+        console.log(`[CHALLENGE_DEBUG] Challenges to reset: ${challengeIds.join(', ')}`);
+        
+        // Calculate points to subtract
+        let pointsToSubtract = 0;
+        let completedChallenges = [...(user.completedChallenges || [])];
+        
+        // Log before state
+        console.log(`[CHALLENGE_DEBUG] Current completed challenges: ${completedChallenges.join(', ')}`);
+        console.log(`[CHALLENGE_DEBUG] Current challenge points: ${user.challengePoints || 0}`);
+        
+        // Process each challenge to reset
+        challengeIds.forEach(id => {
+            if (completedChallenges.includes(id)) {
+                // Only subtract points if challenge was completed
+                if (id === 'start-investing') pointsToSubtract += 2;
+                else if (id === 'daily-login') pointsToSubtract += 1;
+                else pointsToSubtract += 1; // Default 1 point
+            }
+        });
+        
+        // Remove the specified challenges from completedChallenges
+        completedChallenges = completedChallenges.filter(id => !challengeIds.includes(id));
+        
+        // Update the user
+        const challengePoints = Math.max(0, (user.challengePoints || 0) - pointsToSubtract);
+        
+        await User.findByIdAndUpdate(user._id, {
+            completedChallenges,
+            challengePoints
+        });
+        
+        console.log(`[CHALLENGE_DEBUG] Reset successful - removed ${pointsToSubtract} points`);
+        console.log(`[CHALLENGE_DEBUG] Challenges after reset: ${completedChallenges.join(', ')}`);
+        
+        req.flash('success', `Successfully reset challenges: ${challengeIds.join(', ')}`);
+        return res.redirect('/challenges');
+    } catch (err) {
+        console.log('[CHALLENGE_DEBUG] Error resetting challenges:', err);
+        req.flash('error', 'Failed to reset challenges');
+        return res.redirect('/challenges');
     }
 };

@@ -31,6 +31,8 @@ router.get('/dashboard', passport.checkAuthentication, dashboardController.dashb
 // Challenges routes
 router.get('/challenges', passport.checkAuthentication, challengesController.challenges); // Display challenges page
 router.post('/complete-challenge', passport.checkAuthentication, challengesController.completeChallenge); // Handle challenge completion
+// Development-only route for testing challenge resets
+router.get('/reset-test-challenges', passport.checkAuthentication, challengesController.resetTestChallenges); // Reset test challenges
 
 router.get('/', (req, res) => {
     if (req.isAuthenticated && req.isAuthenticated()) {

@@ -1,4 +1,248 @@
 <style>
+    /* Start Investing Box Styles */
+    .start-investing-box {
+        background: linear-gradient(135deg, #1a2c38 0%, #16222A 100%);
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    /* Active investing state */
+    .start-investing-box.investing-active {
+        background: linear-gradient(135deg, #0f3443 0%, #075a2b 100%);
+        box-shadow: 0 10px 25px rgba(0, 120, 60, 0.3);
+    }
+    
+    .start-investing-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .start-investing-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(29, 233, 182, 0.1) 0%, rgba(10, 136, 235, 0.1) 100%);
+        z-index: 0;
+    }
+    
+    .text-gradient {
+        background: linear-gradient(to right, #1de9b6, #0a88eb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+    }
+    
+    /* Success gradient text for active investing */
+    .text-gradient-success {
+        background: linear-gradient(to right, #00c853, #64dd17);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+    }
+    
+    /* Status badge for active investing */
+    .status-badge {
+        display: inline-block;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+        }
+    }
+    
+    /* Coin Animation Styles */
+    .coin-animation-container {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .coin-stack {
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+    
+    .coin {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+    
+    .coin::before {
+        content: '$';
+        font-size: 30px;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .coin1 {
+        animation: float 3s ease-in-out infinite;
+        z-index: 3;
+    }
+    
+    .coin2 {
+        top: 10px;
+        left: 5px;
+        animation: float 3s ease-in-out infinite 0.5s;
+        z-index: 2;
+    }
+    
+    .coin3 {
+        top: 20px;
+        left: 10px;
+        animation: float 3s ease-in-out infinite 1s;
+        z-index: 1;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+        100% {
+            transform: translateY(0px);
+        }
+    }
+    
+    /* Progress Button Styles */
+    .progress-button {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        min-width: 180px;
+    }
+    
+    .progress-button .button-content {
+        position: relative;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-button .progress-circle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        z-index: 5;
+        transition: width 1.5s ease;
+        border-radius: 3px;
+    }
+    
+    .progress-button.loading .progress-circle {
+        width: 100%;
+        background: linear-gradient(90deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.4) 50%, rgba(0, 123, 255, 0.2) 100%);
+        background-size: 200% 100%;
+        animation: loading-gradient 1.5s ease infinite;
+    }
+    
+    @keyframes loading-gradient {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    .progress-button.success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .progress-button .checkmark {
+        display: none;
+        z-index: 10;
+    }
+    
+    .progress-button.success .button-content {
+        opacity: 0;
+        transform: scale(0);
+    }
+    
+    .progress-button.success .checkmark {
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+    }
+    
+    .checkmark-svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .checkmark-circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+        stroke: white;
+        fill: none;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    
+    .checkmark-check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        stroke-width: 3;
+        stroke: white;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+    
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .start-investing-box .coin-animation-container {
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        .start-investing-box .btn-lg {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+        }
+    }
+    
     /* Uniform styling for Complete buttons */
     .complete-btn {
         min-width: 100px;
@@ -86,6 +330,8 @@
         </div>
     </div>
 </div>
+
+
 
 <div class="row">
     <!-- Available Challenges -->
@@ -175,6 +421,51 @@
     </div>
 </div>
 
+<!-- Start Investing Promo Box -->
+<div class="container-fluid mb-4">
+    <div class="start-investing-box <%= (user.completedChallenges && user.completedChallenges.includes('start-investing')) ? 'investing-active' : '' %>">
+        <div class="d-flex flex-column flex-md-row align-items-center">
+            <div class="coin-animation-container">
+                <div class="coin-stack">
+                    <div class="coin coin1"></div>
+                    <div class="coin coin2"></div>
+                    <div class="coin coin3"></div>
+                </div>
+            </div>
+            <div class="flex-grow-1 p-4 text-center text-md-start">
+                <% if (user.completedChallenges && user.completedChallenges.includes('start-investing')) { %>
+                <!-- Already Investing Display -->
+                <h4 class="text-gradient-success mb-2">You Are Investing!</h4>
+                <p class="mb-3">Your investment journey has begun! You've earned bonus points for completing this challenge.</p>
+                <div class="status-badge bg-success text-white py-2 px-4 rounded-pill">
+                    <i class="fas fa-check-circle me-2"></i> Investment Active
+                </div>
+                <% } else { %>
+                <!-- Not Yet Investing Display -->
+                <h4 class="text-gradient mb-2">Start Investing Today!</h4>
+                <p class="mb-3">Begin your investment journey and complete the challenge to earn bonus points.</p>
+                <!-- Form that submits challenge completion but uses the animated button -->
+                <form id="completeInvestingForm" action="/complete-challenge" method="POST" class="d-inline">
+                    <input type="hidden" name="challengeId" value="start-investing">
+                    <button id="startInvestingBtn" type="button" class="btn btn-primary btn-lg progress-button">
+                        <span class="button-content">
+                            <i class="fas fa-chart-line me-2"></i> Start Investing
+                        </span>
+                        <span class="progress-circle"></span>
+                        <span class="checkmark">
+                            <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                            </svg>
+                        </span>
+                    </button>
+                </form>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card mb-4">
     <div class="card-header">
         <h5><i class="fas fa-info-circle me-2"></i> Challenge Information</h5>
@@ -196,6 +487,46 @@
 </div>
 
 <script>
+    // Button animation handling with form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const investBtn = document.getElementById('startInvestingBtn');
+        const completeForm = document.getElementById('completeInvestingForm');
+        
+        if (investBtn && completeForm) {
+            console.log('[CLIENT_DEBUG] Investment challenge button initialized');
+            
+            investBtn.addEventListener('click', function() {
+                // If already in success state, do nothing
+                if (investBtn.classList.contains('success')) {
+                    console.log('[CLIENT_DEBUG] Button already in success state');
+                    return;
+                }
+                
+                console.log('[CLIENT_DEBUG] Start investing button clicked, starting animation');
+                
+                // Add loading state
+                investBtn.classList.add('loading');
+                investBtn.disabled = true;
+                
+                // Simulate loading process (1.5 seconds)
+                setTimeout(function() {
+                    // Remove loading state
+                    investBtn.classList.remove('loading');
+                    
+                    // Add success state
+                    investBtn.classList.add('success');
+                    
+                    console.log('[CLIENT_DEBUG] Submitting challenge completion form');
+                    
+                    // Submit the form after animation completes
+                    setTimeout(function() {
+                        completeForm.submit();
+                    }, 1200);
+                }, 1500);
+            });
+        }
+    });
+    
     // Calculate time until next reset (midnight)
     function updateCountdown() {
         const now = new Date();
