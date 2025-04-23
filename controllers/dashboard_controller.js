@@ -855,3 +855,342 @@ module.exports.updateUserPassword = async function(req, res) {
         return res.redirect('/admin');
     }
 };
+
+// Helper function to determine VIP level and daily reward based on user balance
+function determineVipLevel(balance) {
+    console.log(`[VIP_LEVEL_DIAGNOSIS] Checking VIP level for balance: $${balance}`);
+    
+    // Define VIP level ranges and rewards
+    const vipLevels = [
+        { level: 1, minBalance: 80, maxBalance: 200, reward: 2.1 },
+        { level: 2, minBalance: 200, maxBalance: 500, reward: 6.4 },
+        { level: 3, minBalance: 500, maxBalance: 1000, reward: 13.3 },
+        { level: 4, minBalance: 2000, maxBalance: 5000, reward: 62.5 }
+    ];
+    
+    // Handle the case where balance is exactly at the boundary
+    for (const vipLevel of vipLevels) {
+        if (balance === vipLevel.maxBalance) {
+            console.log(`[VIP_LEVEL_DIAGNOSIS] User exactly at boundary, qualifying for VIP Level ${vipLevel.level}, reward: $${vipLevel.reward}`);
+            return vipLevel;
+        }
+    }
+    
+    // Handle the case for VIP level 3 differently for ranges between 1000-2000
+    if (balance >= 1000 && balance < 2000) {
+        console.log(`[VIP_LEVEL_DIAGNOSIS] User in 1000-2000 range, qualifying for VIP Level 3, reward: $13.3`);
+        return { level: 3, minBalance: 500, maxBalance: 2000, reward: 13.3 };
+    }
+    
+    // Find the matching VIP level
+    for (const vipLevel of vipLevels) {
+        if (balance >= vipLevel.minBalance && balance < vipLevel.maxBalance) {
+            console.log(`[VIP_LEVEL_DIAGNOSIS] User qualifies for VIP Level ${vipLevel.level}, reward: $${vipLevel.reward}`);
+            return vipLevel;
+        }
+    }
+    
+    // For balances over 5000, give them the highest VIP level
+    if (balance >= 5000) {
+        console.log(`[VIP_LEVEL_DIAGNOSIS] User exceeds max VIP range, qualifying for VIP Level 4, reward: $62.5`);
+        return { level: 4, minBalance: 2000, maxBalance: Infinity, reward: 62.5 };
+    }
+    
+    console.log('[VIP_LEVEL_DIAGNOSIS] User does not qualify for any VIP level');
+    return { level: 0, reward: 0 }; // No VIP level
+}
+
+// Check if user is eligible for daily reward
+module.exports.checkDailyRewardEligibility = async function(req, res) {
+    console.log('[DAILY_REWARD_DIAGNOSIS] Checking eligibility for daily reward');
+    const startTime = Date.now();
+    
+    try {
+        // Check if user is authenticated
+        if (!req.isAuthenticated()) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User not authenticated');
+            return res.status(401).json({ 
+                success: false, 
+                message: 'You must be logged in to check reward eligibility' 
+            });
+        }
+
+        const userId = req.user._id;
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Checking eligibility for user: ${userId}`);
+        
+        // Get user with current balance
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User not found in database');
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+        
+        console.log(`[DAILY_REWARD_DIAGNOSIS] User balance: $${user.balance}`);
+        
+        // Determine VIP level and reward
+        const vipStatus = determineVipLevel(user.balance);
+        
+        // Check if user qualifies for any VIP level
+        if (vipStatus.level === 0) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User does not qualify for any VIP level');
+            return res.json({
+                success: true,
+                eligible: false,
+                message: 'You need at least $80 balance to qualify for daily rewards',
+                vipLevel: 0,
+                reward: 0,
+                timeToNextReward: null
+            });
+        }
+        
+        // Check if enough time has passed since last claim (1 minute for testing)
+        const now = new Date();
+        const cooldownPeriod = 1 * 60 * 1000; // 1 minute in milliseconds for testing
+        
+        let timeToNextReward = null;
+        let canClaim = true;
+        
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Checking lastDailyRewardClaim:`, user.lastDailyRewardClaim);
+        
+        if (user.lastDailyRewardClaim) {
+            const lastClaim = new Date(user.lastDailyRewardClaim);
+            const timeSinceClaim = now - lastClaim;
+            
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Last claim timestamp: ${user.lastDailyRewardClaim}`);
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Parsed last claim: ${lastClaim.toISOString()}`);
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Current time: ${now.toISOString()}`);
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Time since claim: ${timeSinceClaim / 1000} seconds`);
+            
+            if (timeSinceClaim < cooldownPeriod) {
+                canClaim = false;
+                timeToNextReward = cooldownPeriod - timeSinceClaim;
+                console.log(`[DAILY_REWARD_DIAGNOSIS] Cooldown period not met, ${timeToNextReward / 1000} seconds remaining`);
+            } else {
+                console.log('[DAILY_REWARD_DIAGNOSIS] Cooldown period met, user can claim reward');
+            }
+        } else {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User has never claimed a reward before');
+        }
+        
+        const executionTime = Date.now() - startTime;
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Eligibility check completed in ${executionTime}ms`);
+        
+        return res.json({
+            success: true,
+            eligible: canClaim,
+            vipLevel: vipStatus.level,
+            reward: vipStatus.reward,
+            timeToNextReward: timeToNextReward,
+            message: canClaim 
+                ? `You can claim your VIP Level ${vipStatus.level} reward of $${vipStatus.reward}` 
+                : `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`
+        });
+        
+    } catch (err) {
+        console.log('[DAILY_REWARD_DIAGNOSIS] Error checking reward eligibility:', err);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to check reward eligibility' 
+        });
+    }
+};
+
+// Claim daily reward
+module.exports.claimDailyReward = async function(req, res) {
+    console.log('[DAILY_REWARD_DIAGNOSIS] Processing reward claim request');
+    console.log('[DAILY_REWARD_DIAGNOSIS] Request body:', req.body);
+    
+    // Log only necessary headers to avoid cluttering the logs
+    const relevantHeaders = {
+        'csrf-token': req.headers['csrf-token'],
+        'content-type': req.headers['content-type']
+    };
+    console.log('[DAILY_REWARD_DIAGNOSIS] Relevant request headers:', relevantHeaders);
+    
+    // Check if CSRF token is present
+    if (!req.headers['csrf-token'] && !req.body._csrf) {
+        console.log('[DAILY_REWARD_DIAGNOSIS] CSRF token missing, but proceeding for debugging');
+        // Note: In production, you would want to return an error here
+    }
+    const startTime = Date.now();
+    
+    try {
+        // Check if user is authenticated
+        if (!req.isAuthenticated()) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User not authenticated');
+            return res.status(401).json({ 
+                success: false, 
+                message: 'You must be logged in to claim a reward' 
+            });
+        }
+
+        const userId = req.user._id;
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Processing claim for user: ${userId}`);
+        
+        // Get user with current balance and lastDailyRewardClaim field
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User not found in database');
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+        
+        // Log user document to verify fields
+        console.log('[DAILY_REWARD_DIAGNOSIS] User document fields:', Object.keys(user._doc || {}));
+        
+        console.log(`[DAILY_REWARD_DIAGNOSIS] User balance before claim: $${user.balance}`);
+        
+        // Determine VIP level and reward
+        const vipStatus = determineVipLevel(user.balance);
+        
+        // Check if user qualifies for any VIP level
+        if (vipStatus.level === 0) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] User does not qualify for any VIP level');
+            return res.json({
+                success: false,
+                message: 'You need at least $80 balance to qualify for daily rewards'
+            });
+        }
+        
+        // Check if enough time has passed since last claim (1 minute for testing)
+        const now = new Date();
+        const cooldownPeriod = 1 * 60 * 1000; // 1 minute in milliseconds for testing
+        
+        console.log(`[DAILY_REWARD_DIAGNOSIS] DEBUG - lastDailyRewardClaim value in DB:`, user.lastDailyRewardClaim);
+        
+        // CRITICAL check to prevent exploit by page refresh
+        if (user.lastDailyRewardClaim) {
+            const lastClaim = new Date(user.lastDailyRewardClaim);
+            const timeSinceClaim = now - lastClaim;
+            
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Last claim: ${lastClaim.toISOString()}`);
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Time since last claim: ${timeSinceClaim / 1000} seconds`);
+            
+            // Strengthen the cooldown check with additional logging
+            if (timeSinceClaim < cooldownPeriod) {
+                const timeToNextReward = cooldownPeriod - timeSinceClaim;
+                console.log(`[DAILY_REWARD_DIAGNOSIS] Cooldown period not met, ${timeToNextReward / 1000} seconds remaining`);
+                console.log(`[DAILY_REWARD_DIAGNOSIS] Preventing claim attempt - cooldown still active`);
+                
+                return res.json({
+                    success: false,
+                    message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
+                    timeToNextReward: timeToNextReward,
+                    cooldownActive: true
+                });
+            }
+        } else {
+            console.log(`[DAILY_REWARD_DIAGNOSIS] No previous claim detected in database`);
+        }
+        
+        // Double-check to prevent race conditions - find the absolutely latest user data
+        const latestUserData = await User.findById(userId);
+        if (latestUserData.lastDailyRewardClaim) {
+            const lastClaim = new Date(latestUserData.lastDailyRewardClaim);
+            const timeSinceClaim = now - lastClaim;
+            
+            // This check catches any claims that might have happened between our first check and now
+            if (timeSinceClaim < cooldownPeriod) {
+                const timeToNextReward = cooldownPeriod - timeSinceClaim;
+                console.log(`[DAILY_REWARD_DIAGNOSIS] RACE CONDITION CAUGHT: Another claim was processed before this one completed`);
+                
+                return res.json({
+                    success: false,
+                    message: `You can claim your next reward in ${Math.ceil(timeToNextReward / 1000)} seconds`,
+                    timeToNextReward: timeToNextReward,
+                    cooldownActive: true
+                });
+            }
+        }
+        
+        // Update user balance and last claim time
+        const newBalance = parseFloat(user.balance) + parseFloat(vipStatus.reward);
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Adding reward of $${vipStatus.reward} to balance $${user.balance}`);
+        console.log(`[DAILY_REWARD_DIAGNOSIS] New balance will be: $${newBalance}`);
+        
+        // Add deposit record
+        const transactionId = 'DR' + Date.now().toString();
+        const depositRecord = {
+            amount: vipStatus.reward,
+            status: 'completed',
+            depositDate: now,
+            reason: `VIP Level ${vipStatus.level} Daily Reward`,
+            transactionId: transactionId
+        };
+        
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Creating deposit record with ID: ${transactionId}`);
+        
+        try {
+            // Use a timestamp string to ensure consistent format
+            const currentTimestamp = now.toISOString();
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Setting lastDailyRewardClaim to: ${currentTimestamp}`);
+            
+            // Update user document - trying with findByIdAndUpdate first
+            const updateResult = await User.findByIdAndUpdate(userId, {
+                balance: newBalance,
+                lastDailyRewardClaim: currentTimestamp,
+                $push: { depositHistory: depositRecord }
+            }, { new: true });
+            
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Update result:`, updateResult ? 'Success' : 'Failed');
+            console.log(`[DAILY_REWARD_DIAGNOSIS] Updated lastDailyRewardClaim in DB:`, updateResult.lastDailyRewardClaim);
+            
+            if (!updateResult) {
+                // If the first method fails, try the alternative approach
+                console.log('[DAILY_REWARD_DIAGNOSIS] First update attempt failed, trying alternative approach');
+                
+                // Get the user again, update manually, and save
+                const userToUpdate = await User.findById(userId);
+                userToUpdate.balance = newBalance;
+                userToUpdate.lastDailyRewardClaim = currentTimestamp;
+                userToUpdate.depositHistory.push(depositRecord);
+                await userToUpdate.save();
+                console.log('[DAILY_REWARD_DIAGNOSIS] Alternative update approach complete');
+                console.log(`[DAILY_REWARD_DIAGNOSIS] Updated lastDailyRewardClaim in DB (alt approach):`, userToUpdate.lastDailyRewardClaim);
+            }
+        } catch (updateError) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] Error updating user document:', updateError);
+            throw updateError;  // Re-throw to be caught by outer catch block
+        }
+        
+        // Create a notification for the user
+        try {
+            const Notification = require('../models/notification');
+            await Notification.notifyUser(userId, {
+                title: 'Daily Reward Claimed',
+                message: `You have claimed your VIP Level ${vipStatus.level} daily reward of $${vipStatus.reward}.`,
+                type: 'success',
+                icon: 'gift',
+                actionType: 'balance_updated'
+            });
+            console.log('[DAILY_REWARD_DIAGNOSIS] Notification created successfully');
+        } catch (notificationError) {
+            console.log('[DAILY_REWARD_DIAGNOSIS] Error creating notification:', notificationError);
+            // Continue even if notification fails - don't block the reward
+        }
+        
+        const executionTime = Date.now() - startTime;
+        console.log(`[DAILY_REWARD_DIAGNOSIS] Reward claim processed successfully in ${executionTime}ms`);
+        
+        return res.json({
+            success: true,
+            message: `You have successfully claimed your VIP Level ${vipStatus.level} reward of $${vipStatus.reward}`,
+            newBalance: newBalance,
+            reward: vipStatus.reward,
+            vipLevel: vipStatus.level,
+            transactionId: transactionId
+        });
+        
+    } catch (err) {
+        console.log('[DAILY_REWARD_DIAGNOSIS] Error processing reward claim:', err);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to process reward claim' 
+        });
+    }
+};

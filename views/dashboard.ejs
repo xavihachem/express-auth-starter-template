@@ -87,6 +87,70 @@
         </div>
     </div>
 
+    <!-- Daily Rewards Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card animate-fade-in delay-4" id="daily-reward-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-gift me-2"></i>Daily Rewards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center" id="reward-status-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Checking reward status...</p>
+                    </div>
+                    
+                    <!-- This will be shown if user is not eligible for any VIP level -->
+                    <div class="text-center d-none" id="no-vip-status">
+                        <div class="rounded-circle bg-secondary bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
+                            <i class="fas fa-lock fa-2x text-secondary"></i>
+                        </div>
+                        <h4>Not Eligible</h4>
+                        <p>You need at least $80 balance to qualify for daily rewards.</p>
+                    </div>
+                    
+                    <!-- This will be shown if user is eligible but needs to wait -->
+                    <div class="text-center d-none" id="waiting-for-cooldown">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
+                            <i class="fas fa-hourglass-half fa-2x text-warning"></i>
+                        </div>
+                        <h4>Not Ready Yet</h4>
+                        <p id="cooldown-message">You can claim your next reward in <span id="cooldown-timer">60</span> seconds.</p>
+                    </div>
+                    
+                    <!-- This will be shown if user can claim their reward -->
+                    <div class="text-center d-none" id="can-claim-reward">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
+                            <i class="fas fa-gift fa-2x text-success"></i>
+                        </div>
+                        <h4>Reward Ready!</h4>
+                        <p>You can claim your VIP <span id="vip-level-display">1</span> reward of $<span id="reward-amount-display">0.00</span></p>
+                        <button id="claim-reward-btn" class="btn btn-success">
+                            <i class="fas fa-gift me-2"></i>Claim Reward
+                        </button>
+                    </div>
+                    
+                    <!-- This will be shown after successful claim -->
+                    <div class="text-center d-none" id="claim-success">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                        <h4>Reward Claimed!</h4>
+                        <p id="success-message">You've claimed $<span id="claimed-amount">0.00</span>. New balance: $<span id="new-balance">0.00</span></p>
+                    </div>
+                    
+                    <!-- Error message area -->
+                    <div class="alert alert-danger mt-3 d-none" id="reward-error">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="error-message">An error occurred.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
@@ -118,3 +182,6 @@
 </div>
 
 <!-- Quick actions and account settings sections removed -->
+
+<!-- Load the daily rewards script -->
+<script src="/js/daily-rewards.js"></script>

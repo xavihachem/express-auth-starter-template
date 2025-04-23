@@ -125,6 +125,10 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: null
         },
+        lastDailyRewardClaim: {
+            type: Date,
+            default: null
+        },
         avatar: {
             type: String,
             default: null // Path to the user's profile image

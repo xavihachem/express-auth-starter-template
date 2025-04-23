@@ -263,5 +263,9 @@ router.get('/check-notifications', passport.checkAuthentication, async (req, res
     }
 });
 
+// Daily reward system routes
+router.get('/check-daily-reward', passport.checkAuthentication, dashboardController.checkDailyRewardEligibility);
+router.post('/claim-daily-reward', passport.checkAuthentication, dashboardController.claimDailyReward);
+
 // Export the router module
 module.exports = router;
