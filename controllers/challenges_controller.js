@@ -3,6 +3,14 @@ const Challenge = require('../models/challenge');
 
 // Helper function to check if challenges need to be reset
 const checkAndResetChallenges = async (user) => {
+    // Handle case where lastChallengeReset is undefined or invalid
+    if (!user.lastChallengeReset) {
+        await User.findByIdAndUpdate(user._id, {
+            lastChallengeReset: new Date()
+        });
+        return false; // No reset needed, just initialized the date
+    }
+    
     const now = new Date();
     const lastReset = new Date(user.lastChallengeReset);
     
@@ -12,16 +20,46 @@ const checkAndResetChallenges = async (user) => {
         now.getFullYear() !== lastReset.getFullYear()) {
         
         // Reset completed challenges and update reset time
-        await User.findByIdAndUpdate(user._id, {
+        const resetResult = await User.findByIdAndUpdate(user._id, {
             completedChallenges: [],
             lastChallengeReset: now
-        });
+        }, { new: true });
         
         return true; // Challenges were reset
     }
     
     return false; // No reset needed
 };
+
+// Helper function to get active override challenges
+async function getActiveChallengesOverride() {
+    let dailyLoginChallenge = await Challenge.findOne({ id: 'daily-login' });
+    if (!dailyLoginChallenge) {
+        dailyLoginChallenge = {
+            id: 'daily-login',
+            title: 'Daily Login',
+            description: 'Log in to your account today',
+            points: 1,
+            type: 'daily',
+            active: true,
+            isInMemory: true // Mark as in-memory if needed
+        };
+    }
+
+    // 'start-investing' is always in-memory based on current logic
+    const startInvestingChallenge = {
+        id: 'start-investing',
+        title: 'Start Investing',
+        description: 'Visit the investments page and start your first investment',
+        points: 2,
+        type: 'daily',
+        active: true,
+        isInMemory: true // Mark as in-memory
+    };
+
+    const overrideChallenges = [dailyLoginChallenge, startInvestingChallenge].filter(c => c && c.active);
+    return overrideChallenges;
+}
 
 // Controller for challenges page
 module.exports.challenges = async function(req, res) {
@@ -48,30 +86,48 @@ module.exports.challenges = async function(req, res) {
             await User.findById(currentUser._id) : 
             currentUser;
         
-        // Get all active challenges
-        const allChallenges = await Challenge.find({ active: true, type: 'daily' });
+        // Get the list of challenges using the override logic
+        const allChallenges = await getActiveChallengesOverride();
         
-        // Separate completed and available challenges
-        const completedChallengeIds = user.completedChallenges || [];
-        const completedChallenges = allChallenges.filter(challenge => 
-            completedChallengeIds.includes(challenge.id)
+        // OVERRIDE: Filter completed challenges to only include our supported ones
+        let completedChallengeIds = user.completedChallenges || [];
+        
+        // Filter to only include our supported challenges
+        completedChallengeIds = completedChallengeIds.filter(id => 
+            id === 'daily-login' || id === 'start-investing'
         );
+        
+        // Create completed challenges based on our hardcoded list
+        const completedChallenges = [];
+        
+        for (const id of completedChallengeIds) {
+            if (id === 'daily-login' && allChallenges.find(c => c.id === 'daily-login')) {
+                completedChallenges.push(allChallenges.find(c => c.id === 'daily-login'));
+            } else if (id === 'start-investing' && allChallenges.find(c => c.id === 'start-investing')) {
+                completedChallenges.push(allChallenges.find(c => c.id === 'start-investing'));
+            }
+        }
+        
+        // Filter available challenges to exclude completed ones
         const availableChallenges = allChallenges.filter(challenge => 
             !completedChallengeIds.includes(challenge.id)
         );
         
         // Render the challenges page
         return res.render('challenges', {
-            user,
-            completedChallenges,
+            title: 'Daily Challenges',
             availableChallenges,
+            completedChallenges,
             challengePoints: user.challengePoints || 0,
             completedToday: completedChallengeIds.length,
-            totalChallenges: allChallenges.length
+            totalChallenges: allChallenges.length,
+            user: req.user,
+            messages: req.flash(),
+            layout: 'layout' // Ensure the layout is used
         });
     } catch (err) {
-        console.log('Error in challenges controller:', err);
-        req.flash('error', 'Something went wrong. Please try again.');
+        console.log('Error loading challenges page:', err);
+        req.flash('error', 'Failed to load challenges');
         return res.redirect('/');
     }
 };
@@ -84,7 +140,7 @@ module.exports.completeChallenge = async function(req, res) {
             req.flash('error', 'Please sign in to complete challenges');
             return res.redirect('/sign-in');
         }
-
+        
         const { challengeId } = req.body;
         
         if (!challengeId || typeof challengeId !== 'string') {
@@ -92,8 +148,9 @@ module.exports.completeChallenge = async function(req, res) {
             return res.redirect('/challenges');
         }
         
-        // Find the challenge
-        const challenge = await Challenge.findOne({ id: challengeId, active: true });
+        // Find the challenge within the override list
+        const availableChallenges = await getActiveChallengesOverride();
+        const challenge = availableChallenges.find(c => c.id === challengeId);
         
         if (!challenge) {
             req.flash('error', 'Challenge not found or inactive');
@@ -109,22 +166,25 @@ module.exports.completeChallenge = async function(req, res) {
         }
         
         // Check if challenges need to be reset
-        await checkAndResetChallenges(user);
+        const resetResult = await checkAndResetChallenges(user);
+        
+        // Get updated user if challenges were reset
+        const updatedUser = resetResult ? await User.findById(req.user._id) : user;
         
         // Check if user has already completed this challenge
-        if (user.completedChallenges && user.completedChallenges.includes(challengeId)) {
+        if (updatedUser.completedChallenges && updatedUser.completedChallenges.includes(challengeId)) {
             req.flash('info', 'You have already completed this challenge');
             return res.redirect('/challenges');
         }
         
         // Update user's completed challenges and points
-        const completedChallenges = [...(user.completedChallenges || []), challengeId];
-        const challengePoints = (user.challengePoints || 0) + (challenge.points || 1);
+        const completedChallenges = [...(updatedUser.completedChallenges || []), challengeId];
+        const challengePoints = (updatedUser.challengePoints || 0) + (challenge.points || 1);
         
-        await User.findByIdAndUpdate(user._id, {
+        const updateResult = await User.findByIdAndUpdate(updatedUser._id, {
             completedChallenges,
             challengePoints
-        });
+        }, { new: true });
         
         req.flash('success', `Challenge completed! You earned ${challenge.points} points.`);
         return res.redirect('/challenges');

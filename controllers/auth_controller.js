@@ -2,6 +2,7 @@
 const User = require('../models/user');
 const Token = require('../models/token');
 const OtpToken = require('../models/otpToken');
+const Challenge = require('../models/challenge');
 const authMailer = require('../mailers/auth_mailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -191,10 +192,75 @@ module.exports.createUser = async function (req, res) {
     }
 };
 
-// Getting the user credentials and creating user session
-module.exports.createSession = function (req, res) {
-    req.flash('success', 'Signed in successfully.');
-    return res.redirect('/');
+// Function to handle user login session creation and initial actions
+// Returns true if successful, false otherwise.
+module.exports.createSession = async function (user) {
+    if (user) {
+        try {
+            // Call the separate function to complete the challenge
+            const challengeCompleted = await completeDailyLoginChallenge(user._id);
+            return true; // Indicate session setup was successful
+        } catch (error) {
+            console.error('Error during challenge completion in createSession:', error);
+            return false; // Indicate failure
+        }
+    } else {
+        console.log('No user object provided to createSession.');
+        return false; // Indicate failure
+    }
+};
+
+// Function to sign out the user
+module.exports.destroySession = function (req, res, next) {
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        req.flash('success', 'Signed out successfully.');
+        return res.redirect('/');
+    });
+};
+
+// Function to complete the Daily Login challenge
+const completeDailyLoginChallenge = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return false;
+        }
+
+        const dailyLoginChallengeId = 'daily-login'; // Make sure this matches your challenge ID
+
+        // Check if the challenge is already completed today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Modified to check if the string ID exists in the array, matching the User schema
+        const alreadyCompleted = user.completedChallenges.includes(dailyLoginChallengeId);
+
+        if (alreadyCompleted) {
+            return false; // Already completed
+        }
+
+        // Fetch the challenge details to get points
+        // Corrected field name from challengeId to id
+        const challenge = await Challenge.findOne({ id: dailyLoginChallengeId, active: true });
+        if (!challenge) {
+            return false;
+        }
+
+        // Mark challenge as completed
+        // Changed to push only the challenge ID (string) to match the User schema
+        user.completedChallenges.push(challenge.id); 
+        user.challengePoints += challenge.points;
+        user.lastChallengeReset = new Date(); // Ensure reset date is updated
+        
+        await user.save();
+        return true;
+    } catch (error) {
+        console.error('Error completing daily login challenge:', error);
+        return false;
+    }
 };
 
 // Handle email verification
@@ -328,17 +394,6 @@ module.exports.resendVerificationEmail = async function (req, res) {
         req.flash('error', 'Unable to send reset link. Please try again.');
         return res.redirect('back');
     }
-};
-
-// to logout user using passports's logout method
-module.exports.destroySession = function (req, res, next) {
-    req.logout(function (err) {
-        if (err) {
-            return next(err);
-        }
-        req.flash('success', 'Signed out successfully.');
-        return res.redirect('/');
-    });
 };
 
 //to render the chaange password

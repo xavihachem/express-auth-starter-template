@@ -25,6 +25,9 @@ app.set('layout extractStyles', true); // extract styles from layout
 app.set('layout extractScripts', true); // extract scripts from layout
 app.use(expressLayouts); // use express-ejs-layouts for rendering views
 
+// Use middleware to parse cookies *before* session
+app.use(cookieParser());
+
 // Configure session middleware
 app.use(
     session({
@@ -51,10 +54,9 @@ app.use(passport.setAuthenticatedUser);
 // Use flash middleware to display flash messages
 app.use(flash());
 
-// Use middleware to parse request body and cookies
+// Use middleware to parse request body 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Add JSON parsing middleware for API endpoints
-app.use(cookieParser());
 
 // CSRF protection: skip file uploads and invitation code check
 const csrfProtection = csrf({ cookie: true });

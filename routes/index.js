@@ -27,6 +27,11 @@ if (!process.env.EASY_SMS_API_KEY) {
 
 // Dashboard route (for explicit dashboard navigation)
 router.get('/dashboard', passport.checkAuthentication, dashboardController.dashboard);
+
+// Challenges routes
+router.get('/challenges', passport.checkAuthentication, challengesController.challenges); // Display challenges page
+router.post('/complete-challenge', passport.checkAuthentication, challengesController.completeChallenge); // Handle challenge completion
+
 router.get('/', (req, res) => {
     if (req.isAuthenticated && req.isAuthenticated()) {
         // If user is authenticated, redirect to dashboard
@@ -60,10 +65,6 @@ router.get('/team', passport.checkAuthentication, teamController.team); // Team 
 
 // Offers page route - accessible by all users
 router.get('/offers', offersController.offers); // Offers page
-
-// Challenges routes - only accessible by authenticated users
-router.get('/challenges', passport.checkAuthentication, challengesController.challenges); // Challenges page
-router.post('/complete-challenge', passport.checkAuthentication, challengesController.completeChallenge); // Complete a challenge
 
 // Ranks route - only accessible by authenticated users
 router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ranks page
@@ -136,8 +137,8 @@ router.get('/verify-wallet', passport.checkAuthentication, investmentsController
 router.post('/verify-wallet', passport.checkAuthentication, investmentsController.handleWalletVerification);
 
 // Login with phone verification check
-router.post('/create-session', otpLimiter, function(req, res, next) {
-    // Fix the email field if it's an array
+router.post('/create-session', function(req, res, next) {
+    // Handle potential array in email field from duplicate inputs
     if (Array.isArray(req.body.email)) {
         req.body.email = req.body.email[0]; // Take the first email value
     }
@@ -146,36 +147,98 @@ router.post('/create-session', otpLimiter, function(req, res, next) {
     failureRedirect: '/sign-in',
     failureFlash: true,
 }), async function(req, res, next) {
-    // At this point passport has set req.user
+    // Passport has set req.user
+    // User successfully authenticated
+
+    // Step 1: Attempt session setup (includes daily challenge completion)
+    const sessionSetupSuccess = await authController.createSession(req.user);
+    if (sessionSetupSuccess) {
+        req.flash('success', 'Signed in successfully.');
+    } else {
+        // Optional: Add a flash message if session setup failed, though unlikely here
+        console.error('Session creation failed for user:', req.user._id);
+        req.flash('error', 'An issue occurred during login setup.');
+        // Decide how to handle this - maybe redirect to sign-in?
+        // For now, we proceed to phone verification check
+    }
+
+    // Step 2: Check phone verification
     if (!req.user.isPhoneVerified) {
         const tempId = req.user._id;
+        // Phone not verified, redirecting to verification
         // Use separate OTP collection for phone verification
-        const existing = await OtpToken.findOne({ user: tempId });
-        const code = existing
-            ? existing.token
-            : Math.floor(100000 + Math.random() * 900000).toString();
-        if (!existing) {
-            await OtpToken.create({ user: tempId, token: code });
-        }
-        console.log(' (Test mode) phone OTP for user ' + tempId + ': ' + code);
-        req.flash('info', 'Your verification code is: ' + code);
-        return req.logout(function(err) {
-            if (err) return next(err);
-            req.session.tempUserId = tempId;
-            return res.redirect('/verify-phone');
+        const otpToken = await OtpToken.create({
+            user: tempId,
+            otp: Math.floor(100000 + Math.random() * 900000).toString(), // Generate 6-digit OTP
+            purpose: 'phone_verification'
         });
+        // Send OTP via SMS (ensure you have an SMS sending function)
+        // await sendSms(req.user.phone, `Your verification code is: ${otpToken.otp}`);
+        console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.otp} for user ${tempId}`); // REMOVE IN PRODUCTION
+
+        // Log the user out temporarily, store ID in session for verification page
+        req.logout(function(err) {
+            if (err) { return next(err); }
+            req.session.verifyUserId = tempId; // Store user ID for verification
+            req.session.verifyPurpose = 'phone_verification'; // Indicate purpose
+            return res.redirect('/verify-phone'); // Redirect to phone verification page
+        });
+    } else {
+        // Phone verified, proceeding to dashboard
+        // Step 3: Redirect to dashboard if phone is verified
+        return res.redirect('/dashboard'); // Changed from '/' to '/dashboard' for clarity
     }
-    // proceed to login user
-    req.logIn(req.user, err => {
-        if (err) return next(err);
-        return res.redirect('/dashboard');
-    });
 });
 
-router.get('/sign-in', authController.signin); // Signin page
-router.get('/sign-up', authController.signup); // Signup page
-router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
-router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
+// Route for handling Google OAuth callback
+router.get(
+    '/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/sign-in', failureFlash: true }),
+    async function(req, res, next) { // Changed this to be async
+        // Google auth successful, Passport sets req.user
+        // Google auth successful
+
+        // Step 1: Attempt session setup (includes daily challenge completion)
+        const sessionSetupSuccess = await authController.createSession(req.user);
+        if (sessionSetupSuccess) {
+            req.flash('success', 'Signed in successfully via Google.');
+        } else {
+            console.error('Session creation failed for Google user:', req.user._id);
+            req.flash('error', 'An issue occurred during Google login setup.');
+            // Decide handling - proceed for now
+        }
+
+        // Step 2: Check phone verification
+        if (!req.user.isPhoneVerified) {
+            const tempId = req.user._id;
+            // Phone not verified for Google user
+            const otpToken = await OtpToken.create({
+                user: tempId,
+                otp: Math.floor(100000 + Math.random() * 900000).toString(),
+                purpose: 'phone_verification'
+            });
+            // await sendSms(req.user.phone, `Your verification code is: ${otpToken.otp}`);
+             console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.otp} for user ${tempId}`); // REMOVE IN PRODUCTION
+
+            req.logout(function(err) {
+                if (err) { return next(err); }
+                req.session.verifyUserId = tempId;
+                req.session.verifyPurpose = 'phone_verification';
+                return res.redirect('/verify-phone');
+            });
+        } else {
+            // Phone verified for Google user
+            // Step 3: Redirect to dashboard if phone is verified
+            return res.redirect('/dashboard'); // Changed from '/' to '/dashboard'
+        }
+    }
+); 
+
+// Route for handling forgot password page
+router.get('/forgot-password', authController.forgotPassword); // Forgot password page
+router.post('/send-reset-link', authController.sendPasswordResetLink); // Send password reset link to the user's email
+router.get('/reset-password', authController.resetPassword); // Page to reset the password using a reset link
+router.post('/set-new-password', authController.verifyAndSetNewPassword); // Set a new password after verifying the reset link
 
 // Bypass CSRF for code validation only (this is safe as it only reads data)
 const csrf = require('csurf');
@@ -227,16 +290,10 @@ router.get(
     passport.authenticate('google', { scope: ['profile', 'email'] })
 ); // Endpoint to authenticate using Google OAuth
 
-router.get(
-    '/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/sign-in' }),
-    authController.createSession
-); // Callback URL for Google OAuth authentication
-
-router.get('/forgot-password', authController.forgotPassword); // Forgot password page
-router.post('/send-reset-link', authController.sendPasswordResetLink); // Send password reset link to the user's email
-router.get('/reset-password', authController.resetPassword); // Page to reset the password using a reset link
-router.post('/set-new-password', authController.verifyAndSetNewPassword); // Set a new password after verifying the reset link
+router.get('/sign-in', authController.signin); // Signin page
+router.get('/sign-up', authController.signup); // Signup page
+router.get('/verify-email/:userId/:token', authController.verifyEmail); // Email verification
+router.post('/resend-verification', authController.resendVerificationEmail); // Resend verification email
 
 // Route to check for unread notifications (called by client-side JS for real-time updates)
 router.get('/check-notifications', passport.checkAuthentication, async (req, res) => {
