@@ -133,43 +133,116 @@
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Referral Program</h3>
                 </div>
-                <div class="card-body dark-theme-card">
+                <div class="card-body dark-theme-card mobile-scroll" style="overflow-x: hidden;">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h4 class="mb-3">Invite Friends & Earn Points</h4>
-                            <p>Earn points when your friends deposit:</p>
-                            <ul class="list-group mb-4 dark-list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
-                                    VIP Level I Deposit
-                                    <span class="badge bg-primary rounded-pill">100 Points</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
-                                    VIP Level II Deposit
-                                    <span class="badge bg-info rounded-pill">200 Points</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
-                                    VIP Level III Deposit
-                                    <span class="badge bg-success rounded-pill">300 Points</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center dark-list-item">
-                                    VIP Level IV Deposit
-                                    <span class="badge bg-warning text-dark rounded-pill">400 Points</span>
-                                </li>
-                            </ul>
+                        <div class="col-12 mb-4">
+                            <div class="referral-header text-center mb-4">
+                                <h4><i class="fas fa-users me-2"></i>Invite Friends & Earn Points</h4>
+                                <p class="text-muted">Earn premium rewards when your friends make deposits</p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card conversion-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Points to USDT Conversion</h5>
-                                    <p class="card-text">Each 100 Points = $10 USDT</p>
-                                    <p class="card-text">You can transfer your points to USDT after 60 days from your deposit date.</p>
-                                    <% if (locals.user) { %>
-                                        <a href="/team" class="btn btn-primary btn-glow">View My Referrals</a>
-                                    <% } else { %>
-                                        <a href="/sign-up" class="btn btn-primary btn-glow">Join Now</a>
-                                    <% } %>
+                        
+                        <div class="col-12">
+                            <div class="referral-tiers-grid mb-4">
+                                <div class="row mx-0">
+                                    <!-- First Row -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="referral-tier">
+                                            <div class="tier-header level-1">
+                                                <span class="level-name">VIP Level I</span>
+                                                <span class="level-points">100</span>
+                                            </div>
+                                            <div class="tier-body">
+                                                <i class="fas fa-gift tier-icon"></i>
+                                                <span>Beginner Tier</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-4">
+                                        <div class="referral-tier">
+                                            <div class="tier-header level-2">
+                                                <span class="level-name">VIP Level II</span>
+                                                <span class="level-points">200</span>
+                                            </div>
+                                            <div class="tier-body">
+                                                <i class="fas fa-trophy tier-icon"></i>
+                                                <span>Semi-Pro Tier</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Second Row -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="referral-tier">
+                                            <div class="tier-header level-3">
+                                                <span class="level-name">VIP Level III</span>
+                                                <span class="level-points">300</span>
+                                            </div>
+                                            <div class="tier-body">
+                                                <i class="fas fa-star tier-icon"></i>
+                                                <span>Professional Tier</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-4">
+                                        <div class="referral-tier">
+                                            <div class="tier-header level-4">
+                                                <span class="level-name">VIP Level IV</span>
+                                                <span class="level-points">400</span>
+                                            </div>
+                                            <div class="tier-body">
+                                                <i class="fas fa-crown tier-icon"></i>
+                                                <span>Elite Tier</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div class="text-center mt-2 mb-3">
+                                <% if (locals.user) { %>
+                                    <a href="/team" class="btn btn-primary btn-lg btn-glow">
+                                        <i class="fas fa-users me-2"></i>View My Referrals
+                                    </a>
+                                <% } else { %>
+                                    <a href="/sign-up" class="btn btn-primary btn-lg btn-glow">
+                                        <i class="fas fa-user-plus me-2"></i>Join Now
+                                    </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Moonify Coin Card -->
+            <div class="card shadow-sm mb-4 vip-levels-card animate-fade-in">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0"><i class="fas fa-coins me-2"></i>Moonify Coin</h3>
+                </div>
+                <div class="card-body dark-theme-card text-center" style="overflow-x: hidden;">
+                    <div class="moonify-coin-card mx-auto" style="max-width: 600px;">
+                        <div class="moonify-coin-glow"></div>
+                        <div class="moonify-coin-content">
+                            <div class="moonify-coin-icon">
+                                <i class="fas fa-moon"></i>
+                                <i class="fas fa-coins coin-stack"></i>
+                            </div>
+                            <h5 class="moonify-title">COMING SOON</h5>
+                            <h3 class="moonify-name">Moonify Coin <span class="moonify-symbol">🔸</span></h3>
+                            <p class="moonify-description">Your earned points will soon be convertible to exclusive Moonify Coins - our premium digital currency</p>
+                            <div class="moonify-features">
+                                <span><i class="fas fa-lock-open"></i> Exclusive Access</span>
+                                <span><i class="fas fa-exchange-alt"></i> Point Conversion</span>
+                                <span><i class="fas fa-rocket"></i> Premium Features</span>
+                            </div>
+                            <% if (locals.user) { %>
+                                <a href="/team" class="btn btn-moonify">View My Referrals</a>
+                            <% } else { %>
+                                <a href="/sign-up" class="btn btn-moonify">Join Now</a>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -330,6 +403,15 @@
         .vip-levels-card .card-body {
             padding: 1rem 0.5rem;
         }
+        
+        .mobile-scroll {
+            overflow-y: auto !important;
+            max-height: 600px;
+        }
+        
+        .referral-tier {
+            margin-bottom: 10px;
+        }
     }
     
     /* Animation for the special VIP level */
@@ -444,5 +526,255 @@
         background: linear-gradient(135deg, #ffc107, #d39e00);
         color: #212529;
         border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Referral Tiers Styling */
+    .referral-header h4 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+    }
+    
+    .referral-tiers {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .referral-tiers-grid {
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    @media (max-width: 767.98px) {
+        .referral-tiers-grid {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+    }
+    
+    .referral-tiers-grid .row {
+        margin-right: 0;
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    @media (min-width: 992px) {
+        .referral-tier {
+            max-width: 100%;
+        }
+    }
+    
+    .referral-tier {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+    
+    .referral-tier:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tier-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tier-header.level-1 { background: linear-gradient(135deg, #007bff, #0056b3); }
+    .tier-header.level-2 { background: linear-gradient(135deg, #17a2b8, #138496); }
+    .tier-header.level-3 { background: linear-gradient(135deg, #28a745, #1e7e34); }
+    .tier-header.level-4 { background: linear-gradient(135deg, #ffc107, #d39e00); color: #212529; }
+    
+    .level-name {
+        font-weight: bold;
+        font-size: 1rem;
+        color: white;
+    }
+    
+    .tier-header.level-4 .level-name {
+        color: #212529;
+    }
+    
+    .level-points {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .tier-header.level-4 .level-points {
+        background: rgba(0, 0, 0, 0.1);
+        color: #212529;
+    }
+    
+    .tier-body {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background: rgba(33, 37, 41, 0.7);
+        color: #e0e0e0;
+        min-height: 50px;
+    }
+    
+    .tier-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
+    
+    /* Moonify Coin Card Styling */
+    .moonify-coin-card {
+        position: relative;
+        background: linear-gradient(145deg, #1a1d22, #252b36);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        height: 100%;
+        min-height: 380px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .moonify-coin-glow {
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(255, 193, 7, 0.4) 0%, rgba(33, 37, 41, 0) 70%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: pulse 3s infinite alternate;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.4; transform: scale(1); }
+        100% { opacity: 0.8; transform: scale(1.2); }
+    }
+    
+    .moonify-coin-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .moonify-coin-icon {
+        position: relative;
+        margin: 0 auto 15px;
+        width: 80px;
+        height: 80px;
+    }
+    
+    .moonify-coin-icon .fa-moon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 3rem;
+        color: #ffc107;
+        filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.7));
+        animation: rotate 8s linear infinite;
+    }
+    
+    .moonify-coin-icon .fa-coins {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 2.2rem;
+        color: #e0b300;
+        filter: drop-shadow(0 0 5px rgba(224, 179, 0, 0.7));
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .moonify-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 5px;
+    }
+    
+    .moonify-name {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(to right, #fff, #ffc107);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-bottom: 15px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    
+    .moonify-symbol {
+        font-size: 1.5rem;
+        vertical-align: middle;
+    }
+    
+    .moonify-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .moonify-features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+    
+    .moonify-features span {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .moonify-features i {
+        color: #ffc107;
+    }
+    
+    .btn-moonify {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        border: none;
+        color: #000;
+        font-weight: bold;
+        padding: 10px 25px;
+        border-radius: 30px;
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-moonify:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.6);
+        color: #000;
     }
 </style>
