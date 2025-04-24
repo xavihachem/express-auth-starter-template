@@ -437,20 +437,162 @@
             font-weight: 500 !important;
         }
         
-        /* Profile dropdown styling */
-        .profile-dropdown {
-            background-color: rgba(33, 37, 41, 0.95) !important;
-            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+        /* Gold username styling */
+        .username-gold {
+            background: linear-gradient(to right, #FFD700, #FFA500) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+            font-weight: 600 !important;
+            margin-right: 4px !important;
+            letter-spacing: 0.5px !important;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+        }
+        
+        .username-gold-large {
+            background: linear-gradient(to right, #FFD700, #FFA500) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+            font-weight: 700 !important;
+            font-size: 1.2rem !important;
+            letter-spacing: 0.5px !important;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
+        }
+        
+        /* Profile avatar styling */
+        .profile-avatar {
+            border: 2px solid rgba(255, 215, 0, 0.7) !important;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Desktop nav profile link */
+        .navbar .dropdown .user-profile-link {
+            padding: 5px 10px !important;
+            border-radius: 50px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .navbar .dropdown .user-profile-link:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .user-profile-link:hover .profile-avatar {
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8) !important;
+        }
+        
+        /* Position the desktop dropdown properly */
+        @media (min-width: 992px) {
+            .dropdown-menu.premium-profile-dropdown {
+                position: absolute !important;
+                right: 0 !important;
+                left: auto !important;
+                transform: none !important;
+                margin-top: 10px !important;
+            }
+        }
+        
+        /* Enhanced Profile dropdown styling */
+        .premium-profile-dropdown {
+            background: linear-gradient(135deg, rgba(20, 24, 33, 0.97), rgba(33, 37, 41, 0.97)) !important;
+            border: 1px solid rgba(255, 215, 0, 0.3) !important;
             backdrop-filter: blur(10px) !important;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
-            padding: 0.5rem 0 !important;
-            border-radius: 0.5rem !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+            padding: 0 0 8px 0 !important;
+            border-radius: 12px !important;
+            animation: fadeIn 0.3s ease-out !important;
+            position: absolute !important;
+            right: 0 !important;
+            left: auto !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-card {
+            background: linear-gradient(to bottom, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)) !important;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2) !important;
+        }
+        
+        .avatar-large {
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 50% !important;
+            overflow: hidden !important;
+            border: 2px solid rgba(255, 215, 0, 0.7) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5) !important;
+        }
+        
+        .menu-item {
+            transition: all 0.2s ease !important;
+            margin: 0 8px !important;
+            border-radius: 8px !important;
+            width: auto !important;
+            white-space: nowrap !important;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            transform: translateX(3px) !important;
+        }
+        
+        .sign-out-button {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+            margin-top: 5px !important;
+            margin-bottom: 5px !important;
+        }
+        
+        .sign-out-button:hover {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+        }
+        
+        .menu-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .menu-item:hover .menu-icon {
+            transform: scale(1.15) !important;
+        }
+        
+        .icon-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3) !important;
+            color: white !important;
+        }
+        
+        .icon-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+            color: white !important;
+        }
+        
+        .icon-info {
+            background: linear-gradient(135deg, #17a2b8, #138496) !important;
+            color: white !important;
+        }
+        
+        .icon-danger {
+            background: linear-gradient(135deg, #dc3545, #bd2130) !important;
+            color: white !important;
         }
         
         .profile-dropdown .dropdown-header {
-            color: white !important;
-            font-weight: 600 !important;
-            font-size: 0.9rem !important;
+            background-color: rgba(0, 123, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.5px !important;
             padding: 0.5rem 1rem !important;
         }
         
@@ -643,6 +785,167 @@
             position: relative !important;
             overflow: hidden !important;
         }
+                /* Enhanced Navbar Styling */
+        .navbar-glass {
+            background: rgba(13, 25, 42, 0.5) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid rgba(95, 145, 255, 0.2) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            padding: 0.8rem 1rem !important;
+            transition: all 0.3s ease !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+        }
+        
+        .navbar-glass:hover {
+            background: rgba(13, 25, 42, 0.7) !important;
+            border-bottom: 1px solid rgba(95, 145, 255, 0.3) !important;
+        }
+        
+        /* Logo animation */
+        .pulse-glow {
+            animation: logoPulse 3s ease-in-out infinite !important;
+        }
+        
+        @keyframes logoPulse {
+            0% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
+            50% { filter: drop-shadow(0 0 10px rgba(95, 145, 255, 0.8)); }
+            100% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
+        }
+        
+        /* Hamburger Menu Animation */
+        .nav-toggler-btn {
+            background: transparent !important;
+            border: none !important;
+            width: 30px !important;
+            height: 30px !important;
+            position: relative !important;
+            padding: 0 !important;
+            display: none !important; /* Hide by default */
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+        }
+        
+        /* Only show hamburger on mobile */
+        @media (max-width: 991.98px) {
+            .nav-toggler-btn {
+                display: flex !important;
+            }
+        }
+        
+        .toggler-icon {
+            width: 100% !important;
+            height: 2px !important;
+            background-color: white !important;
+            border-radius: 2px !important;
+            transition: all 0.3s !important;
+            transform-origin: 1px !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:first-child {
+            transform: rotate(45deg) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:nth-child(2) {
+            opacity: 0 !important;
+            transform: translateX(-20px) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:last-child {
+            transform: rotate(-45deg) !important;
+        }
+        
+        /* Navigation Menu Items */
+        .nav-menu {
+            gap: 8px !important;
+        }
+        
+        .nav-btn {
+            padding: 0.6rem 1rem !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            overflow: hidden !important;
+        }
+        
+        .nav-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(to right, rgba(95, 145, 255, 0.1), transparent) !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.3s ease-out !important;
+            z-index: -1 !important;
+        }
+        
+        .nav-btn:hover {
+            color: white !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .nav-btn:hover::before {
+            transform: translateX(0) !important;
+        }
+        
+        .nav-btn.active {
+            background: rgba(95, 145, 255, 0.2) !important;
+            box-shadow: 0 0 10px rgba(95, 145, 255, 0.3) !important;
+            color: white !important;
+        }
+        
+        .nav-icon {
+            margin-right: 10px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .nav-btn:hover .nav-icon {
+            transform: scale(1.2) !important;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 991.98px) {
+            .nav-menu {
+                padding: 1rem 0.5rem !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+            }
+            
+            .nav-btn {
+                padding: 0.8rem 1rem !important;
+                margin-bottom: 5px !important;
+                border-radius: 8px !important;
+            }
+            
+            .nav-btn:active {
+                background: rgba(95, 145, 255, 0.2) !important;
+            }
+            
+            .navbar-collapse {
+                background: rgba(13, 25, 42, 0.95) !important;
+                border-radius: 12px !important;
+                margin-top: 10px !important;
+                padding: 0.5rem !important;
+                border: 1px solid rgba(95, 145, 255, 0.2) !important;
+                animation: slideDown 0.3s ease forwards !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+            }
+            
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
         body.platform .navbar {
             background-color: transparent !important;
         }
@@ -672,12 +975,12 @@
     <div class="stars-bg" id="stars-bg"></div>
     <% } %>
     <% if (locals.user) { %>
-    <!-- Modern navbar with animations -->
-    <nav class="navbar navbar-expand-lg mb-4">
+    <!-- Modern navbar with enhanced animations and glass effect -->
+    <nav class="navbar navbar-expand-lg mb-4 navbar-glass">
         <div class="container">
             <a class="navbar-brand animate-fade-in" href="/">
                 <div class="navbar-logo-container">
-                    <img src="/css/images/Moonify1.png" alt="Moonify Logo" class="navbar-logo">
+                    <img src="/css/images/Moonify1.png" alt="Moonify Logo" class="navbar-logo pulse-glow">
                 </div>
             </a>
             
@@ -736,8 +1039,8 @@
                     
                     <!-- User Dropdown (Mobile) -->
                     <div class="dropdown">
-                        <a href="#" class="text-white" id="userDropdownMobile" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <div class="rounded-circle overflow-hidden" style="width: 28px; height: 28px;">
+                        <a href="#" class="text-decoration-none dropdown-toggle user-profile-link" id="userDropdownMobile" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <div class="rounded-circle overflow-hidden profile-avatar" style="width: 28px; height: 28px;">
                                 <% if (locals.user.avatar) { %>
                                 <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
                                 <% } else { %>
@@ -747,25 +1050,60 @@
                                 <% } %>
                             </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdownMobile" style="min-width: 200px; max-width: 200px; right: 0; left: auto; transform: translateX(-50%); z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute premium-profile-dropdown" aria-labelledby="userDropdownMobile" style="width: 240px; right: 0; left: auto; z-index: 9999 !important;">
+                            <li class="user-card mb-2">
+                                <div class="text-center p-3">
+                                    <div class="avatar-large mx-auto mb-2">
+                                        <% if (locals.user.avatar) { %>
+                                        <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
+                                        <% } else { %>
+                                        <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <h6 class="mb-0 username-gold-large"><%= locals.user.name %></h6>
+                                    <small class="text-muted">Member since <%= new Date(locals.user.createdAt).toLocaleDateString() %></small>
+                                </div>
+                            </li>
                             <li>
-                                <a class="dropdown-item py-1 small" href="/profile">
+                                <a class="dropdown-item menu-item py-2" href="/profile">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle icon-bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-user-circle fa-sm"></i>
+                                        <div class="rounded-circle menu-icon icon-primary me-2">
+                                            <i class="fas fa-user-circle"></i>
                                         </div>
                                         <span>My Profile</span>
                                     </div>
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider my-1"></li>
                             <li>
-                                <a class="dropdown-item py-1 small" href="/sign-out">
+                                <a class="dropdown-item menu-item py-2" href="/team">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle icon-bg-danger p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-sign-out-alt fa-sm"></i>
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-users"></i>
                                         </div>
-                                        <span>Sign Out</span>
+                                        <span>My Team</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="/investments">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-success me-2">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Investments</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2 sign-out-button" href="/sign-out">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-danger me-2">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </div>
+                                        <span class="fw-bold">Sign Out</span>
                                     </div>
                                 </a>
                             </li>
@@ -773,41 +1111,43 @@
                     </div>
                 </div>
                 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                <button class="navbar-toggler nav-toggler-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars"></i>
+                    <span class="toggler-icon"></span>
+                    <span class="toggler-icon"></span>
+                    <span class="toggler-icon"></span>
                 </button>
             </div>
             <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-menu">
                     <li class="nav-item animate-fade-in delay-1">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-home me-2"></i>Dashboard
+                        <a class="nav-link nav-btn <%= locals.page === 'dashboard' ? 'active' : '' %>" href="/">
+                            <i class="fas fa-home nav-icon"></i>
+                            <span class="nav-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-2">
-                        <a class="nav-link" href="/team">
-                            <i class="fas fa-users me-2"></i>My Team
+                        <a class="nav-link nav-btn <%= locals.page === 'team' ? 'active' : '' %>" href="/team">
+                            <i class="fas fa-users nav-icon"></i>
+                            <span class="nav-text">My Team</span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-3">
-                        <a class="nav-link" href="/investments">
-                            <i class="fas fa-chart-line me-2"></i>Investments
+                        <a class="nav-link nav-btn <%= locals.page === 'investments' ? 'active' : '' %>" href="/investments">
+                            <i class="fas fa-chart-line nav-icon"></i>
+                            <span class="nav-text">Investments</span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-4">
-                        <a class="nav-link" href="/challenges">
-                            <i class="fas fa-trophy me-2"></i>Daily Challenges
-                        </a>
-                    </li>
-                    <li class="nav-item animate-fade-in delay-4">
-                        <a class="nav-link" href="/ranks">
-                            <i class="fas fa-medal me-2"></i>Rankings
+                        <a class="nav-link nav-btn <%= locals.page === 'challenges' ? 'active' : '' %>" href="/challenges">
+                            <i class="fas fa-trophy nav-icon"></i>
+                            <span class="nav-text">Daily Challenges</span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-5">
-                        <a class="nav-link" href="/offers">
-                            <i class="fas fa-gem me-2"></i>VIP Offers
+                        <a class="nav-link nav-btn <%= locals.page === 'offers' ? 'active' : '' %>" href="/offers">
+                            <i class="fas fa-gift nav-icon"></i>
+                            <span class="nav-text">Offers & VIP</span>
                         </a>
                     </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
@@ -871,8 +1211,8 @@
                     
                     <!-- User Dropdown Menu (Desktop only) -->
                     <div class="dropdown">
-                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <div class="rounded-circle me-2 overflow-hidden" style="width: 32px; height: 32px;">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle user-profile-link" id="userDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <div class="rounded-circle me-2 overflow-hidden profile-avatar" style="width: 38px; height: 38px;">
                                 <% if (locals.user.avatar) { %>
                                 <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
                                 <% } else { %>
@@ -881,28 +1221,62 @@
                                 </div>
                                 <% } %>
                             </div>
-                            <span class="d-none d-md-inline"><%= locals.user.name.split(' ')[0] %></span>
+                            <span class="d-none d-md-inline username-gold"><%= locals.user.name.split(' ')[0] %> <i class="fas fa-caret-down ms-1 opacity-75" style="font-size: 12px;"></i></span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute profile-dropdown" aria-labelledby="userDropdown" style="min-width: 200px; z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute premium-profile-dropdown" aria-labelledby="userDropdown" style="width: 260px; z-index: 9999 !important; right: 0; left: auto; margin-top: 5px;">
+                            <li class="user-card mb-2">
+                                <div class="text-center p-3">
+                                    <div class="avatar-large mx-auto mb-2">
+                                        <% if (locals.user.avatar) { %>
+                                        <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
+                                        <% } else { %>
+                                        <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <h6 class="mb-0 username-gold-large"><%= locals.user.name %></h6>
+                                    <small class="text-muted">Member since <%= new Date(locals.user.createdAt).toLocaleDateString() %></small>
+                                </div>
+                            </li>
                             <li>
-                                <a class="dropdown-item py-1 small" href="/profile">
+                                <a class="dropdown-item menu-item py-2" href="/profile">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle icon-bg-primary p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-user-circle fa-sm"></i>
+                                        <div class="rounded-circle menu-icon icon-primary me-2">
+                                            <i class="fas fa-user-circle"></i>
                                         </div>
                                         <span>My Profile</span>
                                     </div>
                                 </a>
                             </li>
-                            <!-- Change Password option removed -->
-                            <li><hr class="dropdown-divider my-1"></li>
                             <li>
-                                <a class="dropdown-item py-1 small" href="/sign-out">
+                                <a class="dropdown-item menu-item py-2" href="/team">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle icon-bg-danger p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-sign-out-alt fa-sm"></i>
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-users"></i>
                                         </div>
-                                        <span>Sign Out</span>
+                                        <span>My Team</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="/investments">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-success me-2">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Investments</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2 sign-out-button" href="/sign-out">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-danger me-2">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </div>
+                                        <span class="fw-bold">Sign Out</span>
                                     </div>
                                 </a>
                             </li>

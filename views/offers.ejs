@@ -11,7 +11,7 @@
                 <div class="card-header bg-primary text-white">
                     <h2 class="mb-0 text-center">VIP Levels</h2>
                 </div>
-                <div class="card-body dark-theme-card">
+                <div class="card-body dark-theme-card" style="border-radius: 0 0 12px 12px;">
                     <div class="vip-levels-scrollable">
                         <!-- VIP Level I -->
                         <div class="col-md-6 col-lg-3 mb-4">
@@ -133,7 +133,7 @@
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Referral Program</h3>
                 </div>
-                <div class="card-body dark-theme-card mobile-scroll" style="overflow-x: hidden;">
+                <div class="card-body dark-theme-card mobile-scroll" style="overflow-x: hidden; border-radius: 0 0 12px 12px;">
                     <div class="row">
                         <div class="col-12 mb-4">
                             <div class="referral-header text-center mb-4">
@@ -201,15 +201,15 @@
                                 </div>
                             </div>
                             
-                            <div class="text-center mt-2 mb-3">
+                            <div class="text-center mt-2 mb-3 referral-cta">
                                 <% if (locals.user) { %>
-                                    <a href="/team" class="btn btn-primary btn-lg btn-glow">
-                                        <i class="fas fa-users me-2"></i>View My Referrals
-                                    </a>
+                                     <a href="/team" class="btn btn-primary btn-lg btn-glow view-referrals-btn">
+                                         <i class="fas fa-users me-2"></i>View My Referrals
+                                     </a>
                                 <% } else { %>
-                                    <a href="/sign-up" class="btn btn-primary btn-lg btn-glow">
-                                        <i class="fas fa-user-plus me-2"></i>Join Now
-                                    </a>
+                                     <a href="/sign-up" class="btn btn-primary btn-lg btn-glow">
+                                         <i class="fas fa-user-plus me-2"></i>Join Now
+                                     </a>
                                 <% } %>
                             </div>
                         </div>
@@ -222,7 +222,7 @@
                 <div class="card-header bg-warning text-dark">
                     <h3 class="mb-0"><i class="fas fa-coins me-2"></i>Moonify Coin</h3>
                 </div>
-                <div class="card-body dark-theme-card text-center" style="overflow-x: hidden;">
+                <div class="card-body dark-theme-card text-center" style="overflow-x: hidden; border-radius: 0 0 12px 12px;">
                     <div class="moonify-coin-card mx-auto" style="max-width: 600px;">
                         <div class="moonify-coin-glow"></div>
                         <div class="moonify-coin-content">
@@ -392,25 +392,116 @@
     
     /* Responsive styles */
     @media (max-width: 767.98px) {
+        /* General card improvements */
+        .card {
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            padding: 0.75rem 1rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        
+        .card-header h2, .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
         .card-header h4 {
             font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .vip-levels-card .card-body {
+            padding: 0.75rem 0.5rem;
+        }
+        
+        /* VIP levels mobile styling */
+        .vip-levels-scrollable {
+            padding: 0 0.5rem;
+        }
+        
+        .vip-header {
+            min-height: 60px;
+            padding: 0.5rem 0;
+        }
+        
+        .level-badge {
+            transform: scale(0.9);
+            margin-top: 5px;
+            padding: 3px 10px;
+        }
+        
+        .price-range {
+            padding: 0.75rem;
+            margin-bottom: 1rem !important;
         }
         
         .price-range .lead {
             font-size: 1rem;
         }
         
-        .vip-levels-card .card-body {
-            padding: 1rem 0.5rem;
+        .benefits h6 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .list-group-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Referral program mobile improvements */
+        .referral-header {
+            margin-bottom: 1rem !important;
+        }
+        
+        .referral-header h4 {
+            font-size: 1.15rem;
+        }
+        
+        .referral-header p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
         }
         
         .mobile-scroll {
             overflow-y: auto !important;
-            max-height: 600px;
+            max-height: 550px;
+            padding-right: 5px;
+            -webkit-overflow-scrolling: touch;
         }
         
         .referral-tier {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .tier-header {
+            padding: 10px 12px;
+        }
+        
+        .tier-body {
+            padding: 10px 12px;
+        }
+        
+        .tier-icon {
+            font-size: 0.9rem;
+        }
+        
+        /* Buttons become more touch-friendly */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
     }
     
@@ -551,6 +642,17 @@
             max-height: 400px;
             overflow-y: auto;
             padding-right: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .referral-tiers-grid .col-md-6 {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        
+        .referral-tiers-grid .row {
+            margin-left: -8px;
+            margin-right: -8px;
         }
     }
     
@@ -645,6 +747,57 @@
         justify-content: center;
         padding: 20px;
         border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    @media (max-width: 767.98px) {
+        .moonify-coin-card {
+            min-height: 320px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+        
+        .moonify-coin-icon {
+            width: 60px !important;
+            height: 60px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .moonify-coin-icon .fa-moon,
+        .moonify-coin-icon .fa-coins {
+            font-size: 2.2rem !important;
+        }
+        
+        .moonify-title {
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .moonify-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .moonify-description {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .moonify-features {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .moonify-features span {
+            font-size: 0.85rem;
+            padding: 5px 8px;
+        }
+        
+        /* Hide View My Referrals button in mobile view */
+        .view-referrals-btn {
+            display: none;
+        }
     }
     
     .moonify-coin-glow {
