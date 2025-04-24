@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rewardCard = document.getElementById('daily-reward-card');
     if (!rewardCard) return;
 
-    console.log('[DAILY_REWARD_CLIENT] Initializing daily rewards system');
+    // Daily rewards system initialization
     
     // Cache DOM elements
     const statusLoading = document.getElementById('reward-status-loading');
@@ -75,42 +75,39 @@ document.addEventListener('DOMContentLoaded', function() {
      * Check localStorage for recent claims to prevent refresh exploits
      */
     function checkLocalStorageForClaims() {
-        console.log('[DAILY_REWARD_CLIENT] Checking localStorage for recent claims');
-        
         // Hide the loading state and show a better initial state if we've recently claimed
         const lastClaimTime = localStorage.getItem('lastDailyRewardClaim');
         if (lastClaimTime) {
-            const now = Date.now();
-            const timeSinceClaim = now - parseInt(lastClaimTime);
-            const cooldownPeriod = 1 * 60 * 1000; // 1 minute in milliseconds (matches server)
+            const now = new Date();
+            const lastClaimDate = new Date(parseInt(lastClaimTime));
             
-            console.log(`[DAILY_REWARD_CLIENT] Last claim from localStorage: ${new Date(parseInt(lastClaimTime)).toISOString()}`);
-            console.log(`[DAILY_REWARD_CLIENT] Time since last claim: ${timeSinceClaim / 1000} seconds`);
+            // If the claim was very recent (within the last 60 seconds), show success
+            const timeSinceClaim = now - lastClaimDate;
+            if (timeSinceClaim < 60000) {
+                showSection(claimSuccess);
+                return;
+            }
             
-            if (timeSinceClaim < cooldownPeriod) {
-                // If local cooldown is active, show cooldown UI immediately for a better user experience
-                const timeToNextReward = cooldownPeriod - timeSinceClaim;
-                console.log(`[DAILY_REWARD_CLIENT] Local cooldown active, ${timeToNextReward / 1000} seconds remaining`);
+            // Check if the last claim was today (same calendar day)
+            if (lastClaimDate.getDate() === now.getDate() && 
+                lastClaimDate.getMonth() === now.getMonth() && 
+                lastClaimDate.getFullYear() === now.getFullYear()) {
                 
-                // Hide the loading spinner and show cooldown info right away
-                statusLoading.classList.add('d-none');
+                // Calculate time until midnight
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const timeToMidnight = tomorrow - now;
                 
-                // Update the cooldown timer with a nicer message
-                const formattedTime = formatMilliseconds(timeToNextReward);
-                cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> You've already claimed your reward.<br>Next reward available in ${formattedTime}.`;
-                
-                // Update the UI
-                window.timeToNextReward = timeToNextReward;
-                startCountdown();
+                // Update the UI immediately for better user experience
+                window.timeToNextReward = timeToMidnight;
+                updateCooldownTimer();
                 showSection(waitingForCooldown);
+                startCountdown();
                 
                 // Still check with the server in the background for accuracy
                 setTimeout(checkRewardEligibility, 500);
                 return;
-            } else {
-                // If local cooldown has expired, clear it and check eligibility
-                console.log('[DAILY_REWARD_CLIENT] Local cooldown expired, checking with server');
-                localStorage.removeItem('lastDailyRewardClaim');
             }
         }
         
@@ -130,18 +127,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * Check if user is eligible for daily reward
      */
     function checkRewardEligibility() {
-        console.log('[DAILY_REWARD_CLIENT] Checking reward eligibility');
-        
         // Show loading state
         showSection(statusLoading);
         
         fetch('/check-daily-reward')
             .then(response => response.json())
             .then(data => {
-                console.log('[DAILY_REWARD_CLIENT] Eligibility response:', data);
-                
                 if (!data.success) {
-                    console.log('[DAILY_REWARD_CLIENT] Error checking eligibility:', data.message);
                     showError(data.message || 'Failed to check reward eligibility');
                     return;
                 }
@@ -151,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Check if daily challenges have been completed
                 if (data.hasOwnProperty('challengesCompleted') && !data.challengesCompleted) {
-                    console.log('[DAILY_REWARD_CLIENT] Daily challenges not completed');
                     
                     // Update challenge indicators
                     updateChallengeStatus('daily-login', data.dailyLoginCompleted);
@@ -164,7 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // If user is eligible for a reward
                 if (data.eligible) {
-                    console.log('[DAILY_REWARD_CLIENT] User eligible for reward');
                     
                     // Update reward display
                     vipLevelDisplay.textContent = data.vipLevel;
@@ -180,8 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 // If user needs to wait for cooldown
                 else if (data.timeToNextReward) {
-                    console.log('[DAILY_REWARD_CLIENT] Cooldown active, time remaining:', data.timeToNextReward);
-                    
                     // Set time to next reward and start countdown
                     window.timeToNextReward = data.timeToNextReward;
                     const formattedTime = formatMilliseconds(data.timeToNextReward);
@@ -219,8 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
      * Claim the daily reward
      */
     function claimReward() {
-        console.log('[DAILY_REWARD_CLIENT] Attempting to claim reward');
-        
         // Disable the button to prevent double claims
         claimButton.disabled = true;
         claimButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing';
@@ -260,8 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log('[DAILY_REWARD_CLIENT] Claim response:', data);
-            
             // Reset the button state
             claimButton.disabled = false;
             claimButton.innerHTML = '<i class="fas fa-gift me-2"></i>Claim Reward';
@@ -314,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Loop through them to find the one that displays balance
             for (const counter of statCounters) {
                 if (counter.nextElementSibling && counter.nextElementSibling.textContent.includes('Balance')) {
-                    console.log('[DAILY_REWARD_CLIENT] Found balance display, updating to: $' + data.newBalance.toFixed(2));
                     counter.innerText = '$' + data.newBalance.toFixed(2);
                     break;
                 }
@@ -330,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // When they click the button again or refresh, the server-side check will enforce the cooldown
         })
         .catch(error => {
-            console.error('[DAILY_REWARD_CLIENT] Error claiming reward:', error);
             showError('Failed to connect to the server. Please try again later.');
             // Re-enable the claim button
             claimButton.disabled = false;
@@ -377,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.timeToNextReward === null) return;
         
         const formattedTime = formatMilliseconds(window.timeToNextReward);
-        cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in ${formattedTime}.`;
+        cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available at midnight (in ${formattedTime}).`;
     }
     
     /**

@@ -123,7 +123,7 @@ router.post('/update-withdraw-wallet', passport.checkAuthentication, otpLimiter,
         await OtpToken.create({ user: userId, token: code });
     }
     console.log(' (Test mode) Wallet OTP for user ' + userId + ': ' + code);
-    req.flash('info', 'Your wallet verification code is: ' + code);
+    req.flash('info', 'A verification code has been sent to your phone. Please enter it to confirm your wallet change.');
     req.session.pendingWithdrawWallet = req.body.withdrawWallet;
     return res.redirect('/verify-wallet');
 });

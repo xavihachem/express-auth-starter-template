@@ -1029,20 +1029,27 @@ module.exports.checkDailyRewardEligibility = async function(req, res) {
             });
         }
         
-        // Check if enough time has passed since last claim (24 hours)
+        // Check if user has already claimed their reward today (resets at midnight)
         const now = new Date();
-        const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         
         let timeToNextReward = null;
         let canClaim = true;
         
         if (user.lastDailyRewardClaim) {
             const lastClaim = new Date(user.lastDailyRewardClaim);
-            const timeSinceClaim = now - lastClaim;
             
-            if (timeSinceClaim < cooldownPeriod) {
+            // Check if last claim was on the same calendar day
+            if (lastClaim.getDate() === now.getDate() && 
+                lastClaim.getMonth() === now.getMonth() && 
+                lastClaim.getFullYear() === now.getFullYear()) {
+                
                 canClaim = false;
-                timeToNextReward = cooldownPeriod - timeSinceClaim;
+                
+                // Calculate time until midnight for the next reset
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                timeToNextReward = tomorrow - now;
             }
         }
         
@@ -1138,51 +1145,54 @@ module.exports.claimDailyReward = async function(req, res) {
             });
         }
         
-        // Check if enough time has passed since last claim (24 hours)
+        // Check if user has already claimed reward today (resets at midnight)
         const now = new Date();
-        const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-        
         // CRITICAL check to prevent exploit by page refresh
         if (user.lastDailyRewardClaim) {
             const lastClaim = new Date(user.lastDailyRewardClaim);
-            const timeSinceClaim = now - lastClaim;
             
-
-            
-            // Strengthen the cooldown check with additional logging
-            if (timeSinceClaim < cooldownPeriod) {
-                const timeToNextReward = cooldownPeriod - timeSinceClaim;
-
+            // Check if last claim was on the same calendar day
+            if (lastClaim.getDate() === now.getDate() && 
+                lastClaim.getMonth() === now.getMonth() && 
+                lastClaim.getFullYear() === now.getFullYear()) {
+                
+                // Calculate time until midnight for the next reset
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const timeToNextReward = tomorrow - now;
                 
                 return res.json({
                     success: false,
                     challengesCompleted: true,
-                    message: 'You need to wait before claiming the next reward.',
+                    message: 'You have already claimed your daily reward today. New rewards will be available at midnight.',
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
                 });
             }
-
         }
         
         // Double-check to prevent race conditions - find the absolutely latest user data
         const latestUserData = await User.findById(userId);
         if (latestUserData.lastDailyRewardClaim) {
             const lastClaim = new Date(latestUserData.lastDailyRewardClaim);
-            const timeSinceClaim = now - lastClaim;
             
-
-            
-            // This check catches any claims that might have happened between our first check and now
-            if (timeSinceClaim < cooldownPeriod) {
-                const timeToNextReward = cooldownPeriod - timeSinceClaim;
-
+            // Check if last claim was on the same calendar day (race condition check)
+            if (lastClaim.getDate() === now.getDate() && 
+                lastClaim.getMonth() === now.getMonth() && 
+                lastClaim.getFullYear() === now.getFullYear()) {
+                
+                // Calculate time until midnight for the next reset
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const timeToNextReward = tomorrow - now;
                 
                 return res.json({
                     success: false,
                     challengesCompleted: true,
-                    message: 'You need to wait before claiming the next reward.',
+                    message: 'You have already claimed your daily reward today. New rewards will be available at midnight.',
                     timeToNextReward: timeToNextReward,
                     cooldownActive: true
                 });

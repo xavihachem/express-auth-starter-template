@@ -17,7 +17,10 @@
                         <div class="col-md-6 col-lg-3 mb-4">
                             <div class="card h-100 border-primary hover-card">
                                 <div class="card-header bg-primary text-white text-center">
-                                    <h4>Beginner VIP Level I</h4>
+                                    <div class="vip-header">
+                                        <div>Beginner VIP</div>
+                                        <span class="level-badge level-1">Level I</span>
+                                    </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
@@ -42,7 +45,10 @@
                         <div class="col-md-6 col-lg-3 mb-4">
                             <div class="card h-100 border-info hover-card">
                                 <div class="card-header bg-info text-white text-center">
-                                    <h4>Semi-Professional VIP Level II</h4>
+                                    <div class="vip-header">
+                                        <div>Semi-Professional VIP</div>
+                                        <span class="level-badge level-2">Level II</span>
+                                    </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
@@ -67,7 +73,10 @@
                         <div class="col-md-6 col-lg-3 mb-4">
                             <div class="card h-100 border-success hover-card">
                                 <div class="card-header bg-success text-white text-center">
-                                    <h4>Professional VIP Level III</h4>
+                                    <div class="vip-header">
+                                        <div>Professional VIP</div>
+                                        <span class="level-badge level-3">Level III</span>
+                                    </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
@@ -92,8 +101,10 @@
                         <div class="col-md-6 col-lg-3 mb-4">
                             <div class="card h-100 border-warning hover-card special-vip">
                                 <div class="card-header bg-warning text-dark text-center">
-                                    <h4>Highly Professional Level IV</h4>
-                                    <div class="badge bg-dark text-warning mt-2">Moonify COIN 🔸</div>
+                                    <div class="vip-header">
+                                        <div>Highly Professional</div>
+                                        <span class="level-badge level-4">Level IV</span>
+                                    </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
@@ -107,7 +118,6 @@
                                             <li class="list-group-item">Elite VIP support</li>
                                             <li class="list-group-item">Maximum earning rates</li>
                                             <li class="list-group-item">400 Points per referral deposit</li>
-                                            <li class="list-group-item text-warning">Access to Moonify Coin 🔸</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -380,5 +390,59 @@
     .btn-glow:hover {
         box-shadow: 0 0 20px rgba(95, 145, 255, 0.8);
         transform: translateY(-2px);
+    }
+    
+    /* VIP Header and Level Badges Styling */
+    .vip-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+    
+    .vip-header > div {
+        margin-bottom: 10px;
+    }
+    
+    .level-badge {
+        display: block;
+        margin-top: 8px;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover .level-badge {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .level-1 {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+    }
+    
+    .level-2 {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+    }
+    
+    .level-3 {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+    }
+    
+    .level-4 {
+        background: linear-gradient(135deg, #ffc107, #d39e00);
+        color: #212529;
+        border: 1px solid rgba(0, 0, 0, 0.1);
     }
 </style>
