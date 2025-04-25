@@ -68,7 +68,12 @@
 
 <div class="card mb-4 shadow-sm">
     <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Withdrawals</h5>
+        <div class="d-flex align-items-center">
+            <a href="/admin" class="btn btn-dark btn-sm me-3">
+                <i class="fas fa-arrow-left me-1"></i> Back to Admin Panel
+            </a>
+            <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Withdrawals</h5>
+        </div>
         <% if (user) { %>
             <span class="badge bg-dark">User: <%= user.name %></span>
         <% } else { %>
@@ -177,6 +182,25 @@
                         <% }); %>
                     </tbody>
                 </table>
+                
+                <!-- Pagination Controls -->
+                <div class="d-flex justify-content-center mt-3" id="paginationContainer">
+                    <nav aria-label="Withdrawal requests pagination">
+                        <ul class="pagination" id="requestsPagination">
+                            <li class="page-item disabled" id="prevPage">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <!-- Page numbers will be inserted here by JavaScript -->
+                            <li class="page-item disabled" id="nextPage">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         <% } else { %>
             <div class="alert alert-info">
@@ -186,15 +210,17 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-between mb-4">
-    <a href="/admin" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-2"></i> Back to Admin Panel
-    </a>
-</div>
+
 
 
 
 <script>
+    // Pagination variables
+    let allRows = [];
+    let filteredRows = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
     // Override container width to match admin dashboard
     document.addEventListener('DOMContentLoaded', function() {
         // Find the parent container and make it wider
@@ -213,7 +239,35 @@
         document.querySelectorAll('.rejection-form').forEach(form => {
             form.style.display = 'none';
         });
+        
+        // Initialize pagination
+        initializePagination();
     });
+    
+    function initializePagination() {
+        // Get all table rows
+        allRows = Array.from(document.querySelectorAll('tbody tr'));
+        filteredRows = [...allRows];
+        
+        // Initial pagination setup
+        updatePagination();
+        goToPage(1);
+        
+        // Add event listeners for pagination
+        document.getElementById('prevPage').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
+        });
+        
+        document.getElementById('nextPage').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentPage < Math.ceil(filteredRows.length / itemsPerPage)) {
+                goToPage(currentPage + 1);
+            }
+        });
+    }
     
     // Function to show the rejection form overlay
     function showRejectionForm(requestId) {
@@ -266,6 +320,71 @@
         }
     });
     
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        const paginationElement = document.getElementById('requestsPagination');
+        
+        // Clear existing page numbers
+        const pageItems = paginationElement.querySelectorAll('.page-item:not(#prevPage):not(#nextPage)');
+        pageItems.forEach(item => item.remove());
+        
+        // Add new page numbers
+        const nextPageItem = document.getElementById('nextPage');
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.setAttribute('data-page', i);
+            
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.textContent = i;
+            
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                goToPage(i);
+            });
+            
+            li.appendChild(a);
+            paginationElement.insertBefore(li, nextPageItem);
+        }
+        
+        // Update prev/next buttons
+        document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages || totalPages === 0);
+    }
+    
+    function goToPage(page) {
+        currentPage = page;
+        
+        // Hide all rows first
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        // Show only rows for current page
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+        
+        for (let i = startIndex; i < endIndex; i++) {
+            filteredRows[i].style.display = '';
+        }
+        
+        // Update active page in pagination
+        document.querySelectorAll('#requestsPagination .page-item').forEach(item => {
+            if (item.getAttribute('data-page') == page) {
+                item.classList.add('active');
+            } else if (item.getAttribute('data-page')) {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Update prev/next buttons
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        document.getElementById('prevPage').classList.toggle('disabled', page === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', page === totalPages || totalPages === 0);
+    }
+
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
             // Create a temporary element for the success message

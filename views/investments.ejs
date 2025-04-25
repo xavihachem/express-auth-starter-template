@@ -333,8 +333,9 @@
                         <li>Copy your assigned deposit wallet address</li>
                         <li>Send funds to this address from your external wallet</li>
                         <li>Your balance will be updated once the transaction is confirmed</li>
-                        <li>Minimum deposit: 10 USD</li>
-                        <li>If you don't have a deposit wallet yet, please contact an admin</li>
+                        <li>Minimum deposit: 80 USD</li>
+                        <li><strong>Deposit only on BNB smart chain</strong></li>
+                        <li>If you don't have a deposit wallet yet, please contact Support</li>
                     </ol>
                 </div>
             </div>
@@ -369,19 +370,23 @@
                 
                 <form action="/update-withdraw-wallet" method="post" class="mt-3" id="updateWalletForm" onsubmit="return validateWalletForm()">
                     <div class="form-outline mb-3">
-                        <label for="withdrawWallet" class="form-label fw-bold" style="color: #17a2b8 !important; background-color: transparent !important;">Update Withdraw Wallet Address</label>
+                        <label for="withdrawWallet" class="form-label fw-bold" style="color: #17a2b8 !important; background-color: transparent !important;">Update Withdraw Wallet Address (USDT BNB Smart Chain only)</label>
                         <input 
                             type="text" 
                             class="form-control dark-input" 
                             id="withdrawWallet" 
                             name="withdrawWallet" 
                             value="<%= withdrawWallet %>" 
-                            placeholder="Enter your withdraw wallet address"
+                            placeholder="Enter your USDT BNB Smart Chain wallet address"
+                            <%= withdrawWallet ? 'disabled' : '' %>
                             required
                         >
+                        <% if (withdrawWallet) { %>
+                            <small class="text-info mt-1 d-block">Wallet address is locked for security. Contact Support if you need to change it.</small>
+                        <% } %>
                         <div class="form-text text-danger" id="walletError" style="display: none;">Please enter a valid wallet address</div>
                     </div>
-                    <button type="submit" class="btn btn-glow-info" id="updateWalletButton">Update Withdraw Wallet</button>
+                    <button type="submit" class="btn btn-glow-info" id="updateWalletButton" <%= withdrawWallet ? 'disabled' : '' %>>Update Withdraw Wallet</button>
                 </form>
                 
                 <form action="/request-withdraw" method="post" class="mt-4" id="withdrawForm">
@@ -427,6 +432,8 @@
                         <li>Processing time: 24-48 hours</li>
                         <li>Withdrawal fee: 2%</li>
                         <li>You cannot withdraw more than your available balance</li>
+                        <li><strong>Important:</strong> Your wallet address must be USDT on BNB Smart Chain network only</li>
+                        <li><strong>Withdrawal Lock Period:</strong> Withdrawals are only available after 45 days from your first deposit</li>
                     </ul>
                 </div>
             </div>

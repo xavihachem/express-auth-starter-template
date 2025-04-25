@@ -29,7 +29,7 @@
     /* Set specific colors for elements to ensure contrast */
     .card-body p, .card-body div:not(.btn):not(.badge), 
     .card-header h6, .card-header div:not(.btn):not(.badge),
-    .table td, .table th:not(.table-dark th), .fw-bold {
+    .fw-bold {
         color: #000000 !important;
     }
     
@@ -49,12 +49,31 @@
     
     /* Table styling for better contrast */
     .table {
-        color: #000000 !important;
+        color: white !important;
     }
     
     .table-dark th {
         background-color: #212529 !important;
         color: white !important;
+    }
+    
+    /* Ensure table headers in dark theme are always white */
+    thead.table-dark th {
+        color: white !important;
+    }
+    
+    /* Ensure all table content is white */
+    .table td,
+    .table td div,
+    .table td .fw-bold,
+    .table .ticket-subject,
+    .table .ticket-date {
+        color: white !important;
+    }
+    
+    /* Adjust text-muted in table for better visibility */
+    .table td small.text-muted {
+        color: #cccccc !important;
     }
     
     /* Ensure buttons and badges have proper contrast */

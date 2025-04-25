@@ -464,7 +464,9 @@ module.exports.forgotPassword = function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/');
     }
-    return res.render('forgot_password');
+    return res.render('forgot_password', {
+        page: 'forgot_password' // Set page variable for cosmic theme
+    });
 };
 
 module.exports.sendPasswordResetLink = async function (req, res) {
@@ -528,6 +530,7 @@ module.exports.resetPassword = async function (req, res) {
             isTokenValid: isTokenValid,
             id: req.query.id,
             key: req.query.key,
+            page: 'reset_password' // Set page variable for cosmic theme
         });
     } catch (err) {
         console.error('Error : ', err);

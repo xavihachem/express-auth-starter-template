@@ -404,6 +404,26 @@
         const closeBtn = document.getElementById('closeSupportPanel');
         const contactForm = document.getElementById('contactSupportForm');
         
+        // Check if we need to open the support panel (redirected from another page)
+        if (sessionStorage.getItem('openSupportPanel') === 'true') {
+            // Remove the flag from session storage
+            sessionStorage.removeItem('openSupportPanel');
+            
+            // Log diagnostic info
+            console.log('--- DASHBOARD REDIRECTED STATE ---');
+            console.log('Window scroll position:', window.pageYOffset);
+            
+            // Small delay to ensure the page is fully loaded
+            setTimeout(() => {
+                // Directly show the panel without scrolling
+                if (contactPanel) {
+                    console.log('Directly showing contact support panel without scrolling (redirected)');
+                    contactPanel.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }, 300);
+        }
+        
         // Show contact panel when button is clicked
         contactBtn.addEventListener('click', function() {
             contactPanel.style.display = 'flex';

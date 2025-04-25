@@ -31,21 +31,57 @@
     
     <!-- Custom styles for modern UI with animations -->
     <style>
-        /* Logo styling */
+        /* Simple rotating logo styling */
         .navbar-logo-container {
             display: inline-block;
             position: relative;
             height: 50px;
             overflow: visible;
+            z-index: 10;
         }
         
         .navbar-logo {
-            height: 85px;
+            height: 110px;
             width: auto;
             position: absolute;
-            top: -10px; /* Push logo above the navbar top edge */
-            left: -70px; /* Push logo much further left */
+            top: -30px; /* Push logo above the navbar top edge */
+            left: -85px; /* Push logo further left */
             object-fit: contain;
+            transform-origin: center;
+            animation: logo-rotate 15s infinite linear; /* Slowed down to 15s */
+            z-index: 2;
+        }
+        
+        /* Animation for the 360° rotating logo with color change */
+        @keyframes logo-rotate {
+            0% {
+                transform: rotate(0deg);
+                filter: hue-rotate(0deg) brightness(1);
+            }
+            25% {
+                transform: rotate(90deg);
+                filter: hue-rotate(60deg) brightness(1.1);
+            }
+            50% {
+                transform: rotate(180deg);
+                filter: hue-rotate(180deg) brightness(1.2); /* Purple-blue shift */
+            }
+            75% {
+                transform: rotate(270deg);
+                filter: hue-rotate(240deg) brightness(1.1); /* Blue-indigo shift */
+            }
+            90% {
+                transform: rotate(324deg);
+                filter: hue-rotate(300deg) brightness(1.2); /* Purple-pink shift */
+            }
+            95% {
+                transform: rotate(342deg);
+                filter: hue-rotate(330deg) brightness(1.4) saturate(1.5); /* Intense red shift */
+            }
+            100% {
+                transform: rotate(360deg);
+                filter: hue-rotate(0deg) brightness(1);
+            }
         }
         
         :root {
@@ -618,6 +654,213 @@
         .icon-bg-warning { background-color: #ffc107 !important; }
         .icon-bg-info { background-color: #0dcaf0 !important; }
         .icon-bg-secondary { background-color: #6c757d !important; }
+        
+        /* Reset for navbar */
+        nav {
+            max-width: 100%;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            position: relative;
+        }
+        
+        .navbar-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-logo-container {
+            position: relative;
+            z-index: 1000;
+            margin-left: 30px; /* Adjust space for the logo */
+        }
+        
+        .nav-toggler-btn {
+            background: transparent !important;
+            border: none !important;
+            width: 30px !important;
+            height: 30px !important;
+            position: relative !important;
+            padding: 0.4rem !important; /* Reduced padding */
+            display: none !important; /* Hide by default */
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+        }
+        
+        /* Only show hamburger on mobile */
+        @media (max-width: 991.98px) {
+            .nav-toggler-btn {
+                display: flex !important;
+            }
+        }
+        
+        .toggler-icon {
+            width: 100% !important;
+            height: 2px !important;
+            background-color: white !important;
+            border-radius: 2px !important;
+            transition: all 0.3s !important;
+            transform-origin: 1px !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:first-child {
+            transform: rotate(45deg) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:nth-child(2) {
+            opacity: 0 !important;
+            transform: translateX(-20px) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:last-child {
+            transform: rotate(-45deg) !important;
+        }
+        
+        /* Navigation Menu Items */
+        .nav-menu {
+            gap: 8px !important;
+        }
+        
+        .nav-btn {
+            padding: 0.6rem 1rem !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            overflow: hidden !important;
+        }
+        
+        .nav-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(to right, rgba(95, 145, 255, 0.1), transparent) !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.3s ease-out !important;
+            z-index: -1 !important;
+        }
+        
+        .nav-btn:hover {
+            color: white !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .nav-btn:hover::before {
+            transform: translateX(0) !important;
+        }
+        
+        .nav-btn.active {
+            background: rgba(95, 145, 255, 0.2) !important;
+            box-shadow: 0 0 10px rgba(95, 145, 255, 0.3) !important;
+            color: white !important;
+        }
+        
+        .nav-icon {
+            margin-right: 10px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .nav-btn:hover .nav-icon {
+            transform: scale(1.2) !important;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 991.98px) {
+            .nav-menu {
+                padding: 1rem 0.5rem !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+            }
+            
+            .nav-btn {
+                padding: 0.8rem 1rem !important;
+                margin-bottom: 5px !important;
+                border-radius: 8px !important;
+            }
+            
+            .nav-btn:active {
+                background: rgba(95, 145, 255, 0.2) !important;
+            }
+            
+            .navbar-collapse {
+                background: rgba(13, 25, 42, 0.95) !important;
+                border-radius: 12px !important;
+                margin-top: 10px !important;
+                padding: 0.5rem !important;
+                border: 1px solid rgba(95, 145, 255, 0.2) !important;
+                animation: slideDown 0.3s ease forwards !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+            }
+            
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+        
+        body.platform .navbar {
+            background-color: transparent !important;
+        }
+        body.platform section.vh-100 {
+            background-color: transparent !important;
+        }
+        /* Glass effect matching auth `.cosmic-card` */
+        body.platform .card {
+            background: rgba(13, 25, 42, 0.5) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            box-shadow: 0 0 20px rgba(95, 145, 255, 0.2) !important;
+        }
+        body.platform .card:hover {
+            box-shadow: 0 0 30px rgba(95, 145, 255, 0.4) !important;
+            border: 1px solid rgba(95, 145, 255, 0.5) !important;
+        }
+        
+        /* Cosmic background & transparent navbar on platform pages */
+        body.platform {
+            background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%) !important;
+            animation: backgroundPulse 15s ease-in-out infinite !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        
+        /* Enhanced Navbar Styling */
+        .navbar-glass {
+            background: rgba(13, 25, 42, 0.5) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid rgba(95, 145, 255, 0.2) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            padding: 0.8rem 1rem !important;
+            transition: all 0.3s ease !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+        }
+        
+        .navbar-glass:hover {
+            background: rgba(13, 25, 42, 0.7) !important;
+            border-bottom: 1px solid rgba(95, 145, 255, 0.3) !important;
+        }
+        
+        /* Logo animation */
+        .pulse-glow {
+            animation: logoPulse 3s ease-in-out infinite !important;
+        }
+        
+        @keyframes logoPulse {
+            0% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
+            50% { filter: drop-shadow(0 0 10px rgba(95, 145, 255, 0.8)); }
+            100% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
+        }
     </style>
 
     <!-- Scripts for Bootstrap, Material Design Bootstrap and Noty -->
@@ -787,12 +1030,30 @@
                     // Scroll to the contact support section on the dashboard
                     if (window.location.pathname === '/dashboard') {
                         const contactSupportSection = document.querySelector('#contactSupportSection');
+                        const contactSupportPanel = document.getElementById('contactSupportPanel');
+                        const contactSupportBtn = document.getElementById('contactSupportBtn');
+                        
                         if (contactSupportSection) {
-                            contactSupportSection.scrollIntoView({ behavior: 'smooth' });
+                            // Log the initial position of elements for diagnosis
+                            const dashboardCards = document.querySelectorAll('.card');
+                            console.log('--- SUPPORT TICKET CLICK - BEFORE ACTION ---');
+                            console.log('Window scroll position:', window.pageYOffset);
+                            
+                            // Instead of scrolling, directly show the contact support panel
+                            if (contactSupportBtn && contactSupportPanel) {
+                                // Directly show the panel without scrolling
+                                contactSupportPanel.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                                
+                                console.log('Directly showing contact support panel without scrolling');
+                            }
                         }
                     } else {
-                        // Redirect to dashboard with anchor
-                        window.location.href = '/dashboard#contactSupportSection';
+                        // Redirect to dashboard without anchor to avoid panel issues
+                        window.location.href = '/dashboard';
+                        
+                        // Store in session that we want to open the support panel
+                        sessionStorage.setItem('openSupportPanel', 'true');
                     }
                 });
             });
@@ -1001,7 +1262,7 @@
         <div class="container">
             <a class="navbar-brand animate-fade-in" href="/">
                 <div class="navbar-logo-container">
-                    <img src="/css/images/Moonify1.png" alt="Moonify Logo" class="navbar-logo pulse-glow">
+                    <img src="/css/images/Monifylogo.png" alt="Moonify Logo" class="navbar-logo">
                 </div>
             </a>
             
@@ -1329,15 +1590,15 @@
     </nav>
     <% } %>
 
-    <% if (!locals.user && (locals.page === 'sign_in' || locals.page === 'sign_up')) { %>
-    <!-- Cosmic theme for auth pages (ONLY login and signup) -->
+    <% if (!locals.user && (locals.page === 'sign_in' || locals.page === 'sign_up' || locals.page === 'forgot_password' || locals.page === 'reset_password')) { %>
+    <!-- Cosmic theme for auth pages (login, signup, forgot password, and reset password) -->
     <section class="vh-100 auth-section">
         <!-- Background stars -->
         <div class="stars-bg" id="stars-bg"></div>
         
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="col-12 col-md-10 col-lg-8 col-xl-7">
                     <div class="card shadow-2-strong cosmic-card" style="border-radius: 1rem;">
                         <div class="card-body p-5 text-center">
                             <%- body %>

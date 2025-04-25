@@ -88,18 +88,8 @@ router.get('/profile', passport.checkAuthentication, profileController.profile);
 router.post('/update-name', passport.checkAuthentication, profileController.updateName);
 router.get('/upload-avatar', passport.checkAuthentication, profileController.showAvatarUpload);
 router.post('/contact-support', passport.checkAuthentication, profileController.contactSupport); // Handle contact support requests
-// Handle avatar upload with proper error handling
-router.post('/update-avatar', passport.checkAuthentication, function(req, res, next) {
-    upload.single('avatar')(req, res, function(err) {
-        if (err) {
-            // Handle multer errors
-            req.flash('error', err.message || 'Only JPEG, JPG, PNG, and GIF files are allowed');
-            return res.redirect('/profile');
-        }
-        // No errors, proceed to controller
-        next();
-    });
-}, profileController.updateAvatar); // Profile page
+// Handle avatar selection
+router.post('/update-avatar', passport.checkAuthentication, profileController.updateAvatar); // Profile page
 
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
