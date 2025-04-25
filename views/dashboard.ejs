@@ -5,87 +5,740 @@
         </div>
     </div>
 
-    <!-- Welcome Card with Glass Morphism -->
+    <!-- Cosmic Welcome Card -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card dashboard-welcome-card animate-fade-in delay-1">
-                <div class="card-header">
+            <div class="card cosmic-welcome-card animate-fade-in delay-1">
+                <div class="cosmic-card-stars"></div>
+                <div class="cosmic-card-glow"></div>
+                
+                <div class="card-header cosmic-card-header">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle me-3 overflow-hidden" style="width: 64px; height: 64px;">
-                            <% if (locals.user.avatar) { %>
-                            <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
-                            <% } else { %>
-                            <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                <i class="fas fa-user-circle fa-2x"></i>
+                        <div class="cosmic-avatar-container me-3">
+                            <div class="cosmic-avatar-ring"></div>
+                            <div class="cosmic-avatar overflow-hidden">
+                                <% if (locals.user.avatar) { %>
+                                <img src="<%= locals.user.avatar %>" alt="<%= locals.user.name %>" class="w-100 h-100" style="object-fit: cover;">
+                                <% } else { %>
+                                <div class="bg-celestial w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <i class="fas fa-user-astronaut fa-2x"></i>
+                                </div>
+                                <% } %>
                             </div>
-                            <% } %>
                         </div>
                         <div>
-                            <h4 class="mb-0" style="font-size:18px;">Welcome back, <%= locals.user.name %>!</h4>
+                            <h4 class="cosmic-welcome-title">Welcome back, <span class="user-name-glow"><%= locals.user.name %></span>!</h4>
+                            <p class="cosmic-subtitle">Your cosmic journey continues</p>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                
+                <div class="card-body cosmic-card-body">
                     <div class="row align-items-center">
-                        <div class="col-12 text-center">
-                            <p class="mb-3 d-none d-lg-block">Welcome to your dashboard! Here you can see your stats and access quick actions</p>
-                            <a href="/profile" class="btn btn-primary">
-                                <i class="fas fa-user-circle me-2"></i>View Your Profile
-                            </a>
+                        <div class="col-md-7">
+                            <p class="cosmic-welcome-text">Navigate through your universe dashboard and explore your cosmic achievements and galactic stats</p>
+                            
+                            <!-- Support Ticket Status -->
+                            <div class="cosmic-support-status" id="supportTicketStatus">
+                                <div class="cosmic-status-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div class="cosmic-status-message">
+                                    You have already submitted a support ticket in the last 24 hours. Please wait before submitting another request.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5 text-center mt-4 mt-md-0">
+                            <div class="cosmic-profile-button-container">
+                                <a href="/profile" class="btn cosmic-profile-button">
+                                    <span class="cosmic-button-stars"></span>
+                                    <span class="cosmic-button-glow"></span>
+                                    <span class="cosmic-button-content">
+                                        <i class="fas fa-user-astronaut me-2"></i>View My Profile
+                                    </span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Add the cosmic card styles -->
+    <style>
+    /* Cosmic Welcome Card */
+    .cosmic-welcome-card {
+        background: linear-gradient(135deg, rgba(25, 32, 72, 0.7) 0%, rgba(13, 17, 38, 0.8) 100%);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 30, 0.36);
+        backdrop-filter: blur(8px);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        transition: all 0.4s ease;
+    }
+    
+    .cosmic-welcome-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(111, 76, 255, 0.3);
+    }
+    
+    .cosmic-card-stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+        background-repeat: repeat;
+        background-size: 200px 200px;
+        opacity: 0.2;
+        animation: twinkling 8s linear infinite;
+        pointer-events: none;
+    }
+    
+    .cosmic-card-glow {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(ellipse at center, rgba(111, 76, 255, 0.15) 0%, rgba(28, 20, 56, 0) 60%);
+        opacity: 0.6;
+        pointer-events: none;
+        z-index: -1;
+        animation: pulse 4s ease-in-out infinite alternate;
+    }
+    
+    .cosmic-card-header {
+        background: linear-gradient(135deg, rgba(111, 76, 255, 0.2) 0%, rgba(55, 50, 168, 0.1) 100%);
+        border-bottom: 1px solid rgba(111, 76, 255, 0.2);
+        padding: 1.5rem;
+    }
+    
+    .cosmic-card-body {
+        padding: 1.8rem;
+    }
+    
+    /* User Avatar */
+    .cosmic-avatar-container {
+        position: relative;
+        width: 76px;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cosmic-avatar {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        z-index: 1;
+        border: 2px solid rgba(111, 76, 255, 0.6);
+        box-shadow: 0 0 15px rgba(111, 76, 255, 0.4);
+    }
+    
+    .cosmic-avatar-ring {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 1px solid rgba(111, 76, 255, 0.3);
+        animation: spin 12s linear infinite;
+    }
+    
+    .cosmic-avatar-ring:before, .cosmic-avatar-ring:after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+    }
+    
+    .cosmic-avatar-ring:before {
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid transparent;
+        border-top-color: rgba(111, 76, 255, 0.5);
+        border-bottom-color: rgba(111, 76, 255, 0.2);
+        animation: spin 8s linear infinite;
+    }
+    
+    .cosmic-avatar-ring:after {
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        bottom: 4px;
+        border: 1px solid transparent;
+        border-left-color: rgba(111, 76, 255, 0.5);
+        border-right-color: rgba(111, 76, 255, 0.2);
+        animation: spin 6s linear infinite reverse;
+    }
+    
+    /* Text Styles */
+    .cosmic-welcome-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(111, 76, 255, 0.7);
+    }
+    
+    .user-name-glow {
+        background: linear-gradient(90deg, #6f4cff, #c86fff, #6f4cff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 3s linear infinite;
+    }
+    
+    .cosmic-subtitle {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0;
+    }
+    
+    .cosmic-welcome-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Support Ticket Status */
+    .cosmic-support-status {
+        background: rgba(20, 25, 50, 0.6);
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        border-left: 3px solid #ff7676;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateZ(0);
+        transition: all 0.3s;
+    }
+    
+    .cosmic-support-status:hover {
+        background: rgba(30, 35, 60, 0.7);
+        box-shadow: 0 6px 20px rgba(255, 118, 118, 0.15);
+    }
+    
+    .cosmic-status-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 118, 118, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 14px;
+        flex-shrink: 0;
+        color: #ff7676;
+        position: relative;
+    }
+    
+    .cosmic-status-icon:after {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 118, 118, 0.3);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .cosmic-status-message {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.4;
+    }
+    
+    /* Profile Button */
+    .cosmic-profile-button-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .cosmic-profile-button {
+        position: relative;
+        background: linear-gradient(135deg, #6f4cff 0%, #c86fff 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 13px 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        overflow: hidden;
+        z-index: 1;
+        transition: all 0.4s ease;
+        box-shadow: 0 6px 15px rgba(111, 76, 255, 0.3);
+    }
+    
+    .cosmic-profile-button:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 8px 25px rgba(111, 76, 255, 0.5);
+        color: white;
+    }
+    
+    .cosmic-profile-button:active {
+        transform: translateY(1px);
+    }
+    
+    .cosmic-button-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cosmic-button-glow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(111, 76, 255, 0.8) 0%, rgba(200, 111, 255, 0.8) 100%);
+        opacity: 0;
+        z-index: 1;
+        transition: opacity 0.3s ease;
+    }
+    
+    .cosmic-profile-button:hover .cosmic-button-glow {
+        opacity: 1;
+        animation: pulse 1.5s infinite alternate;
+    }
+    
+    .cosmic-button-stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .cosmic-profile-button:hover .cosmic-button-stars {
+        opacity: 0.5;
+    }
+    
+    .cosmic-button-stars:before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        right: -50%;
+        bottom: -50%;
+        background-image: 
+            radial-gradient(1px 1px at 25px 5px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1px 1px at 50px 25px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1px 1px at 125px 20px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1.5px 1.5px at 50px 75px, white, rgba(0, 0, 0, 0));
+        background-size: 200% 200%;
+        animation: twinkle 4s ease-in-out infinite;
+    }
+    
+    /* Animations */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
+    @keyframes shine {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    @keyframes twinkling {
+        0% { background-position: 0 0; }
+        100% { background-position: 200px 0; }
+    }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 0.3; }
+    }
+    
+    /* Custom Color */
+    .bg-celestial {
+        background: linear-gradient(135deg, #6f4cff 0%, #c86fff 100%);
+    }
+    </style>
+    
+    <!-- JavaScript to toggle the support ticket status message visibility -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initially hide the support ticket status message
+        // It will be shown via JavaScript when needed
+        const supportStatus = document.getElementById('supportTicketStatus');
+        if (supportStatus) {
+            supportStatus.style.display = 'none';
+        }
+        
+        // This function will be called when a ticket submission fails due to the 24-hour limit
+        window.showSupportTicketLimitMessage = function() {
+            if (supportStatus) {
+                supportStatus.style.display = 'flex';
+                supportStatus.style.animation = 'fadeIn 0.5s ease-out';
+            }
+        };
+    });
+    </script>
 
-    <!-- Stats Row -->
+    <!-- Cosmic Stats Row -->
     <div class="row mb-4">
+        <!-- Challenge Points Card -->
         <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
-            <div class="card h-100 animate-fade-in delay-2">
-                <div class="card-body text-center">
-                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
-                        <i class="fas fa-trophy fa-2x text-primary"></i>
+            <div class="cosmic-stat-card animate-fade-in delay-2 cosmic-purple">
+                <div class="cosmic-stat-bg"></div>
+                <div class="cosmic-stat-stars"></div>
+                <div class="cosmic-stat-content">
+                    <div class="cosmic-stat-icon-container">
+                        <div class="cosmic-stat-icon-orbit">
+                            <span class="cosmic-orbit-particle"></span>
+                        </div>
+                        <div class="cosmic-stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-counter"><%= locals.user.challengePoints || 0 %></h3>
-                    <p class="stat-label mb-0">Challenge Points</p>
+                    <div class="cosmic-stat-value">
+                        <span class="cosmic-stat-counter"><%= locals.user.challengePoints || 0 %></span>
+                        <div class="cosmic-stat-label">Challenge Points</div>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Team Members Card -->
         <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
-            <div class="card h-100 animate-fade-in delay-3">
-                <div class="card-body text-center">
-                    <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
-                        <i class="fas fa-users fa-2x text-success"></i>
+            <div class="cosmic-stat-card animate-fade-in delay-3 cosmic-green">
+                <div class="cosmic-stat-bg"></div>
+                <div class="cosmic-stat-stars"></div>
+                <div class="cosmic-stat-content">
+                    <div class="cosmic-stat-icon-container">
+                        <div class="cosmic-stat-icon-orbit">
+                            <span class="cosmic-orbit-particle"></span>
+                        </div>
+                        <div class="cosmic-stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-counter">0</h3>
-                    <p class="stat-label mb-0">Team Members</p>
+                    <div class="cosmic-stat-value">
+                        <span class="cosmic-stat-counter">0</span>
+                        <div class="cosmic-stat-label">Team Members</div>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Balance Card -->
         <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
-            <div class="card h-100 animate-fade-in delay-3">
-                <div class="card-body text-center">
-                    <div class="rounded-circle bg-info bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
-                        <i class="fas fa-wallet fa-2x text-info"></i>
+            <div class="cosmic-stat-card animate-fade-in delay-3 cosmic-blue">
+                <div class="cosmic-stat-bg"></div>
+                <div class="cosmic-stat-stars"></div>
+                <div class="cosmic-stat-content">
+                    <div class="cosmic-stat-icon-container">
+                        <div class="cosmic-stat-icon-orbit">
+                            <span class="cosmic-orbit-particle"></span>
+                        </div>
+                        <div class="cosmic-stat-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-counter">$<%= locals.user.balance ? Number(locals.user.balance).toFixed(2) : '0.00' %></h3>
-                    <p class="stat-label mb-0">Balance</p>
+                    <div class="cosmic-stat-value">
+                        <span class="cosmic-stat-counter">$<%= locals.user.balance ? Number(locals.user.balance).toFixed(2) : '0.00' %></span>
+                        <div class="cosmic-stat-label">Balance</div>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Completed Tasks Card -->
         <div class="col-md-3 col-sm-6">
-            <div class="card h-100 animate-fade-in delay-4">
-                <div class="card-body text-center">
-                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
-                        <i class="fas fa-tasks fa-2x text-warning"></i>
+            <div class="cosmic-stat-card animate-fade-in delay-4 cosmic-orange">
+                <div class="cosmic-stat-bg"></div>
+                <div class="cosmic-stat-stars"></div>
+                <div class="cosmic-stat-content">
+                    <div class="cosmic-stat-icon-container">
+                        <div class="cosmic-stat-icon-orbit">
+                            <span class="cosmic-orbit-particle"></span>
+                        </div>
+                        <div class="cosmic-stat-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-counter"><%= locals.user.completedChallenges ? locals.user.completedChallenges.length : 0 %></h3>
-                    <p class="stat-label mb-0">Completed Tasks</p>
+                    <div class="cosmic-stat-value">
+                        <span class="cosmic-stat-counter"><%= locals.user.completedChallenges ? locals.user.completedChallenges.length : 0 %></span>
+                        <div class="cosmic-stat-label">Completed Tasks</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Cosmic Stats Styling -->
+    <style>
+    /* Cosmic Stat Cards */
+    .cosmic-stat-card {
+        position: relative;
+        background: rgba(20, 25, 45, 0.7);
+        border-radius: 16px;
+        overflow: hidden;
+        height: 100%;
+        min-height: 175px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+    }
+    
+    .cosmic-stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* Background effects */
+    .cosmic-stat-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.7;
+        z-index: 0;
+    }
+    
+    .cosmic-purple .cosmic-stat-bg {
+        background: linear-gradient(135deg, rgba(111, 76, 255, 0.3) 0%, rgba(55, 0, 179, 0.1) 100%);
+    }
+    
+    .cosmic-green .cosmic-stat-bg {
+        background: linear-gradient(135deg, rgba(20, 184, 116, 0.3) 0%, rgba(0, 109, 65, 0.1) 100%);
+    }
+    
+    .cosmic-blue .cosmic-stat-bg {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.3) 0%, rgba(0, 83, 146, 0.1) 100%);
+    }
+    
+    .cosmic-orange .cosmic-stat-bg {
+        background: linear-gradient(135deg, rgba(255, 171, 64, 0.3) 0%, rgba(179, 87, 0, 0.1) 100%);
+    }
+    
+    /* Star particles */
+    .cosmic-stat-stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(1px 1px at 25px 15px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1px 1px at 50px 75px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1px 1px at 100px 25px, white, rgba(0, 0, 0, 0)),
+            radial-gradient(1px 1px at 125px 100px, white, rgba(0, 0, 0, 0));
+        background-repeat: repeat;
+        background-size: 150px 150px;
+        opacity: 0.2;
+        animation: twinkling 15s linear infinite;
+        z-index: 0;
+    }
+    
+    /* Card content container */
+    .cosmic-stat-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 20px 15px;
+        text-align: center;
+    }
+    
+    /* Icon styling */
+    .cosmic-stat-icon-container {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 15px;
+    }
+    
+    .cosmic-stat-icon {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px auto 0;
+        font-size: 22px;
+        z-index: 2;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .cosmic-purple .cosmic-stat-icon {
+        background: linear-gradient(135deg, #8066ff, #5e46e0);
+        color: white;
+    }
+    
+    .cosmic-green .cosmic-stat-icon {
+        background: linear-gradient(135deg, #20d489, #18a971);
+        color: white;
+    }
+    
+    .cosmic-blue .cosmic-stat-icon {
+        background: linear-gradient(135deg, #42a5f5, #1976d2);
+        color: white;
+    }
+    
+    .cosmic-orange .cosmic-stat-icon {
+        background: linear-gradient(135deg, #ffb74d, #f57c00);
+        color: white;
+    }
+    
+    /* Orbiting elements */
+    .cosmic-stat-icon-orbit {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: spin 15s linear infinite;
+    }
+    
+    .cosmic-orbit-particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .cosmic-purple .cosmic-orbit-particle {
+        background: #8066ff;
+        box-shadow: 0 0 10px 2px rgba(128, 102, 255, 0.7);
+    }
+    
+    .cosmic-green .cosmic-orbit-particle {
+        background: #20d489;
+        box-shadow: 0 0 10px 2px rgba(32, 212, 137, 0.7);
+    }
+    
+    .cosmic-blue .cosmic-orbit-particle {
+        background: #42a5f5;
+        box-shadow: 0 0 10px 2px rgba(66, 165, 245, 0.7);
+    }
+    
+    .cosmic-orange .cosmic-orbit-particle {
+        background: #ffb74d;
+        box-shadow: 0 0 10px 2px rgba(255, 183, 77, 0.7);
+    }
+    
+    /* Value styling */
+    .cosmic-stat-value {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .cosmic-stat-counter {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        display: block;
+        line-height: 1.2;
+    }
+    
+    .cosmic-purple .cosmic-stat-counter {
+        background: linear-gradient(90deg, #a193ff, #6f4cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .cosmic-green .cosmic-stat-counter {
+        background: linear-gradient(90deg, #78ffb2, #20d489);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .cosmic-blue .cosmic-stat-counter {
+        background: linear-gradient(90deg, #90d0ff, #42a5f5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .cosmic-orange .cosmic-stat-counter {
+        background: linear-gradient(90deg, #ffd28e, #ffb74d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .cosmic-stat-label {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+    
+    /* Card hover states with color-specific enhancements */
+    .cosmic-stat-card.cosmic-purple:hover {
+        box-shadow: 0 15px 30px rgba(111, 76, 255, 0.25);
+    }
+    
+    .cosmic-stat-card.cosmic-green:hover {
+        box-shadow: 0 15px 30px rgba(32, 212, 137, 0.25);
+    }
+    
+    .cosmic-stat-card.cosmic-blue:hover {
+        box-shadow: 0 15px 30px rgba(66, 165, 245, 0.25);
+    }
+    
+    .cosmic-stat-card.cosmic-orange:hover {
+        box-shadow: 0 15px 30px rgba(255, 183, 77, 0.25);
+    }
+    
+    /* Hover animations for orbit particles */
+    .cosmic-stat-card:hover .cosmic-orbit-particle {
+        animation: pulseParticle 2s infinite alternate;
+    }
+    
+    /* Keyframe animation for particle orbit pulsing */
+    @keyframes pulseParticle {
+        0% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+        100% { transform: translateX(-50%) scale(1.3); opacity: 1; }
+    }
+    </style>
 
     <!-- Daily Rewards Card -->
     <div class="row mb-4">
@@ -505,6 +1158,11 @@
                     console.error('Support request failed:', data.message);
                     // Show error message using cosmic notification system
                     cosmicNotify.error(data.message || 'Failed to send message. Please try again.');
+                    
+                    // If the error is about the 24-hour limit, show the special message in the welcome card
+                    if (data.message && data.message.includes('already submitted a support ticket')) {
+                        window.showSupportTicketLimitMessage();
+                    }
                 }
             })
             .catch(error => {
