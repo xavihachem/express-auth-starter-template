@@ -1115,11 +1115,8 @@ module.exports.claimDailyReward = async function(req, res) {
         const dailyLoginCompleted = completedChallenges.includes('daily-login');
         const startInvestingCompleted = completedChallenges.includes('start-investing');
         
-
-        
         // Check if both required challenges are completed
         if (!dailyLoginCompleted || !startInvestingCompleted) {
-
             return res.json({
                 success: false,
                 challengesCompleted: false,
@@ -1175,6 +1172,23 @@ module.exports.claimDailyReward = async function(req, res) {
         
         // Double-check to prevent race conditions - find the absolutely latest user data
         const latestUserData = await User.findById(userId);
+        
+        // Re-verify challenge completion with the latest data
+        const latestCompletedChallenges = latestUserData.completedChallenges || [];
+        const latestDailyLoginCompleted = latestCompletedChallenges.includes('daily-login');
+        const latestStartInvestingCompleted = latestCompletedChallenges.includes('start-investing');
+        
+        // Double-check challenges are completed
+        if (!latestDailyLoginCompleted || !latestStartInvestingCompleted) {
+            return res.json({
+                success: false,
+                challengesCompleted: false,
+                dailyLoginCompleted: latestDailyLoginCompleted,
+                startInvestingCompleted: latestStartInvestingCompleted,
+                message: 'You need to complete all daily challenges before claiming your reward'
+            });
+        }
+        
         if (latestUserData.lastDailyRewardClaim) {
             const lastClaim = new Date(latestUserData.lastDailyRewardClaim);
             

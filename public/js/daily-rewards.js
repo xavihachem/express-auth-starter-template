@@ -72,20 +72,33 @@ document.addEventListener('DOMContentLoaded', function() {
     checkLocalStorageForClaims();
     
     /**
-     * Check localStorage for recent claims to prevent refresh exploits
+     * Check localStorage for recent claims to prevent refresh exploits and improve UX
      */
     function checkLocalStorageForClaims() {
         // Hide the loading state and show a better initial state if we've recently claimed
         const lastClaimTime = localStorage.getItem('lastDailyRewardClaim');
+        const lastClaimData = localStorage.getItem('lastDailyRewardData');
+        
         if (lastClaimTime) {
             const now = new Date();
             const lastClaimDate = new Date(parseInt(lastClaimTime));
             
-            // If the claim was very recent (within the last 60 seconds), show success
+            // If the claim was very recent (within the last 60 seconds), show success with stored data
             const timeSinceClaim = now - lastClaimDate;
-            if (timeSinceClaim < 60000) {
-                showSection(claimSuccess);
-                return;
+            if (timeSinceClaim < 60000 && lastClaimData) {
+                try {
+                    const claimData = JSON.parse(lastClaimData);
+                    // Update success message with stored data
+                    claimedAmount.textContent = claimData.reward.toFixed(2);
+                    newBalance.textContent = claimData.newBalance.toFixed(2);
+                    showSection(claimSuccess);
+                    
+                    // Still check with the server in the background for accuracy
+                    setTimeout(checkRewardEligibility, 300);
+                    return;
+                } catch (e) {
+                    console.error('[DAILY_REWARD_CLIENT] Error parsing stored claim data:', e);
+                }
             }
             
             // Check if the last claim was today (same calendar day)
@@ -106,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 startCountdown();
                 
                 // Still check with the server in the background for accuracy
-                setTimeout(checkRewardEligibility, 500);
+                setTimeout(checkRewardEligibility, 300);
                 return;
             }
         }
@@ -127,8 +140,12 @@ document.addEventListener('DOMContentLoaded', function() {
      * Check if user is eligible for daily reward
      */
     function checkRewardEligibility() {
-        // Show loading state
-        showSection(statusLoading);
+        // Only show loading state if no other state is currently shown
+        // This prevents flickering when checking in the background
+        const currentlyShownSection = document.querySelector('#daily-reward-card .card-body > div:not(.d-none)');
+        if (!currentlyShownSection || currentlyShownSection.id === 'reward-status-loading') {
+            showSection(statusLoading);
+        }
         
         fetch('/check-daily-reward')
             .then(response => response.json())
@@ -275,6 +292,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const formattedTime = formatMilliseconds(data.timeToNextReward);
                     cooldownMessage.innerHTML = `<i class="fas fa-hourglass-half text-warning me-2"></i> Next reward available in ${formattedTime}.`;
                     
+                    // Store cooldown info in localStorage for immediate display on page reload
+                    localStorage.setItem('cooldownActive', 'true');
+                    localStorage.setItem('timeToNextReward', data.timeToNextReward);
+                    localStorage.setItem('cooldownTimestamp', Date.now());
+                    
                     // Show the cooldown section
                     showSection(waitingForCooldown);
                 } else {
@@ -306,8 +328,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show success message
             showSection(claimSuccess);
             
-            // Store the claim time in localStorage to prevent refresh exploits
+            // Store the claim time and data in localStorage to prevent refresh exploits and improve UX
             localStorage.setItem('lastDailyRewardClaim', Date.now());
+            localStorage.setItem('lastDailyRewardData', JSON.stringify({
+                reward: data.reward,
+                newBalance: data.newBalance,
+                vipLevel: data.vipLevel,
+                transactionId: data.transactionId
+            }));
             
             // Don't automatically re-check - let the user see the success message
             // When they click the button again or refresh, the server-side check will enforce the cooldown

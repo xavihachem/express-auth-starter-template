@@ -110,7 +110,7 @@ const otpLimiter = rateLimit({
 router.post('/update-withdraw-wallet', passport.checkAuthentication, otpLimiter, async (req, res) => {
     // block if wallet already set
     if (req.user.withdrawWallet) {
-        req.flash('error', 'Wallet already set.');
+        req.flash('error', 'Contact our support team in telegram for wallet update');
         return res.redirect('/investments');
     }
     const userId = req.user._id;

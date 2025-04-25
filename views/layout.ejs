@@ -822,7 +822,7 @@
             width: 30px !important;
             height: 30px !important;
             position: relative !important;
-            padding: 0 !important;
+            padding: 0.4rem !important; /* Reduced padding */
             display: none !important; /* Hide by default */
             flex-direction: column !important;
             justify-content: space-around !important;
@@ -1361,6 +1361,35 @@
     <!-- IntlTelInput JS for phone number input with country codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" referrerpolicy="no-referrer"></script>
+    
+    <!-- Scroll position restoration script -->
+    <script>
+      // Save scroll position before page unload
+      if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+      }
+      
+      let scrollPos = {};
+      
+      window.addEventListener('beforeunload', function() {
+        scrollPos = {
+          x: window.scrollX,
+          y: window.scrollY
+        };
+        sessionStorage.setItem('scrollPos', JSON.stringify(scrollPos));
+      });
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        // Restore scroll position after page has fully loaded
+        if (sessionStorage.getItem('scrollPos')) {
+          const savedPos = JSON.parse(sessionStorage.getItem('scrollPos'));
+          // Use a slight delay to ensure all content is rendered
+          setTimeout(() => {
+            window.scrollTo(savedPos.x, savedPos.y);
+          }, 100);
+        }
+      });
+    </script>
     
     <!-- Auto-inject CSRF token into all POST forms -->
     <script>

@@ -198,6 +198,8 @@ module.exports.createSession = async function (user) {
     if (user) {
         try {
             // Call the separate function to complete the challenge
+            // Add a small delay to ensure the user document is fully saved and available
+            await new Promise(resolve => setTimeout(resolve, 100));
             const challengeCompleted = await completeDailyLoginChallenge(user._id);
             return true; // Indicate session setup was successful
         } catch (error) {
@@ -205,7 +207,6 @@ module.exports.createSession = async function (user) {
             return false; // Indicate failure
         }
     } else {
-        console.log('No user object provided to createSession.');
         return false; // Indicate failure
     }
 };
@@ -224,8 +225,9 @@ module.exports.destroySession = function (req, res, next) {
 // Function to complete the Daily Login challenge
 const completeDailyLoginChallenge = async (userId) => {
     try {
-        const user = await User.findById(userId);
-        if (!user) {
+        // Use findById with lean() for initial check, then get a full document for modifications
+        const userCheck = await User.findById(userId).lean();
+        if (!userCheck) {
             return false;
         }
 
@@ -234,6 +236,17 @@ const completeDailyLoginChallenge = async (userId) => {
         // Check if the challenge is already completed today
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
+        // Get a full user document for modifications
+        const user = await User.findById(userId);
+        if (!user) {
+            return false;
+        }
+
+        // Initialize completedChallenges array if it doesn't exist
+        if (!user.completedChallenges) {
+            user.completedChallenges = [];
+        }
 
         // Modified to check if the string ID exists in the array, matching the User schema
         const alreadyCompleted = user.completedChallenges.includes(dailyLoginChallengeId);
