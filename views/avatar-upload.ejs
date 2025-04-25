@@ -25,7 +25,8 @@
                     <form action="/update-avatar" method="POST" id="avatar-form">
                         <input type="hidden" name="selectedAvatar" id="selected-avatar" value="">
                         
-                        <div class="row">
+                        <div class="avatar-selection-scrollable">
+                            <div class="row">
                             <div class="col-6 col-md-4 col-lg-2 mb-4">
                                 <div class="avatar-option" data-avatar="/css/images/Avatar/Avatar1.jpeg">
                                     <img src="/css/images/Avatar/Avatar1.jpeg" alt="Avatar 1" class="img-fluid rounded-circle avatar-preview">
@@ -74,9 +75,10 @@
                                     </div>
                                 </div>
                             </div>
+                            </div>
                         </div>
                         
-                        <div class="text-center mt-3">
+                        <div class="text-center mt-3 save-button-container">
                             <button type="submit" class="btn btn-primary" id="save-avatar-btn" disabled>
                                 <i class="fas fa-save me-2"></i>Save Selected Avatar
                             </button>
@@ -89,6 +91,46 @@
 </div>
 
 <style>
+    /* Avatar selection scrollable container */
+    .avatar-selection-scrollable {
+        width: 100%;
+    }
+    
+    /* Mobile vertical scrolling */
+    @media (max-width: 767.98px) {
+        .avatar-selection-scrollable {
+            overflow-y: auto;
+            max-height: 400px; /* Adjust height as needed */
+            padding-right: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .avatar-selection-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .avatar-selection-scrollable::-webkit-scrollbar-track {
+            background: rgba(33, 37, 41, 0.3);
+            border-radius: 10px;
+        }
+        
+        .avatar-selection-scrollable::-webkit-scrollbar-thumb {
+            background-color: rgba(95, 145, 255, 0.5);
+            border-radius: 10px;
+        }
+        
+        /* Ensure the save button container stays visible */
+        .save-button-container {
+            position: sticky;
+            bottom: 0;
+            background-color: rgba(13, 25, 42, 0.8);
+            padding: 15px 0;
+            margin-top: 1rem;
+            border-radius: 0 0 12px 12px;
+            z-index: 10;
+        }
+    }
+    
     .avatar-option {
         position: relative;
         cursor: pointer;
