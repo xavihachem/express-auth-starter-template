@@ -1328,6 +1328,47 @@
             position: relative !important;
             overflow: hidden !important;
         }
+        
+        /* Night platform container for shooting stars */
+        .night-platform {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        /* Cosmic highlight effect on cards */
+        .cosmic-highlight {
+            box-shadow: 0 0 25px rgba(72, 127, 255, 0.6), inset 0 0 15px rgba(72, 127, 255, 0.3) !important;
+            transition: box-shadow 0.5s ease-out !important;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Cosmic trail effect */
+        .cosmic-trail {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(125, 185, 255, 0.6) 0%, rgba(72, 127, 255, 0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.8;
+            filter: blur(2px);
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Fade out animation */
+        .cosmic-trail.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
                 /* Enhanced Navbar Styling */
         .navbar-glass {
             background: rgba(13, 25, 42, 0.5) !important;
@@ -1516,6 +1557,7 @@
 <body class="<%= locals.user ? 'platform' : 'auth' %>">
     <% if (locals.user) { %>
     <div class="stars-bg" id="stars-bg"></div>
+    <div class="night-platform"></div>
     <% } %>
     <% if (locals.user) { %>
     <!-- Modern navbar with enhanced animations and glass effect -->
@@ -1892,6 +1934,21 @@
     <%- script %>
     <% if (locals.user) { %>
     <script src="/js/cosmic-bg.js"></script>
+    
+    <!-- Initialize shooting stars for platform pages -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're on a platform page
+            if (document.body.classList.contains('platform')) {
+                // Use setTimeout to ensure DOM is fully loaded
+                setTimeout(function() {
+                    if (typeof createPlatformShootingStars === 'function') {
+                        createPlatformShootingStars();
+                    }
+                }, 500);
+            }
+        });
+    </script>
     
     <!-- Welcome Overlay JavaScript - only for logged in users -->
     <script>

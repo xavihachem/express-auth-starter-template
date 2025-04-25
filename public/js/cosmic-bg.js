@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create background twinkling stars
     createBackgroundStars();
     
-    // Create falling stars with special effects
-    createFallingStars();
+    // Create falling stars with special effects (for auth pages)
+    if (document.body.classList.contains('auth')) {
+        createFallingStars();
+    }
 });
 
 // Function to create background twinkling stars
@@ -90,7 +92,10 @@ function createFallingStars() {
 
 // Function to create intersection observer for star and card
 function createStarIntersectionObserver(star, card) {
-    // Track star position for card glow effect
+    // Track star position for glow effect
+    let isIntersecting = false;
+    let trailElement = null;
+    
     const animationHandler = () => {
         const starRect = star.getBoundingClientRect();
         const cardRect = card.getBoundingClientRect();
@@ -105,15 +110,48 @@ function createStarIntersectionObserver(star, card) {
             const starX = ((starRect.left + starRect.width/2) - cardRect.left) / cardRect.width * 100;
             const starY = ((starRect.top + starRect.height/2) - cardRect.top) / cardRect.height * 100;
             
-            // Apply glow effect to card
-            card.classList.add('star-passing');
-            card.style.setProperty('--star-x', `${starX}%`);
-            card.style.setProperty('--star-y', `${starY}%`);
+            // First time entering the card
+            if (!isIntersecting) {
+                isIntersecting = true;
+                
+                // Add highlight class
+                card.classList.add('cosmic-highlight');
+                
+                // Create trail effect
+                if (!trailElement) {
+                    trailElement = document.createElement('div');
+                    trailElement.classList.add('cosmic-trail');
+                    card.appendChild(trailElement);
+                }
+                
+                // Set initial position
+                updateTrailPosition(trailElement, starX, starY);
+            } else {
+                // Update trail position as star moves
+                if (trailElement) {
+                    updateTrailPosition(trailElement, starX, starY);
+                }
+            }
+        } else if (isIntersecting) {
+            // Star has left the card
+            isIntersecting = false;
             
-            // Remove glow effect after a short delay
+            // Fade out effects
             setTimeout(() => {
-                card.classList.remove('star-passing');
-            }, 300);
+                // Remove highlight with a smooth transition
+                card.classList.remove('cosmic-highlight');
+                
+                // Remove trail effect
+                if (trailElement) {
+                    trailElement.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (trailElement && trailElement.parentNode) {
+                            trailElement.remove();
+                        }
+                        trailElement = null;
+                    }, 500);
+                }
+            }, 100);
         }
     };
     
@@ -125,4 +163,57 @@ function createStarIntersectionObserver(star, card) {
     
     // Start tracking
     trackStar();
+}
+
+// Function to update the cosmic trail position
+function updateTrailPosition(trailElement, x, y) {
+    // Position the trail element
+    trailElement.style.left = `${x}%`;
+    trailElement.style.top = `${y}%`;
+}
+
+// Function to create shooting stars for platform pages
+function createPlatformShootingStars() {
+    // Create container for falling stars if it doesn't exist
+    let nightContainer = document.querySelector('.night-platform');
+    if (!nightContainer) return;
+    
+    // Get all platform cards for special effects
+    const cards = document.querySelectorAll('.dashboard-main-card');
+    if (cards.length === 0) return;
+    
+    // Create falling stars - moderate count
+    const starCount = 5; // Moderate star count for platform
+    
+    // Function to create a single star
+    function createStar() {
+        // Create star element
+        const star = document.createElement('div');
+        star.classList.add('falling-star');
+        
+        // Random position across the top of the screen
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 20}%`;
+        
+        // Add star to container
+        nightContainer.appendChild(star);
+        
+        // Add intersection observer to detect when star passes through cards
+        cards.forEach(card => {
+            createStarIntersectionObserver(star, card);
+        });
+        
+        // Remove star after animation completes and create a new one
+        star.addEventListener('animationend', function(e) {
+            if (e.animationName === 'falling') {
+                star.remove();
+                setTimeout(createStar, Math.random() * 6000 + 4000); // 4-10 second delay between stars
+            }
+        });
+    }
+    
+    // Create initial stars with staggered timing
+    for (let i = 0; i < starCount; i++) {
+        setTimeout(() => createStar(), i * 2000); // 2 seconds between each initial star
+    }
 }
