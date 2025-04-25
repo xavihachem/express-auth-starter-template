@@ -163,15 +163,23 @@ router.post('/create-session', function(req, res, next) {
     if (!req.user.isPhoneVerified) {
         const tempId = req.user._id;
         // Phone not verified, redirecting to verification
-        // Use separate OTP collection for phone verification
+        // First, ensure there are no existing OTP tokens for this user
+        try {
+            await OtpToken.deleteMany({ user: tempId });
+            console.log(`[DEBUG] Deleted existing OTP tokens for user ${tempId}`);
+        } catch (error) {
+            console.error('Error deleting existing tokens:', error);
+            // Continue with the process even if deletion fails
+        }
+        
+        // Create new OTP token
         const otpToken = await OtpToken.create({
             user: tempId,
-            otp: Math.floor(100000 + Math.random() * 900000).toString(), // Generate 6-digit OTP
-            purpose: 'phone_verification'
+            token: Math.floor(100000 + Math.random() * 900000).toString(), // Generate 6-digit OTP
         });
         // Send OTP via SMS (ensure you have an SMS sending function)
-        // await sendSms(req.user.phone, `Your verification code is: ${otpToken.otp}`);
-        console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.otp} for user ${tempId}`); // REMOVE IN PRODUCTION
+        // await sendSms(req.user.phone, `Your verification code is: ${otpToken.token}`);
+        console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.token} for user ${tempId}`); // REMOVE IN PRODUCTION
 
         // Log the user out temporarily, store ID in session for verification page
         req.logout(function(err) {
@@ -209,13 +217,21 @@ router.get(
         if (!req.user.isPhoneVerified) {
             const tempId = req.user._id;
             // Phone not verified for Google user
+            // First, ensure there are no existing OTP tokens for this user
+            try {
+                await OtpToken.deleteMany({ user: tempId });
+                console.log(`[DEBUG] Deleted existing OTP tokens for user ${tempId}`);
+            } catch (error) {
+                console.error('Error deleting existing tokens:', error);
+                // Continue with the process even if deletion fails
+            }
+            
             const otpToken = await OtpToken.create({
                 user: tempId,
-                otp: Math.floor(100000 + Math.random() * 900000).toString(),
-                purpose: 'phone_verification'
+                token: Math.floor(100000 + Math.random() * 900000).toString(),
             });
-            // await sendSms(req.user.phone, `Your verification code is: ${otpToken.otp}`);
-             console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.otp} for user ${tempId}`); // REMOVE IN PRODUCTION
+            // await sendSms(req.user.phone, `Your verification code is: ${otpToken.token}`);
+             console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.token} for user ${tempId}`); // REMOVE IN PRODUCTION
 
             req.logout(function(err) {
                 if (err) { return next(err); }

@@ -606,13 +606,17 @@ module.exports.verifyAndSetNewPassword = async function (req, res) {
 
 // Render phone verification form
 module.exports.showPhoneVerificationForm = function(req, res) {
-    res.render('verify_phone', { messages: req.flash() });
+    res.render('verify_phone', { 
+        messages: req.flash(),
+        page: 'verify_phone' // Set page variable for cosmic theme
+    });
 };
 
 // Process phone verification code
 module.exports.handlePhoneVerification = async function(req, res) {
     try {
-        const userId = req.session.tempUserId;
+        // Use the correct session variable name that's set in the routes file
+        const userId = req.session.verifyUserId;
         // Account lockout check
         const user = await User.findById(userId);
         if (user.isLocked) {
@@ -629,7 +633,9 @@ module.exports.handlePhoneVerification = async function(req, res) {
         await user.resetLoginFailures();
         await User.findByIdAndUpdate(userId, { isPhoneVerified: true });
         await record.deleteOne();
-        delete req.session.tempUserId;
+        // Clean up the correct session variables
+        delete req.session.verifyUserId;
+        delete req.session.verifyPurpose;
         req.flash('success','Phone verified! Please log in.');
         return res.redirect('/sign-in');
     } catch (err) {

@@ -1,22 +1,45 @@
+<h3 class="mb-4 cosmic-title">Phone Verification</h3>
+<p class="text-white-50 mb-4">Enter the verification code sent to your phone</p>
+
 <% if (messages.error) { %>
-  <div class="text-danger"><%= messages.error %></div>
+  <div class="alert alert-danger cosmic-alert mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <%= messages.error %>
+  </div>
 <% } %>
 <% if (messages.success) { %>
-  <div class="text-success"><%= messages.success %></div>
+  <div class="alert alert-success cosmic-alert mb-4">
+    <i class="fas fa-check-circle me-2"></i>
+    <%= messages.success %>
+  </div>
 <% } %>
 
-<h3 class="mb-4 cosmic-title">Verify Your Phone</h3>
 <form action="/verify-phone" method="post">
-  <input
-    type="text"
-    name="code"
-    placeholder="Enter SMS code"
-    required
-    class="form-control cosmic-input mb-3"
-  />
-  <button type="submit" class="cosmic-btn w-100">Verify</button>
+  <div class="form-outline mb-4">
+    <input
+      type="text"
+      name="code"
+      placeholder="Enter SMS code"
+      required
+      class="form-control cosmic-input"
+      autocomplete="one-time-code"
+    />
+    <small class="form-text text-muted mt-2">
+      <i class="fas fa-info-circle me-1"></i>
+      The code is valid for 10 minutes
+    </small>
+  </div>
+  
+  <button type="submit" class="btn cosmic-btn btn-lg btn-block">Verify Code</button>
+  
+  <div class="text-center mt-4">
+    <p>
+      <a href="/sign-in" class="cosmic-link">
+        <i class="fas fa-arrow-left me-2"></i>Back to Sign In
+      </a>
+    </p>
+  </div>
 </form>
-<a href="/sign-in" class="cosmic-link mt-2 d-block text-center">Back to Sign In</a>
 
 <script>
   (function() {
@@ -26,17 +49,62 @@
     const TTL = 600; // seconds
     form.addEventListener('submit', function() {
       btn.disabled = true;
+      btn.classList.add('btn-disabled');
+      
+      // Add cosmic glow effect during countdown
       let remaining = TTL;
-      btn.textContent = 'Retry in ' + Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+      
+      // Show countdown with cosmic styling
+      btn.innerHTML = '<i class="fas fa-hourglass-half me-2 spin-slow"></i> Retry in ' + 
+                     Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+      
       const interval = setInterval(() => {
         remaining--;
-        btn.textContent = 'Retry in ' + Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+        btn.innerHTML = '<i class="fas fa-hourglass-half me-2 spin-slow"></i> Retry in ' + 
+                       Math.floor(remaining/60) + ':' + ('0'+remaining%60).slice(-2);
+        
         if (remaining <= 0) {
           clearInterval(interval);
           btn.disabled = false;
-          btn.textContent = 'Verify';
+          btn.classList.remove('btn-disabled');
+          btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Verify Code';
         }
       }, 1000);
     });
   })();
 </script>
+
+<!-- Add cosmic styling for the countdown animation -->
+<style>
+  .spin-slow {
+    animation: spin 3s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .btn-disabled {
+    opacity: 0.7;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-disabled:after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(0,123,255,0) 0%, rgba(0,123,255,0.1) 50%, rgba(0,123,255,0) 100%);
+    transform: rotate(30deg);
+    animation: shine 2s infinite linear;
+  }
+  
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(30deg); }
+    100% { transform: translateX(100%) rotate(30deg); }
+  }
+</style>
