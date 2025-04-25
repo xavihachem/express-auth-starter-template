@@ -494,14 +494,8 @@
                 
                 if (data.success) {
                     console.log('Support request submitted successfully');
-                    // Show success message
-                    new Noty({
-                        theme: 'nest',
-                        text: 'Your message has been sent. We will get back to you soon.',
-                        type: 'success',
-                        layout: 'topRight',
-                        timeout: 3000
-                    }).show();
+                    // Show success message using cosmic notification system
+                    cosmicNotify.success('Your message has been sent. We will get back to you soon.');
                     
                     // Reset form and close panel
                     contactForm.reset();
@@ -509,26 +503,14 @@
                     document.body.style.overflow = 'auto'; // Enable scrolling
                 } else {
                     console.error('Support request failed:', data.message);
-                    // Show error message
-                    new Noty({
-                        theme: 'nest',
-                        text: data.message || 'Failed to send message. Please try again.',
-                        type: 'error',
-                        layout: 'topRight',
-                        timeout: 3000
-                    }).show();
+                    // Show error message using cosmic notification system
+                    cosmicNotify.error(data.message || 'Failed to send message. Please try again.');
                 }
             })
             .catch(error => {
                 console.error('Error sending support message:', error);
-                // Show error message
-                new Noty({
-                    theme: 'nest',
-                    text: 'An error occurred. Please try again later.',
-                    type: 'error',
-                    layout: 'topRight',
-                    timeout: 3000
-                }).show();
+                // Show error message using cosmic notification system
+                cosmicNotify.error('An error occurred. Please try again later.');
             });
         });
     });

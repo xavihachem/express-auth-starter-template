@@ -2007,29 +2007,292 @@
     });
     </script>
     <% } %>
+    <!-- Custom Cosmic Notification System -->
+    <style>
+        /* Cosmic Notification Container */
+        .cosmic-notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 350px;
+        }
+        
+        /* Cosmic Notification */
+        .cosmic-notification {
+            position: relative;
+            margin-bottom: 15px;
+            padding: 15px 20px 15px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        /* Success Notification */
+        .cosmic-notification.success {
+            background: linear-gradient(135deg, rgba(13, 50, 77, 0.8), rgba(25, 80, 107, 0.9));
+            border-left: 4px solid rgba(72, 255, 200, 0.8);
+        }
+        
+        /* Error Notification */
+        .cosmic-notification.error {
+            background: linear-gradient(135deg, rgba(77, 13, 38, 0.8), rgba(107, 25, 47, 0.9));
+            border-left: 4px solid rgba(255, 72, 112, 0.8);
+        }
+        
+        /* Icon Container */
+        .cosmic-notification .icon {
+            margin-right: 15px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cosmic-notification.success .icon {
+            background: rgba(72, 255, 200, 0.2);
+            color: rgba(72, 255, 200, 1);
+        }
+        
+        .cosmic-notification.error .icon {
+            background: rgba(255, 72, 112, 0.2);
+            color: rgba(255, 72, 112, 1);
+        }
+        
+        /* Particle effect */
+        .cosmic-notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 15px 15px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateX(120%); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(120%); }
+        }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(72, 127, 255, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(72, 127, 255, 0.5); }
+            100% { box-shadow: 0 0 15px rgba(72, 127, 255, 0.3); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Apply animations */
+        .cosmic-notification.show {
+            animation: fadeIn 0.5s forwards, pulseGlow 3s infinite;
+            opacity: 1;
+        }
+        
+        .cosmic-notification.hide {
+            animation: fadeOut 0.5s forwards;
+        }
+        
+        /* Progress bar */
+        .cosmic-notification .progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2.5s linear 1;
+        }
+        
+        /* Close button */
+        .cosmic-notification .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .cosmic-notification .close:hover {
+            color: white;
+        }
+    </style>
+    
+    <div class="cosmic-notification-container" id="cosmic-notifications"></div>
+    
     <% if (locals.flash) { %>
     <script>
+        /**
+         * Cosmic Notification System
+         * A modern, majestic notification system with cosmic-themed visual effects
+         */
+        class CosmicNotification {
+            constructor() {
+                this.container = document.getElementById('cosmic-notifications');
+                this.notificationCount = 0;
+                this.maxNotifications = 3; // Maximum number of notifications to show at once
+            }
+            
+            /**
+             * Create a notification
+             * @param {string} message - The message to display
+             * @param {string} type - The type of notification ('success' or 'error')
+             * @param {number} duration - How long to show the notification (in ms)
+             */
+            show(message, type = 'success', duration = 4000) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `cosmic-notification ${type}`;
+                notification.setAttribute('role', 'alert');
+                
+                // Set unique ID for tracking
+                const notificationId = `cosmic-notif-${Date.now()}`;
+                notification.id = notificationId;
+                
+                // Icon based on type
+                let icon = '';
+                if (type === 'success') {
+                    icon = '<i class="fas fa-check-circle"></i>';
+                } else if (type === 'error') {
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                }
+                
+                // Notification HTML structure
+                notification.innerHTML = `
+                    <div class="icon">${icon}</div>
+                    <div class="message">${message}</div>
+                    <button class="close" aria-label="Close notification">&times;</button>
+                    <div class="progress"></div>
+                `;
+                
+                // Add to container
+                this.container.appendChild(notification);
+                
+                // Limit number of notifications
+                this.notificationCount++;
+                this.limitNotifications();
+                
+                // Show animation after small delay for proper rendering
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                // Set up close handler
+                const closeBtn = notification.querySelector('.close');
+                closeBtn.addEventListener('click', () => {
+                    this.close(notificationId);
+                });
+                
+                // Auto-close after duration
+                setTimeout(() => {
+                    this.close(notificationId);
+                }, duration);
+                
+                // Return notification ID in case it's needed
+                return notificationId;
+            }
+            
+            /**
+             * Close a notification
+             * @param {string} id - The notification ID to close
+             */
+            close(id) {
+                const notification = document.getElementById(id);
+                if (notification) {
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                    
+                    // Remove from DOM after animation completes
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                            this.notificationCount--;
+                        }
+                    }, 500);
+                }
+            }
+            
+            /**
+             * Limit the number of notifications shown
+             */
+            limitNotifications() {
+                const notifications = this.container.querySelectorAll('.cosmic-notification');
+                if (notifications.length > this.maxNotifications) {
+                    // Remove oldest notifications
+                    const toRemove = notifications.length - this.maxNotifications;
+                    for (let i = 0; i < toRemove; i++) {
+                        this.container.removeChild(notifications[i]);
+                        this.notificationCount--;
+                    }
+                }
+            }
+            
+            /**
+             * Show a success notification
+             */
+            success(message, duration = 4000) {
+                return this.show(message, 'success', duration);
+            }
+            
+            /**
+             * Show an error notification
+             */
+            error(message, duration = 4000) {
+                return this.show(message, 'error', duration);
+            }
+        }
+        
+        // Initialize the notification system
+        const cosmicNotify = new CosmicNotification();
+        
+        // Handle flash messages
         document.addEventListener('DOMContentLoaded', function() {
             <% if (flash.success && flash.success.length > 0) { %>
             var successMessage = "<%= flash.success %>";
-            new Noty({
-                theme: 'nest',
-                text: successMessage,
-                type: 'success',
-                layout: 'topRight',
-                timeout: 2500
-            }).show();
+            cosmicNotify.success(successMessage);
             <% } %>
             
             <% if (flash.error && flash.error.length > 0) { %>
             var errorMessage = "<%= flash.error %>";
-            new Noty({
-                theme: 'nest',
-                text: errorMessage,
-                type: 'error',
-                layout: 'topRight',
-                timeout: 2500
-            }).show();
+            setTimeout(function() {
+                cosmicNotify.error(errorMessage);
+            }, 100); // Small delay to ensure container is ready
             <% } %>
         });
     </script>
