@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <title><%= title %></title>
+</head>
+
+<h3 class="mb-4">Ticket Details</h3>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i> Ticket Details</h5>
+                    <div>
+                        <a href="/admin/tickets" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Tickets
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="avatar-placeholder me-2">
+                                    <%= ticket.userName.charAt(0).toUpperCase() %>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0"><%= ticket.userName %></h5>
+                                    <small class="text-muted"><%= ticket.userEmail %></small>
+                                </div>
+                            </div>
+                            <p style="color: white !important;"><strong style="color: white !important;">Subject:</strong> <span style="color: white !important;"><%= ticket.subject %></span></p>
+                            <p style="color: white !important;"><strong style="color: white !important;">Date:</strong> <span style="color: white !important;"><%= new Date(ticket.createdAt).toLocaleString() %></span></p>
+                            <p style="color: white !important;">
+                                <strong style="color: white !important;">Status:</strong> 
+                                <span class="badge <%= ticket.status === 'open' ? 'bg-success' : 'bg-secondary' %>">
+                                    <%= ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1) %>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <% if (ticket.status === 'open') { %>
+                                <button type="button" class="btn btn-secondary change-status-btn" data-status="closed">
+                                    <i class="fas fa-check me-1"></i> Close Ticket
+                                </button>
+                            <% } else { %>
+                                <span class="badge bg-secondary"><i class="fas fa-lock me-1"></i> Ticket Closed</span>
+                            <% } %>
+                            
+                            <script>
+                                document.querySelectorAll('.change-status-btn').forEach(button => {
+                                    button.addEventListener('click', function() {
+                                        const status = this.getAttribute('data-status');
+                                        const ticketId = '<%= ticket.id %>';
+                                        const adminId = '<%= ticket.adminId %>';
+                                        
+                                        // Create form and submit it
+                                        const form = document.createElement('form');
+                                        form.method = 'POST';
+                                        form.action = '/admin/change-ticket-status';
+                                        
+                                        // Add CSRF token from meta tag
+                                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                                        const csrfInput = document.createElement('input');
+                                        csrfInput.type = 'hidden';
+                                        csrfInput.name = '_csrf';
+                                        csrfInput.value = csrfToken;
+                                        form.appendChild(csrfInput);
+                                        
+                                        // Add other form fields
+                                        const ticketIdInput = document.createElement('input');
+                                        ticketIdInput.type = 'hidden';
+                                        ticketIdInput.name = 'ticketId';
+                                        ticketIdInput.value = ticketId;
+                                        form.appendChild(ticketIdInput);
+                                        
+                                        const adminIdInput = document.createElement('input');
+                                        adminIdInput.type = 'hidden';
+                                        adminIdInput.name = 'adminId';
+                                        adminIdInput.value = adminId;
+                                        form.appendChild(adminIdInput);
+                                        
+                                        const statusInput = document.createElement('input');
+                                        statusInput.type = 'hidden';
+                                        statusInput.name = 'status';
+                                        statusInput.value = status;
+                                        form.appendChild(statusInput);
+                                        
+                                        // Add form to document and submit
+                                        document.body.appendChild(form);
+                                        form.submit();
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header" style="background-color: #e9ecef !important;">
+                            <h6 class="mb-0" style="color: black !important; font-weight: bold;">Message</h6>
+                        </div>
+                        <div class="card-body" style="background-color: #212529 !important;">
+                            <p style="color: white !important;"><%= ticket.message %></p>
+                        </div>
+                    </div>
+
+                    <% if (ticket.responses && ticket.responses.length > 0) { %>
+                        <h5 class="mb-3">Responses</h5>
+                        <% ticket.responses.forEach(response => { %>
+                            <div class="card mb-3 <%= response.from === 'admin' ? 'border-primary' : '' %>">
+                                <div class="card-header bg-light d-flex justify-content-between">
+                                    <div>
+                                        <% if (response.from === 'admin') { %>
+                                            <span class="badge bg-primary">Admin</span>
+                                            <strong><%= response.adminName %></strong>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">User</span>
+                                            <strong><%= ticket.userName %></strong>
+                                        <% } %>
+                                    </div>
+                                    <small class="text-muted"><%= new Date(response.createdAt).toLocaleString() %></small>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-0"><%= response.message %></p>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } %>
+
+                    <% if (ticket.status === 'open') { %>
+                        <div class="card mt-4">
+                            <div class="card-header" style="background-color: #e9ecef !important;">
+                                <h6 class="mb-0" style="color: black !important; font-weight: bold;">Reply to Ticket</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="responseForm">
+                                    <input type="hidden" id="ticketId" value="<%= ticket.id %>">
+                                    <input type="hidden" id="adminId" value="<%= ticket.adminId %>">
+                                    
+                                    <div class="mb-3">
+                                        <label for="responseMessage" class="form-label" style="color: black !important; font-weight: bold;">Your Response</label>
+                                        <textarea class="form-control" id="responseMessage" rows="4" required style="color: black !important;"></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" id="sendResponseBtn" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane me-1"></i> Send Response
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <script>
+                                    document.getElementById('sendResponseBtn').addEventListener('click', function() {
+                                        const ticketId = document.getElementById('ticketId').value;
+                                        const adminId = document.getElementById('adminId').value;
+                                        const message = document.getElementById('responseMessage').value;
+                                        
+                                        if (!message.trim()) {
+                                            alert('Please enter a response message');
+                                            return;
+                                        }
+                                        
+                                        // Create form and submit it
+                                        const form = document.createElement('form');
+                                        form.method = 'POST';
+                                        form.action = '/admin/respond-to-ticket';
+                                        
+                                        // Add CSRF token from meta tag
+                                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                                        const csrfInput = document.createElement('input');
+                                        csrfInput.type = 'hidden';
+                                        csrfInput.name = '_csrf';
+                                        csrfInput.value = csrfToken;
+                                        form.appendChild(csrfInput);
+                                        
+                                        // Add other form fields
+                                        const ticketIdInput = document.createElement('input');
+                                        ticketIdInput.type = 'hidden';
+                                        ticketIdInput.name = 'ticketId';
+                                        ticketIdInput.value = ticketId;
+                                        form.appendChild(ticketIdInput);
+                                        
+                                        const adminIdInput = document.createElement('input');
+                                        adminIdInput.type = 'hidden';
+                                        adminIdInput.name = 'adminId';
+                                        adminIdInput.value = adminId;
+                                        form.appendChild(adminIdInput);
+                                        
+                                        const messageInput = document.createElement('input');
+                                        messageInput.type = 'hidden';
+                                        messageInput.name = 'message';
+                                        messageInput.value = message;
+                                        form.appendChild(messageInput);
+                                        
+                                        // Add form to document and submit
+                                        document.body.appendChild(form);
+                                        form.submit();
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    /* Set specific colors for elements to ensure contrast */
+    .card-body p, .card-body div:not(.btn):not(.badge), .card-body span:not(.badge), 
+    .card-header h6, .card-header div:not(.btn):not(.badge) {
+        color: #000000 !important;
+    }
+    
+    /* Background colors for card elements */
+    .card {
+        background-color: #ffffff !important;
+    }
+    
+    .card-header.bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Ensure buttons and badges have proper contrast */
+    .btn-primary, .badge.bg-primary {
+        background-color: #0d6efd !important;
+        color: white !important;
+    }
+    
+    .btn-secondary, .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: white !important;
+    }
+    
+    .btn-success, .badge.bg-success {
+        background-color: #198754 !important;
+        color: white !important;
+    }
+    
+    .btn-warning, .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000000 !important;
+    }
+    
+    /* Ensure text in form controls is visible */
+    textarea, input {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+</style>

@@ -169,6 +169,9 @@
                         <a href="/challenges" class="btn btn-warning">
                             <i class="fas fa-trophy me-2"></i>Daily Challenges
                         </a>
+                        <button type="button" class="btn btn-info" id="contactSupportBtn">
+                            <i class="fas fa-headset me-2"></i>Contact Support
+                        </button>
                         <% if (locals.user && locals.user.role === 'admin') { %>
                         <a href="/admin" class="btn btn-danger">
                             <i class="fas fa-user-shield me-2"></i>Admin Panel
@@ -180,6 +183,337 @@
         </div>
     </div>
 </div>
+
+<!-- Contact Support Panel (Hidden by default) -->
+<div id="contactSupportSection">
+<div id="contactSupportPanel" class="contact-support-panel" style="display: none;">
+    <div class="contact-support-container">
+        <div class="contact-support-header">
+            <div class="support-header-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h4>Contact Support</h4>
+            <button type="button" class="contact-close-btn" id="closeSupportPanel" aria-label="Close support panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="contact-support-body">
+            <div class="support-intro mb-4">
+                <p>Our support team is here to help you with any questions or issues you may have. Please fill out the form below and we'll get back to you as soon as possible.</p>
+                <div class="support-note">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span>You can submit one support ticket per day.</span>
+                </div>
+            </div>
+            <form id="contactSupportForm" action="/contact-support" method="post">
+                <div class="mb-4">
+                    <label for="supportSubject" class="form-label">Subject</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                        <input type="text" class="form-control" id="supportSubject" name="subject" required placeholder="How can we help you?">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="supportMessage" class="form-label">Message</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-comment-alt"></i></span>
+                        <textarea class="form-control" id="supportMessage" name="message" rows="5" required placeholder="Please describe your issue in detail..."></textarea>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary support-submit-btn">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Support Styles -->
+<style>
+    .contact-support-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(13, 17, 23, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .contact-support-container {
+        width: 550px;
+        max-width: 90%;
+        background: #1a1f2b;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform: translateY(0);
+        animation: slideUp 0.4s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .contact-support-header {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 20px 25px;
+        background: linear-gradient(135deg, #4b6cb7, #182848);
+        color: white;
+        position: relative;
+    }
+    
+    .support-header-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 22px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .contact-support-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 20px;
+        letter-spacing: 0.5px;
+    }
+    
+    .contact-close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .contact-close-btn:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .contact-support-body {
+        padding: 25px;
+        color: #e1e1e1;
+    }
+    
+    .support-intro p {
+        color: #b8b9bd;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    .support-note {
+        background: rgba(75, 108, 183, 0.15);
+        border-left: 3px solid #4b6cb7;
+        padding: 12px 15px;
+        border-radius: 0 8px 8px 0;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+    }
+    
+    .support-note i {
+        color: #4b6cb7;
+    }
+    
+    #contactSupportForm .form-label {
+        color: #000000;
+        font-weight: 500;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+    
+    #contactSupportForm .input-group-text {
+        background-color: rgba(75, 108, 183, 0.2);
+        border: 1px solid rgba(75, 108, 183, 0.3);
+        color: #4b6cb7;
+    }
+    
+    #contactSupportForm .form-control {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 12px 15px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+    
+    #contactSupportForm .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+    
+    #contactSupportForm .form-control:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: #4b6cb7;
+        box-shadow: 0 0 0 0.25rem rgba(75, 108, 183, 0.25);
+    }
+    
+    .support-submit-btn {
+        background: linear-gradient(135deg, #4b6cb7, #182848);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+    }
+    
+    .support-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(75, 108, 183, 0.4);
+        background: linear-gradient(135deg, #5d7ec9, #243b6a);
+    }
+</style>
+
+<!-- Contact Support Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactBtn = document.getElementById('contactSupportBtn');
+        const contactPanel = document.getElementById('contactSupportPanel');
+        const closeBtn = document.getElementById('closeSupportPanel');
+        const contactForm = document.getElementById('contactSupportForm');
+        
+        // Show contact panel when button is clicked
+        contactBtn.addEventListener('click', function() {
+            contactPanel.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+        
+        // Hide contact panel when close button is clicked
+        closeBtn.addEventListener('click', function() {
+            contactPanel.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Enable scrolling
+        });
+        
+        // Close panel when clicking outside the form
+        contactPanel.addEventListener('click', function(e) {
+            if (e.target === contactPanel) {
+                contactPanel.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Enable scrolling
+            }
+        });
+        
+        // Handle escape key to close panel
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && contactPanel.style.display === 'flex') {
+                contactPanel.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Enable scrolling
+            }
+        });
+        
+        // Form submission
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            console.log('Contact support form submitted');
+            
+            // Get form data
+            const subject = document.getElementById('supportSubject').value;
+            const message = document.getElementById('supportMessage').value;
+            
+            console.log('Form data:', { subject, message });
+            
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            console.log('CSRF token found:', !!csrfToken);
+            
+            // Prepare request data
+            const requestData = {
+                subject: subject,
+                message: message
+            };
+            
+            console.log('Sending request to /contact-support with data:', requestData);
+            
+            // Submit the form using fetch API
+            fetch('/contact-support', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': csrfToken
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                console.log('Response received:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    console.log('Support request submitted successfully');
+                    // Show success message
+                    new Noty({
+                        theme: 'nest',
+                        text: 'Your message has been sent. We will get back to you soon.',
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 3000
+                    }).show();
+                    
+                    // Reset form and close panel
+                    contactForm.reset();
+                    contactPanel.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Enable scrolling
+                } else {
+                    console.error('Support request failed:', data.message);
+                    // Show error message
+                    new Noty({
+                        theme: 'nest',
+                        text: data.message || 'Failed to send message. Please try again.',
+                        type: 'error',
+                        layout: 'topRight',
+                        timeout: 3000
+                    }).show();
+                }
+            })
+            .catch(error => {
+                console.error('Error sending support message:', error);
+                // Show error message
+                new Noty({
+                    theme: 'nest',
+                    text: 'An error occurred. Please try again later.',
+                    type: 'error',
+                    layout: 'topRight',
+                    timeout: 3000
+                }).show();
+            });
+        });
+    });
+</script>
+</div> <!-- End of contactSupportSection -->
 
 <!-- Quick actions and account settings sections removed -->
 

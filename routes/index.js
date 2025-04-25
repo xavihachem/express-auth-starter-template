@@ -56,6 +56,10 @@ router.get('/admin/edit-balance/:userId', passport.checkAuthentication, roleMidd
 router.post('/admin/update-balance', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.updateBalance); // Update user balance
 router.get('/admin/withdrawal-requests', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewWithdrawalRequests); // View all withdrawal requests
 router.get('/admin/withdrawal-requests/:userId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewWithdrawalRequests); // View user's withdrawal requests
+router.get('/admin/tickets', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewTickets); // View support tickets
+router.get('/admin/ticket/:ticketId/:adminId', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.viewTicketDetails); // View ticket details
+router.post('/admin/respond-to-ticket', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.respondToTicket); // Respond to a support ticket
+router.post('/admin/change-ticket-status', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.changeTicketStatus); // Change ticket status
 router.post('/admin/approve-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.approveWithdrawal); // Approve withdrawal request
 router.post('/admin/reject-withdrawal', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.rejectWithdrawal); // Reject withdrawal request
 router.post('/admin/change-role', passport.checkAuthentication, roleMiddleware.isAdmin, dashboardController.changeRole); // Change user role
@@ -83,6 +87,7 @@ const upload = require('../config/multer');
 router.get('/profile', passport.checkAuthentication, profileController.profile);
 router.post('/update-name', passport.checkAuthentication, profileController.updateName);
 router.get('/upload-avatar', passport.checkAuthentication, profileController.showAvatarUpload);
+router.post('/contact-support', passport.checkAuthentication, profileController.contactSupport); // Handle contact support requests
 // Handle avatar upload with proper error handling
 router.post('/update-avatar', passport.checkAuthentication, function(req, res, next) {
     upload.single('avatar')(req, res, function(err) {

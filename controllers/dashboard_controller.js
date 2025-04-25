@@ -712,7 +712,7 @@ module.exports.rejectWithdrawal = async function(req, res) {
             return res.redirect('/');
         }
 
-        const { userId, requestId } = req.body;
+        const { userId, requestId, rejectionNote } = req.body;
         
         if (!userId || !requestId) {
             req.flash('error', 'User ID and request ID are required');
@@ -744,9 +744,10 @@ module.exports.rejectWithdrawal = async function(req, res) {
         // Get the withdrawal amount
         const withdrawalAmount = user.withdrawalRequests[requestIndex].amount;
         
-        // Update the withdrawal request status to rejected
+        // Update the withdrawal request status to rejected and add rejection note
         user.withdrawalRequests[requestIndex].status = 'rejected';
         user.withdrawalRequests[requestIndex].processedDate = new Date();
+        user.withdrawalRequests[requestIndex].rejectionNote = rejectionNote || 'No reason provided';
         
         // Return the funds to the user's balance
         user.balance += withdrawalAmount;
@@ -754,11 +755,11 @@ module.exports.rejectWithdrawal = async function(req, res) {
         // Save the updated user
         await user.save();
         
-        // Create notification for the user
+        // Create notification for the user with the rejection note
         const Notification = require('../models/notification');
         await Notification.notifyUser(userId, {
             title: 'Withdrawal Request Rejected',
-            message: `Your withdrawal request for $${withdrawalAmount.toFixed(2)} has been rejected. The funds have been returned to your balance.`,
+            message: `Your withdrawal request for $${withdrawalAmount.toFixed(2)} has been rejected. The funds have been returned to your balance.\n\nReason: ${rejectionNote || 'No reason provided'}`,
             type: 'danger',
             icon: 'times-circle',
             actionType: 'withdrawal_request',
@@ -1294,5 +1295,381 @@ module.exports.claimDailyReward = async function(req, res) {
             success: false, 
             message: 'Failed to process reward claim' 
         });
+    }
+};
+
+/**
+ * View support tickets
+ * Displays all support tickets for admin users
+ */
+module.exports.viewTickets = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You do not have permission to access this page');
+            return res.redirect('/dashboard');
+        }
+        
+        console.log('View tickets request received');
+        const adminId = req.user._id;
+        console.log('Admin user accessing tickets:', adminId);
+        
+        // Get pagination parameters
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
+        // Find all admin users with support notifications
+        console.log('Searching for admin users with support notifications');
+        const admins = await User.find({ role: 'admin' });
+        console.log('Admin users found:', admins.length);
+        
+        // Extract all support tickets from admin notifications
+        const allTickets = [];
+        
+        for (const admin of admins) {
+            console.log(`Admin ${admin._id} (${admin.name})`);
+            console.log(`Admin ${admin._id} has ${admin.notifications.length} notifications`);
+            
+            // Filter notifications to only include support tickets
+            const supportNotifications = admin.notifications.filter(notification => 
+                notification.type === 'support'
+            );
+            
+            console.log(`Admin ${admin._id} has ${supportNotifications.length} support notifications`);
+            
+            // Extract ticket details from each support notification
+            for (const notification of supportNotifications) {
+                console.log('Support notification details:', notification);
+                
+                // Extract user info from the notification message
+                const messageParts = notification.message.match(/Support request from (.+) \((.+)\): (.+)/);
+                
+                if (messageParts) {
+                    const [_, userName, userEmail, subject] = messageParts;
+                    
+                    allTickets.push({
+                        id: notification._id,
+                        adminId: admin._id,
+                        userId: notification.from,
+                        userName: userName,
+                        userEmail: userEmail,
+                        subject: subject,
+                        message: notification.message,
+                        status: notification.status || 'open',
+                        createdAt: notification.createdAt,
+                        responses: notification.responses || []
+                    });
+                }
+            }
+        }
+        
+        // Remove duplicate tickets (same subject, user email, and created within 1 minute)
+        const uniqueTickets = [];
+        const ticketMap = new Map();
+        
+        for (const ticket of allTickets) {
+            const key = `${ticket.userEmail}-${ticket.subject}`;
+            
+            if (!ticketMap.has(key)) {
+                ticketMap.set(key, ticket);
+                uniqueTickets.push(ticket);
+            }
+        }
+        
+        // Sort tickets by date (newest first)
+        uniqueTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        console.log(`Deduplicated tickets: ${uniqueTickets.length} (from ${allTickets.length} total)`);
+        
+        // Apply pagination
+        const totalTickets = uniqueTickets.length;
+        const totalPages = Math.ceil(totalTickets / limit);
+        const paginatedTickets = uniqueTickets.slice(skip, skip + limit);
+        
+        console.log(`Rendering tickets page with ${paginatedTickets.length} tickets (page ${page} of ${totalPages})`);
+        
+        return res.render('tickets', {
+            title: 'Support Tickets',
+            tickets: paginatedTickets,
+            pagination: {
+                page,
+                limit,
+                totalTickets,
+                totalPages
+            }
+        });
+    } catch (err) {
+        console.error('Error in viewTickets controller:', err);
+        req.flash('error', 'An error occurred while retrieving support tickets');
+        return res.redirect('/admin');
+    }
+};
+
+/**
+ * View ticket details
+ * Displays detailed information about a specific support ticket
+ */
+module.exports.viewTicketDetails = async function(req, res) {
+    try {
+        console.log('View ticket details request received');
+        
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You do not have permission to access this page');
+            return res.redirect('/dashboard');
+        }
+        
+        const { ticketId, adminId } = req.params;
+        console.log(`Viewing ticket: ${ticketId} from admin: ${adminId}`);
+        
+        // Find the admin user
+        const admin = await User.findById(adminId);
+        if (!admin) {
+            req.flash('error', 'Admin not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Find the ticket in the admin's notifications
+        if (!admin.notifications || admin.notifications.length === 0) {
+            req.flash('error', 'Ticket not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Find the specific ticket by ID
+        const notification = admin.notifications.find(n => n._id.toString() === ticketId);
+        if (!notification || notification.type !== 'support') {
+            req.flash('error', 'Ticket not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Extract user info from the notification message
+        // Format: 'Support request from {userName} ({userEmail}): {subject}'
+        const messageParts = notification.message.match(/Support request from (.+) \((.+)\): (.+)/);
+        if (!messageParts) {
+            req.flash('error', 'Invalid ticket format');
+            return res.redirect('/admin/tickets');
+        }
+        
+        const [_, userName, userEmail, subject] = messageParts;
+        
+        // Create ticket object
+        const ticket = {
+            id: notification._id,
+            adminId: admin._id,
+            userName: userName,
+            userEmail: userEmail,
+            subject: subject,
+            message: notification.details,
+            status: notification.status || 'open',
+            createdAt: notification.createdAt,
+            responses: notification.responses || []
+        };
+        
+        console.log('Rendering ticket details page');
+        console.log('Session CSRF token for view:', req.csrfToken ? req.csrfToken() : 'No CSRF token function available');
+        
+        return res.render('ticket_details', {
+            title: 'Ticket Details',
+            user: req.user,
+            ticket: ticket,
+            csrfToken: req.csrfToken ? req.csrfToken() : ''
+        });
+    } catch (err) {
+        console.error('Error in viewTicketDetails controller:', err);
+        req.flash('error', 'An error occurred while loading ticket details');
+        return res.redirect('/admin/tickets');
+    }
+};
+
+/**
+ * Respond to a support ticket
+ * Adds a response to a user's support ticket and updates its status
+ */
+module.exports.respondToTicket = async function(req, res) {
+    try {
+        console.log('Respond to ticket request received');
+        console.log('Request body:', req.body);
+        console.log('CSRF token in request:', req.body._csrf);
+        
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            console.log('User not authenticated or not admin');
+            req.flash('error', 'You do not have permission to perform this action');
+            return res.redirect('/dashboard');
+        }
+        
+        const { ticketId, adminId, message } = req.body;
+        console.log('Ticket ID:', ticketId);
+        console.log('Admin ID:', adminId);
+        console.log('Message:', message);
+        
+        if (!ticketId || !adminId || !message || message.trim() === '') {
+            req.flash('error', 'All fields are required');
+            return res.redirect(`/admin/ticket/${ticketId}/${adminId}`);
+        }
+        
+        // Find the admin who received the ticket
+        const admin = await User.findById(adminId);
+        
+        if (!admin) {
+            req.flash('error', 'Admin not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Find the ticket in the admin's notifications
+        const ticketIndex = admin.notifications.findIndex(notification => 
+            notification._id.toString() === ticketId && notification.type === 'support'
+        );
+        
+        if (ticketIndex === -1) {
+            req.flash('error', 'Ticket not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Create the response
+        const response = {
+            from: 'admin',
+            adminName: req.user.name,
+            message: message,
+            createdAt: new Date()
+        };
+        
+        // Add the response to the ticket
+        if (!admin.notifications[ticketIndex].responses) {
+            admin.notifications[ticketIndex].responses = [];
+        }
+        
+        admin.notifications[ticketIndex].responses.push(response);
+        
+        // Save the updated admin
+        await User.findByIdAndUpdate(
+            adminId,
+            { $set: { [`notifications.${ticketIndex}.responses`]: admin.notifications[ticketIndex].responses } }
+        );
+        
+        // Extract user info from the notification message
+        const messageParts = admin.notifications[ticketIndex].message.match(/Support request from (.+) \((.+)\): (.+)/);
+        
+        if (messageParts) {
+            const [_, userName, userEmail, subject] = messageParts;
+            
+            // Find the user by email to notify them
+            const user = await User.findOne({ email: userEmail });
+            
+            if (user) {
+                // Add a notification to the user about the response using the Notification model
+                const Notification = require('../models/notification');
+                
+                await Notification.create({
+                    recipient: user._id,
+                    title: 'Support Ticket Response',
+                    message: `Your ticket "${subject}" has received a response: "${message}"`,
+                    type: 'info',
+                    icon: 'comment-dots',
+                    actionType: 'general',
+                    read: false,
+                    createdAt: new Date()
+                });
+                
+                // Also add to user's notifications array for backward compatibility
+                const notificationMessage = {
+                    message: 'Support ticket response',
+                    details: `Your support ticket "${subject}" has received a response: "${message}"`,
+                    type: 'info',
+                    createdAt: new Date()
+                };
+                
+                await User.findByIdAndUpdate(
+                    user._id,
+                    { $push: { notifications: { $each: [notificationMessage], $position: 0 } } }
+                );
+            }
+        }
+        
+        req.flash('success', 'Response added successfully');
+        return res.redirect(`/admin/ticket/${ticketId}/${adminId}`);
+    } catch (err) {
+        console.error('Error in respond to ticket controller:', err);
+        req.flash('error', 'An error occurred while responding to the ticket');
+        return res.redirect('/admin/tickets');
+    }
+};
+
+/**
+ * Change ticket status
+ * Changes the status of a support ticket (open/closed)
+ */
+module.exports.changeTicketStatus = async function(req, res) {
+    try {
+        // Check if user is authenticated and is an admin
+        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+            req.flash('error', 'You do not have permission to perform this action');
+            return res.redirect('/dashboard');
+        }
+        
+        const { ticketId, adminId, status } = req.body;
+        
+        // Validate input
+        if (!ticketId || !adminId || !status || !['open', 'closed'].includes(status)) {
+            req.flash('error', 'Invalid input');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Find the admin
+        const admin = await User.findById(adminId);
+        
+        if (!admin) {
+            req.flash('error', 'Admin not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Find the notification/ticket
+        const ticketIndex = admin.notifications.findIndex(notification => 
+            notification._id.toString() === ticketId && notification.type === 'support'
+        );
+        
+        if (ticketIndex === -1) {
+            req.flash('error', 'Ticket not found');
+            return res.redirect('/admin/tickets');
+        }
+        
+        // Update ticket status using findByIdAndUpdate to avoid version conflicts
+        await User.findByIdAndUpdate(
+            adminId,
+            { $set: { [`notifications.${ticketIndex}.status`]: status } }
+        );
+        
+        // Extract user info from the notification message to notify them about status change
+        const messageParts = admin.notifications[ticketIndex].message.match(/Support request from (.+) \((.+)\): (.+)/);
+        
+        if (messageParts) {
+            const [_, userName, userEmail, subject] = messageParts;
+            
+            // Find the user by email to notify them
+            const user = await User.findOne({ email: userEmail });
+            
+            if (user) {
+                // Add a notification to the user about the status change
+                const notificationMessage = {
+                    message: `Support ticket ${status === 'open' ? 'reopened' : 'closed'}`,
+                    details: `Your support ticket "${subject}" has been ${status === 'open' ? 'reopened' : 'closed'} by admin ${req.user.name}.`,
+                    type: 'info',
+                    createdAt: new Date()
+                };
+                
+                await User.findByIdAndUpdate(
+                    user._id,
+                    { $push: { notifications: { $each: [notificationMessage], $position: 0 } } }
+                );
+            }
+        }
+        
+        req.flash('success', `Ticket ${status === 'open' ? 'reopened' : 'closed'} successfully`);
+        return res.redirect(`/admin/ticket/${ticketId}/${adminId}`);
+    } catch (err) {
+        console.error('Error in change ticket status controller:', err);
+        req.flash('error', 'An error occurred while changing ticket status');
+        return res.redirect('/admin/tickets');
     }
 };

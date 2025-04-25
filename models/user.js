@@ -156,6 +156,40 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false // Phone verification status
         },
+        // Notifications field for support tickets and other notifications
+        notifications: {
+            type: [{
+                message: String,
+                details: String,
+                type: {
+                    type: String,
+                    enum: ['info', 'success', 'warning', 'error', 'support'],
+                    default: 'info'
+                },
+                status: {
+                    type: String,
+                    enum: ['open', 'closed'],
+                    default: 'open'
+                },
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                },
+                responses: {
+                    type: [{
+                        from: String,
+                        adminName: String,
+                        message: String,
+                        createdAt: {
+                            type: Date,
+                            default: Date.now
+                        }
+                    }],
+                    default: []
+                }
+            }],
+            default: []
+        },
         // Lockout fields
         failedLoginAttempts: {
             type: Number,

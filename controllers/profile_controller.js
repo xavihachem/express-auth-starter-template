@@ -236,3 +236,132 @@ module.exports.showAvatarUpload = async function(req, res) {
         return res.redirect('/profile');
     }
 };
+
+/**
+ * Handles contact support form submissions
+ * Creates a notification for admins and confirms receipt to the user
+ */
+module.exports.contactSupport = async function(req, res) {
+    try {
+        console.log('Contact support request received:', req.body);
+        
+        // Check if user is authenticated
+        if (!req.isAuthenticated()) {
+            console.log('User not authenticated');
+            return res.status(401).json({ success: false, message: 'Please sign in to contact support' });
+        }
+        
+        // Get subject and message from request body
+        // This handles both form data and JSON requests
+        const subject = req.body.subject;
+        const message = req.body.message;
+        
+        console.log('Support request data:', { subject, message });
+        
+        // Validate input
+        if (!subject || !message || subject.trim() === '' || message.trim() === '') {
+            console.log('Invalid input: subject or message is empty');
+            return res.status(400).json({ success: false, message: 'Subject and message are required' });
+        }
+        
+        // Find the current user
+        const user = await User.findById(req.user._id);
+        console.log('User found:', user ? user._id : 'No user found');
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        
+        // Check if user has already submitted a ticket in the last 24 hours
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        
+        // Find all admin users to check for recent tickets from this user
+        const adminUsers = await User.find({ role: 'admin' });
+        console.log('Admin users found:', adminUsers.length);
+        let hasRecentTicket = false;
+        
+        // Check each admin's notifications for recent tickets from this user
+        for (const admin of adminUsers) {
+            if (admin.notifications && admin.notifications.length > 0) {
+                const recentTicket = admin.notifications.find(notification => 
+                    notification.type === 'support' && 
+                    notification.message.includes(`from ${user.name} (${user.email})`) && 
+                    new Date(notification.createdAt) > twentyFourHoursAgo
+                );
+                
+                if (recentTicket) {
+                    hasRecentTicket = true;
+                    break;
+                }
+            }
+        }
+        
+        if (hasRecentTicket) {
+            console.log('User has already submitted a ticket in the last 24 hours');
+            return res.status(429).json({ 
+                success: false, 
+                message: 'You have already submitted a support ticket in the last 24 hours. Please wait before submitting another request.' 
+            });
+        }
+        
+        // Create a support request notification for admins
+        // We already have the admin users from above
+        
+        if (adminUsers && adminUsers.length > 0) {
+            // Find all admin users and add the notification to each
+            for (const admin of adminUsers) {
+                try {
+                    const supportNotification = {
+                        message: `Support request from ${user.name} (${user.email}): ${subject}`,
+                        details: message,
+                        type: 'support',
+                        createdAt: new Date(),
+                    };
+                    
+                    console.log('Adding support notification to admin:', admin._id);
+                    console.log('Notification:', supportNotification);
+                    
+                    // Use findByIdAndUpdate instead of save to avoid version conflicts
+                    const updatedAdmin = await User.findByIdAndUpdate(
+                        admin._id,
+                        { $push: { notifications: { $each: [supportNotification], $position: 0 } } },
+                        { new: true }
+                    );
+                    
+                    console.log('Admin after update - notifications count:', 
+                        updatedAdmin.notifications ? updatedAdmin.notifications.length : 'undefined');
+                    console.log('Admin notification saved');
+                } catch (error) {
+                    console.error('Error adding notification to admin:', error);
+                }
+            }
+        } else {
+            console.log('No admin users found to notify');
+        }
+        
+        // Add a confirmation notification to the user using findByIdAndUpdate to avoid version conflicts
+        const confirmationNotification = {
+            message: 'Your support request has been received',
+            details: `We have received your support request: "${subject}". Our team will get back to you soon.`,
+            type: 'info',
+            createdAt: new Date()
+        };
+        
+        console.log('Adding confirmation notification to user');
+        
+        // Use findByIdAndUpdate instead of save to avoid version conflicts
+        await User.findByIdAndUpdate(
+            user._id,
+            { $push: { notifications: { $each: [confirmationNotification], $position: 0 } } }
+        );
+        
+        console.log('User notification saved');
+        
+        // Return success response
+        console.log('Support request submitted successfully');
+        return res.status(200).json({ success: true, message: 'Your support request has been submitted successfully' });
+    } catch (err) {
+        console.error('Error in contact support controller:', err);
+        return res.status(500).json({ success: false, message: 'An error occurred while submitting your support request' });
+    }
+};

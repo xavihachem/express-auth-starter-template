@@ -777,6 +777,27 @@
     <!-- Insert dynamic CSS -->
     <%- style %>
     <% if (locals.user) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle Support Ticket link clicks
+            const supportTicketLinks = document.querySelectorAll('#supportTicketLink');
+            supportTicketLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Scroll to the contact support section on the dashboard
+                    if (window.location.pathname === '/dashboard') {
+                        const contactSupportSection = document.querySelector('#contactSupportSection');
+                        if (contactSupportSection) {
+                            contactSupportSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else {
+                        // Redirect to dashboard with anchor
+                        window.location.href = '/dashboard#contactSupportSection';
+                    }
+                });
+            });
+        });
+    </script>
     <style>
         /* Cosmic background & transparent navbar on platform pages */
         body.platform {
@@ -1096,6 +1117,16 @@
                                     </div>
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="#" id="supportTicketLink">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                        <span>Support Ticket</span>
+                                    </div>
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item menu-item py-2 sign-out-button" href="/sign-out">
@@ -1266,6 +1297,16 @@
                                             <i class="fas fa-chart-line"></i>
                                         </div>
                                         <span>Investments</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="#" id="supportTicketLink">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                        <span>Support Ticket</span>
                                     </div>
                                 </a>
                             </li>

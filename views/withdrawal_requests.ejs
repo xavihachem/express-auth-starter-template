@@ -31,6 +31,41 @@
     }
 </style>
 
+<!-- Centralized Rejection Form Overlay -->
+<div id="rejectionFormOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="card shadow" style="width: 500px; max-width: 90%; border-radius: 0.5rem; overflow: hidden;">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Reject Withdrawal Request</h5>
+            <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="hideRejectionForm()"></button>
+        </div>
+        <div class="card-body p-4">
+            <form action="/admin/reject-withdrawal" method="post" id="rejectionForm">
+                <input type="hidden" id="rejectionFormUserId" name="userId">
+                <input type="hidden" id="rejectionFormRequestId" name="requestId">
+                
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span id="rejectionFormDetails"></span>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label for="rejectionNote" class="form-label fw-bold">Rejection Note (will be sent to user):</label>
+                    <textarea class="form-control" id="rejectionNote" name="rejectionNote" rows="4" 
+                        placeholder="Please provide a reason for rejection..."
+                        style="border: 1px solid #ced4da; border-radius: 0.25rem;"
+                        required></textarea>
+                    <small class="text-muted">This message will be included in the notification sent to the user.</small>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" onclick="hideRejectionForm()"><i class="fas fa-times me-2"></i>Cancel</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-check me-2"></i>Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="card mb-4 shadow-sm">
     <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Withdrawals</h5>
@@ -53,6 +88,7 @@
                             <th scope="col" style="width: 200px;">Wallet Address</th>
                             <th scope="col" style="width: 120px;">Request Date</th>
                             <th scope="col" class="text-center" style="width: 100px;">Status</th>
+                            <th scope="col" style="width: 200px;">Notes</th>
                             <th scope="col" class="text-center" style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
@@ -95,6 +131,19 @@
                                         <%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %>
                                     </span>
                                 </td>
+                                <td>
+                                    <% if (request.status === 'rejected' && request.rejectionNote) { %>
+                                        <div class="text-danger small">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <%= request.rejectionNote %>
+                                        </div>
+                                    <% } else if (request.status === 'approved') { %>
+                                        <div class="text-success small">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Approved
+                                        </div>
+                                    <% } %>
+                                </td>
                                 <td class="text-center">
                                     <% if (request.status === 'pending') { %>
                                         <div class="d-flex justify-content-center" style="gap: 5px;">
@@ -105,13 +154,16 @@
                                                     <i class="fas fa-check me-1"></i> Approve
                                                 </button>
                                             </form>
-                                            <form action="/admin/reject-withdrawal" method="post" class="d-inline">
-                                                <input type="hidden" name="userId" value="<%= request.user._id %>">
-                                                <input type="hidden" name="requestId" value="<%= request.requestId %>">
-                                                <button type="submit" class="btn btn-danger" title="Reject" onclick="return confirm('Reject this withdrawal request of $<%= request.amount.toFixed(2) %> for <%= request.user.name %>?')">
-                                                    <i class="fas fa-times me-1"></i> Reject
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-danger" title="Reject" onclick="showRejectionForm('<%= request.requestId %>')">
+                                                <i class="fas fa-times me-1"></i> Reject
+                                            </button>
+                                            
+                                            <!-- We'll use a centralized form overlay instead of inline forms -->
+                                            <input type="hidden" id="userId<%= request.requestId %>" value="<%= request.user._id %>">
+                                            <input type="hidden" id="amount<%= request.requestId %>" value="<%= request.amount.toFixed(2) %>">
+                                            <input type="hidden" id="userName<%= request.requestId %>" value="<%= request.user.name %>">
+                                            <input type="hidden" id="requestIdValue<%= request.requestId %>" value="<%= request.requestId %>">
+                                            
                                         </div>
                                     <% } else { %>
                                         <div>
@@ -155,6 +207,62 @@
         const column = document.querySelector('.col-12');
         if (column) {
             column.className = 'col-12';
+        }
+        
+        // Hide all rejection forms initially
+        document.querySelectorAll('.rejection-form').forEach(form => {
+            form.style.display = 'none';
+        });
+    });
+    
+    // Function to show the rejection form overlay
+    function showRejectionForm(requestId) {
+        // Get data from hidden fields
+        const userId = document.getElementById('userId' + requestId).value;
+        const amount = document.getElementById('amount' + requestId).value;
+        const userName = document.getElementById('userName' + requestId).value;
+        
+        // Set values in the form
+        document.getElementById('rejectionFormUserId').value = userId;
+        document.getElementById('rejectionFormRequestId').value = requestId;
+        document.getElementById('rejectionFormDetails').innerHTML = `Rejecting withdrawal request of <strong>$${amount}</strong> for <strong>${userName}</strong>`;
+        
+        // Show the overlay
+        document.getElementById('rejectionFormOverlay').style.display = 'flex';
+        document.getElementById('rejectionNote').focus();
+        
+        // Add escape key handler
+        document.addEventListener('keydown', handleEscapeKey);
+    }
+    
+    // Function to hide the rejection form overlay
+    function hideRejectionForm() {
+        document.getElementById('rejectionFormOverlay').style.display = 'none';
+        document.getElementById('rejectionNote').value = '';
+        
+        // Remove escape key handler
+        document.removeEventListener('keydown', handleEscapeKey);
+    }
+    
+    // Handle escape key press to close the form
+    function handleEscapeKey(event) {
+        if (event.key === 'Escape') {
+            hideRejectionForm();
+        }
+    }
+    
+    // Add form submission handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const rejectionForm = document.getElementById('rejectionForm');
+        if (rejectionForm) {
+            rejectionForm.addEventListener('submit', function(event) {
+                const noteField = document.getElementById('rejectionNote');
+                if (!noteField.value.trim()) {
+                    event.preventDefault();
+                    noteField.classList.add('is-invalid');
+                    noteField.focus();
+                }
+            });
         }
     });
     

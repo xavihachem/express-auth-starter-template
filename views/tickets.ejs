@@ -1,0 +1,627 @@
+<h3 class="mb-4">Support Tickets</h3>
+
+<style>
+    /* Custom styles for tickets page */
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    
+    /* Set specific colors for elements to ensure contrast */
+    .card-body p, .card-body div:not(.btn):not(.badge), 
+    .card-header h6, .card-header div:not(.btn):not(.badge),
+    .table td, .table th:not(.table-dark th), .fw-bold {
+        color: #000000 !important;
+    }
+    
+    /* Make sure text-muted is visible but still muted */
+    .text-muted {
+        color: #555555 !important;
+    }
+    
+    /* Background colors for card elements */
+    .card {
+        background-color: #ffffff !important;
+    }
+    
+    .card-header.bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Table styling for better contrast */
+    .table {
+        color: #000000 !important;
+    }
+    
+    .table-dark th {
+        background-color: #212529 !important;
+        color: white !important;
+    }
+    
+    /* Ensure buttons and badges have proper contrast */
+    .btn-primary, .badge.bg-primary {
+        background-color: #0d6efd !important;
+        color: white !important;
+    }
+    
+    .btn-secondary, .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: white !important;
+    }
+    
+    .btn-success, .badge.bg-success {
+        background-color: #198754 !important;
+        color: white !important;
+    }
+    
+    .btn-warning, .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000000 !important;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i> Support Tickets</h5>
+                    <div>
+                        <a href="/admin" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Admin Panel
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Search and Filter Controls -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="ticketSearch" class="form-control" placeholder="Search tickets...">
+                                <button class="btn btn-primary" type="button" id="searchBtn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-md-end">
+                                <select id="statusFilter" class="form-select me-2" style="max-width: 150px;">
+                                    <option value="all">All Status</option>
+                                    <option value="open">Open</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                                <button id="refreshBtn" class="btn btn-secondary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tickets Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">User</th>
+                                    <th scope="col">Subject</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketsTableBody">
+                                <% if (tickets && tickets.length > 0) { %>
+                                    <% tickets.forEach((ticket, index) => { %>
+                                        <tr data-message="<%= ticket.message %>" data-responses="<%= JSON.stringify(ticket.responses) %>">
+                                            <td><%= index + 1 %></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-placeholder me-2">
+                                                        <%= ticket.userName.charAt(0).toUpperCase() %>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold"><%= ticket.userName %></div>
+                                                        <small class="text-muted"><%= ticket.userEmail %></small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="ticket-subject"><%= ticket.subject %></td>
+                                            <td class="ticket-date"><%= new Date(ticket.createdAt).toLocaleString() %></td>
+                                            <td>
+                                                <span class="badge bg-<%= ticket.status === 'open' ? 'success' : 'secondary' %>">
+                                                    <%= ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/ticket/<%= ticket.id %>/<%= ticket.adminId %>" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="empty-state">
+                                                <i class="fas fa-ticket-alt fa-3x mb-3 text-muted"></i>
+                                                <h5>No support tickets found</h5>
+                                                <p class="text-muted">When users submit support requests, they will appear here.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <% if (pagination && pagination.totalPages > 1) { %>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            <p class="mb-0 text-muted">Showing <%= (pagination.page - 1) * pagination.limit + 1 %> to <%= Math.min(pagination.page * pagination.limit, pagination.totalTickets) %> of <%= pagination.totalTickets %> tickets</p>
+                        </div>
+                        <nav aria-label="Tickets pagination">
+                            <ul class="pagination mb-0">
+                                <!-- Previous Page -->
+                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/tickets?page=<%= pagination.page - 1 %>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                
+                                <!-- Page Numbers -->
+                                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                                    <% if (i === 1 || i === pagination.totalPages || (i >= pagination.page - 1 && i <= pagination.page + 1)) { %>
+                                        <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                            <a class="page-link" href="/admin/tickets?page=<%= i %>"><%= i %></a>
+                                        </li>
+                                    <% } else if (i === pagination.page - 2 || i === pagination.page + 2) { %>
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    <% } %>
+                                <% } %>
+                                
+                                <!-- Next Page -->
+                                <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/tickets?page=<%= pagination.page + 1 %>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Ticket Modal -->
+<div class="modal fade" id="viewTicketModal" tabindex="-1" aria-labelledby="viewTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewTicketModalLabel">Ticket Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="ticketDetails">
+                    <!-- Ticket details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Respond to Ticket Modal -->
+<div class="modal fade" id="respondTicketModal" tabindex="-1" aria-labelledby="respondTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="respondTicketModalLabel">Respond to Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="respondTicketForm">
+                    <input type="hidden" id="ticketId" name="ticketId">
+                    <input type="hidden" id="userId" name="userId">
+                    <div class="mb-3">
+                        <label for="responseMessage" class="form-label">Response Message</label>
+                        <textarea class="form-control" id="responseMessage" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Send Response
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles for Tickets Page -->
+<style>
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    
+    .ticket-message {
+        background-color: rgba(13, 25, 42, 0.5);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .ticket-message .user-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .ticket-message .message-content {
+        white-space: pre-wrap;
+    }
+    
+    .ticket-response {
+        background-color: rgba(25, 135, 84, 0.1);
+        border-left: 4px solid #198754;
+    }
+</style>
+
+<!-- Tickets Page JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('ticketSearch');
+        const searchBtn = document.getElementById('searchBtn');
+        const statusFilter = document.getElementById('statusFilter');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        // Search function
+        function searchTickets() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#ticketsTableBody tr');
+            const status = statusFilter.value;
+            
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const statusBadge = row.querySelector('.badge');
+                const rowStatus = statusBadge ? statusBadge.textContent.toLowerCase() : '';
+                
+                const matchesSearch = searchTerm === '' || rowText.includes(searchTerm);
+                const matchesStatus = status === 'all' || (rowStatus.includes(status));
+                
+                row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            });
+        }
+        
+        // Add event listeners
+        searchBtn.addEventListener('click', searchTickets);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                searchTickets();
+            }
+        });
+        
+        statusFilter.addEventListener('change', searchTickets);
+        
+        refreshBtn.addEventListener('click', function() {
+            window.location.reload();
+        });
+        
+        // View ticket details
+        const viewTicketBtns = document.querySelectorAll('.view-ticket-btn');
+        viewTicketBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                const ticketRow = this.closest('tr');
+                const ticketData = {
+                    user: {
+                        name: ticketRow.querySelector('.user-name').textContent,
+                        email: ticketRow.querySelector('.user-email').textContent
+                    },
+                    subject: ticketRow.querySelector('.ticket-subject').textContent,
+                    message: ticketRow.getAttribute('data-message'),
+                    createdAt: ticketRow.querySelector('.ticket-date').textContent,
+                    responses: JSON.parse(ticketRow.getAttribute('data-responses') || '[]')
+                };
+                
+                // Build the ticket details HTML
+                let detailsHtml = `
+                    <div class="ticket-message">
+                        <div class="user-info">
+                            <div class="avatar-placeholder me-2">${ticketData.user.name.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div>${ticketData.user.name}</div>
+                                <small class="text-muted">${ticketData.user.email}</small>
+                            </div>
+                        </div>
+                        <div class="message-content">
+                            ${ticketData.message}
+                        </div>
+                        <div class="text-muted mt-2 small">
+                            <i class="far fa-clock me-1"></i> Submitted on: ${ticketData.createdAt}
+                        </div>
+                    </div>
+                `;
+                
+                // Add responses if any
+                if (ticketData.responses && ticketData.responses.length > 0) {
+                    ticketData.responses.forEach(response => {
+                        detailsHtml += `
+                            <div class="ticket-message ticket-response">
+                                <div class="user-info">
+                                    <div class="avatar-placeholder me-2" style="background-color: #198754;">
+                                        ${response.adminName ? response.adminName.charAt(0).toUpperCase() : 'A'}
+                                    </div>
+                                    <div>
+                                        <div>${response.adminName || 'Admin'}</div>
+                                        <small class="text-muted">Support Team</small>
+                                    </div>
+                                </div>
+                                <div class="message-content">
+                                    ${response.message}
+                                </div>
+                                <div class="text-muted mt-2 small">
+                                    <i class="far fa-clock me-1"></i> Responded on: ${new Date(response.createdAt).toLocaleString()}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('ticketDetails').innerHTML = detailsHtml;
+            });
+        });
+        
+        // Respond to ticket
+        const respondTicketBtns = document.querySelectorAll('.respond-ticket-btn');
+        respondTicketBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                const userId = this.getAttribute('data-user-id');
+                document.getElementById('ticketId').value = ticketId;
+                document.getElementById('userId').value = userId;
+            });
+        });
+        
+        // Handle respond form submission
+        const respondForm = document.getElementById('respondTicketForm');
+        if (respondForm) {
+            respondForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const ticketId = document.getElementById('ticketId').value;
+                const userId = document.getElementById('userId').value;
+                const message = document.getElementById('responseMessage').value;
+                
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                // Send the response to the server
+                fetch('/admin/respond-to-ticket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({
+                        ticketId: ticketId,
+                        userId: userId,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        new Noty({
+                            theme: 'nest',
+                            text: 'Response sent successfully!',
+                            type: 'success',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                        
+                        // Close the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('respondTicketModal'));
+                        modal.hide();
+                        
+                        // Clear the form
+                        respondForm.reset();
+                        
+                        // Refresh the page after a short delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        new Noty({
+                            theme: 'nest',
+                            text: data.message || 'Failed to send response. Please try again.',
+                            type: 'error',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending response:', error);
+                    new Noty({
+                        theme: 'nest',
+                        text: 'An error occurred. Please try again later.',
+                        type: 'error',
+                        layout: 'topRight',
+                        timeout: 3000
+                    }).show();
+                });
+            });
+        }
+        
+        // Close ticket functionality
+        const closeTicketBtns = document.querySelectorAll('.close-ticket-btn');
+        closeTicketBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                const userId = this.getAttribute('data-user-id');
+                
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                // Send request to close the ticket
+                fetch('/admin/change-ticket-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({
+                        ticketId: ticketId,
+                        userId: userId,
+                        status: 'closed'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        new Noty({
+                            theme: 'nest',
+                            text: 'Ticket closed successfully!',
+                            type: 'success',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                        
+                        // Refresh the page after a short delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        new Noty({
+                            theme: 'nest',
+                            text: data.message || 'Failed to close ticket. Please try again.',
+                            type: 'error',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error closing ticket:', error);
+                    new Noty({
+                        theme: 'nest',
+                        text: 'An error occurred. Please try again later.',
+                        type: 'error',
+                        layout: 'topRight',
+                        timeout: 3000
+                    }).show();
+                });
+            });
+        });
+        
+        // Reopen ticket functionality
+        const reopenTicketBtns = document.querySelectorAll('.reopen-ticket-btn');
+        reopenTicketBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                const userId = this.getAttribute('data-user-id');
+                
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                // Send request to reopen the ticket
+                fetch('/admin/change-ticket-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({
+                        ticketId: ticketId,
+                        userId: userId,
+                        status: 'open'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        new Noty({
+                            theme: 'nest',
+                            text: 'Ticket reopened successfully!',
+                            type: 'success',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                        
+                        // Refresh the page after a short delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        new Noty({
+                            theme: 'nest',
+                            text: data.message || 'Failed to reopen ticket. Please try again.',
+                            type: 'error',
+                            layout: 'topRight',
+                            timeout: 3000
+                        }).show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error reopening ticket:', error);
+                    new Noty({
+                        theme: 'nest',
+                        text: 'An error occurred. Please try again later.',
+                        type: 'error',
+                        layout: 'topRight',
+                        timeout: 3000
+                    }).show();
+                });
+            });
+        });
+    });
+</script>
