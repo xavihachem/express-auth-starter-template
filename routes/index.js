@@ -195,57 +195,55 @@ router.post('/create-session', function(req, res, next) {
     }
 });
 
-// Route for handling Google OAuth callback
-router.get(
-    '/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/sign-in', failureFlash: true }),
-    async function(req, res, next) { // Changed this to be async
-        // Google auth successful, Passport sets req.user
-        // Google auth successful
-
-        // Step 1: Attempt session setup (includes daily challenge completion)
-        const sessionSetupSuccess = await authController.createSession(req.user);
-        if (sessionSetupSuccess) {
-            req.flash('success', 'Signed in successfully via Google.');
-        } else {
-            console.error('Session creation failed for Google user:', req.user._id);
-            req.flash('error', 'An issue occurred during Google login setup.');
-            // Decide handling - proceed for now
-        }
-
-        // Step 2: Check phone verification
-        if (!req.user.isPhoneVerified) {
-            const tempId = req.user._id;
-            // Phone not verified for Google user
-            // First, ensure there are no existing OTP tokens for this user
+// Google OAuth routes are only defined if Google credentials are available
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    // Route for handling Google OAuth callback
+    router.get(
+        '/auth/google/callback',
+        passport.authenticate('google', { failureRedirect: '/sign-in', failureFlash: true }),
+        async (req, res) => {
+            // Google auth successful, Passport sets req.user
+            // Google auth successful
             try {
-                await OtpToken.deleteMany({ user: tempId });
-                console.log(`[DEBUG] Deleted existing OTP tokens for user ${tempId}`);
-            } catch (error) {
-                console.error('Error deleting existing tokens:', error);
-                // Continue with the process even if deletion fails
-            }
-            
-            const otpToken = await OtpToken.create({
-                user: tempId,
-                token: Math.floor(100000 + Math.random() * 900000).toString(),
-            });
-            // await sendSms(req.user.phone, `Your verification code is: ${otpToken.token}`);
-             console.log(`[DEBUG] Generated OTP for phone verification: ${otpToken.token} for user ${tempId}`); // REMOVE IN PRODUCTION
+                const success = await authController.createSession(req.user);
+                if (success) {
+                    req.flash('success', 'Signed in successfully via Google.');
+                } else {
+                    console.error('Session creation failed for Google user:', req.user._id);
+                    req.flash('error', 'An issue occurred during Google login setup.');
+                }
 
-            req.logout(function(err) {
-                if (err) { return next(err); }
-                req.session.verifyUserId = tempId;
-                req.session.verifyPurpose = 'phone_verification';
-                return res.redirect('/verify-phone');
-            });
-        } else {
-            // Phone verified for Google user
-            // Step 3: Redirect to dashboard if phone is verified
-            return res.redirect('/dashboard'); // Changed from '/' to '/dashboard'
+                // Check if phone verification is required and user hasn't verified yet
+                if (req.user.phoneNumber && !req.user.isPhoneVerified) {
+                    // Phone not verified for Google user
+                    req.session.verifyUserId = req.user._id; // Set for OTP verification
+                    req.session.verifyPurpose = 'login';
+                    
+                    // Generate and send OTP
+                    const otpToken = await OtpToken.generateOTP(req.user._id);
+                    
+                    // Send SMS (simplified for brevity)
+                    try {
+                        await axios.get(`https://www.easysms.com/send?key=${process.env.EASY_SMS_API_KEY}&phone=${req.user.phoneNumber}&message=Your verification code is: ${otpToken.token}`);
+                        req.flash('success', 'Please verify your phone to continue.');
+                        return res.redirect('/verify-phone');
+                    } catch (smsError) {
+                        console.error('SMS sending error:', smsError);
+                        req.flash('error', 'Could not send verification code. Please try again.');
+                        return res.redirect('/sign-in');
+                    }
+                } else {
+                    // Phone verified for Google user
+                    return res.redirect('/dashboard');
+                }
+            } catch (err) {
+                console.error('Error in Google callback:', err);
+                req.flash('error', 'An unexpected error occurred during login.');
+                return res.redirect('/sign-in');
+            }
         }
-    }
-); 
+    );
+}
 
 // Route for handling forgot password page
 router.get('/forgot-password', authController.forgotPassword); // Forgot password page
@@ -298,10 +296,16 @@ router.post(
     authController.updatePassword
 ); // Endpoint to update the password, accessible only to authenticated users
 
-router.get(
-    '/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-); // Endpoint to authenticate using Google OAuth
+// Google Auth Endpoint - only defined if credentials are available
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    router.get(
+        '/auth/google',
+        passport.authenticate('google', { scope: ['profile', 'email'] })
+    ); // Endpoint to authenticate using Google OAuth
+    console.log('Google authentication routes enabled');
+} else {
+    console.log('Google authentication disabled - missing credentials');
+}
 
 router.get('/sign-in', authController.signin); // Signin page
 router.get('/sign-up', authController.signup); // Signup page

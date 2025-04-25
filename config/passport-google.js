@@ -1,18 +1,22 @@
 // Import necessary modules
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const crypto = require('crypto');
 const User = require('../models/user');
 
-// Define a new Google Strategy for Passport
-passport.use(
-    new GoogleStrategy(
-        {
-            // Configuration options for the Google Strategy
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
-        },
+// Only set up Google Strategy if environment variables are defined
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    const GoogleStrategy = require('passport-google-oauth20').Strategy;
+    console.log('Setting up Google authentication strategy');
+    
+    // Define a new Google Strategy for Passport
+    passport.use(
+        new GoogleStrategy(
+            {
+                // Configuration options for the Google Strategy
+                clientID: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
+            },
         async (accessToken, refreshToken, profile, cb) => {
             try {
                 // Find a user with the email associated with the Google profile
@@ -41,7 +45,8 @@ passport.use(
             }
         }
     )
-);
+  );
+}
 
 // Export the Passport module
 module.exports = passport;

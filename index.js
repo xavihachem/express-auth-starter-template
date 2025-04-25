@@ -122,11 +122,17 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+// Railway specifically sets PORT environment variable
+// Get the port from environment or use 8000 as fallback
 const PORT = process.env.PORT || 8000;
+
+// Bind to all interfaces - critical for Railway deployment
 app.listen(PORT, '0.0.0.0', (err) => {
     if (err) {
-        console.log(err, 'Error while running server !');
+        console.error('Error starting server:', err);
+        return;
     }
-    console.log('Server running on port ', PORT);
-    return;
+    
+    console.log(`Server running and listening on http://0.0.0.0:${PORT}`);
+    console.log(`Health endpoint available at http://0.0.0.0:${PORT}/health`);
 });
