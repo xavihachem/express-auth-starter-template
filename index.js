@@ -117,6 +117,11 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// Add explicit healthcheck route for Railway
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, '0.0.0.0', (err) => {
     if (err) {
