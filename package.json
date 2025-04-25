@@ -3,6 +3,10 @@
     "version": "1.0.0",
     "description": "A complete authentication system which can be used as a starter code for creating any new application.",
     "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/raj21parihar/express-auth-starter-template.git"
@@ -43,6 +47,7 @@
         "passport": "^0.6.0",
         "passport-google-oauth20": "^2.0.0",
         "passport-local": "^1.0.0",
+        "serverless-http": "^3.2.0",
         "sharp": "^0.34.1",
         "uuid": "^11.1.0",
         "validator": "^13.9.0"
