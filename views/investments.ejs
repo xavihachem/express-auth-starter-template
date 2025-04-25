@@ -362,6 +362,7 @@
                             </button>
                         </div>
                     </div>
+                    <small class="text-info mt-2 d-block">Wallet address is locked for security. Contact Support if you need to change it.</small>
                 <% } else { %>
                     <div class="wallet-card wallet-warning">
                         <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> You need to set up a withdraw wallet address before requesting withdrawals.</p>
@@ -382,7 +383,6 @@
                             required
                         >
                         <% if (withdrawWallet) { %>
-                            <small class="text-info mt-1 d-block">Wallet address is locked for security. Contact Support if you need to change it.</small>
                         <% } %>
                         <div class="form-text text-danger" id="walletError" style="display: none;">Please enter a valid wallet address</div>
                     </div>
