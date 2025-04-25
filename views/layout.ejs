@@ -2346,6 +2346,97 @@
       });
     </script>
     
+    <!-- Global Background Music -->
+    <div class="music-control" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <button id="music-toggle" class="music-btn" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(30, 50, 100, 0.7); border: 2px solid rgba(95, 145, 255, 0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 10px rgba(95, 145, 255, 0.3);">
+            <i class="fas fa-volume-up" id="volume-icon" style="color: rgba(95, 145, 255, 1);"></i>
+        </button>
+        <audio id="background-music" loop>
+            <source src="/css/music/Oxygen for a Dying World.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- Global Music Player Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Global Music player functionality
+        const musicToggle = document.getElementById('music-toggle');
+        const volumeIcon = document.getElementById('volume-icon');
+        const backgroundMusic = document.getElementById('background-music');
+        
+        // Check localStorage for music state
+        let isMusicPlaying = localStorage.getItem('isMusicPlaying') === 'false' ? false : true;
+        
+        // Get stored music position or default to 10 seconds
+        const storedPosition = parseFloat(localStorage.getItem('musicPosition')) || 10;
+        
+        // Set initial volume - lowered to a very quiet level (0.05)
+        backgroundMusic.volume = 0.05;
+        
+        // Set music position based on stored value
+        backgroundMusic.currentTime = storedPosition;
+        
+        // Update UI based on stored preference
+        if (isMusicPlaying) {
+          volumeIcon.className = 'fas fa-volume-up';
+          musicToggle.setAttribute('title', 'Mute music');
+          // Try to autoplay
+          const playPromise = backgroundMusic.play();
+          
+          // Handle autoplay restrictions
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log('Autoplay prevented by browser:', error);
+              // Try playing again when user interacts with the page
+              document.addEventListener('click', function playOnFirstInteraction() {
+                backgroundMusic.play().then(() => {
+                  document.removeEventListener('click', playOnFirstInteraction);
+                }).catch(e => console.log('Still cannot play audio:', e));
+              }, { once: false });
+            });
+          }
+        } else {
+          volumeIcon.className = 'fas fa-volume-mute';
+          musicToggle.setAttribute('title', 'Play music');
+        }
+        
+        // Save current position periodically
+        setInterval(() => {
+          if (isMusicPlaying && !backgroundMusic.paused) {
+            localStorage.setItem('musicPosition', backgroundMusic.currentTime.toString());
+          }
+        }, 1000); // Save position every second
+        
+        // Save position before unload
+        window.addEventListener('beforeunload', () => {
+          localStorage.setItem('musicPosition', backgroundMusic.currentTime.toString());
+        });
+        
+        // Handle music toggle
+        musicToggle.addEventListener('click', function() {
+          if (isMusicPlaying) {
+            backgroundMusic.pause();
+            volumeIcon.className = 'fas fa-volume-mute';
+            musicToggle.setAttribute('title', 'Play music');
+          } else {
+            backgroundMusic.play().catch(error => {
+              console.log('Playback prevented by browser:', error);
+            });
+            volumeIcon.className = 'fas fa-volume-up';
+            musicToggle.setAttribute('title', 'Mute music');
+          }
+          isMusicPlaying = !isMusicPlaying;
+          localStorage.setItem('isMusicPlaying', isMusicPlaying.toString());
+        });
+        
+        // Handle audio ending (loop manually to maintain consistent behavior)
+        backgroundMusic.addEventListener('ended', function() {
+          backgroundMusic.currentTime = 0;
+          backgroundMusic.play().catch(e => console.log('Could not restart audio:', e));
+        });
+      });
+    </script>
 
   </body>
 

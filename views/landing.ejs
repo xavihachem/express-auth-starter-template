@@ -548,7 +548,7 @@
         
         @media (max-width: 700px){
             .moonify-logo h1{font-size:2rem;}
-            .moonify-logo .moon{width:70px;height:70px;}
+            .moonify-logo .moon{width:120px;height:120px;} /* Increased moon size for mobile */
             .moonify-logo .tagline{font-size:1rem;}
             .nav{top: 15px; right: 30px;}
             .nav-btn{padding:6px 10px;font-size:0.8rem;letter-spacing:0px;min-width:70px;white-space:nowrap;}
@@ -612,7 +612,7 @@
         <button id="music-toggle" class="music-btn">
             <i class="fas fa-volume-up" id="volume-icon"></i>
         </button>
-        <audio id="background-music" loop autoplay>
+        <audio id="background-music" loop>
             <source src="/css/music/Oxygen for a Dying World.mp3" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
@@ -737,34 +737,54 @@
             const musicToggle = document.getElementById('music-toggle');
             const volumeIcon = document.getElementById('volume-icon');
             const backgroundMusic = document.getElementById('background-music');
-            let isMusicPlaying = true; // Set initial state to playing
             
-            // Set initial volume
-            backgroundMusic.volume = 0.4;
+            // Check localStorage for music state
+            let isMusicPlaying = localStorage.getItem('isMusicPlaying') === 'false' ? false : true;
             
-            // Set starting position to 10 seconds
-            backgroundMusic.currentTime = 10;
+            // Get stored music position or default to 10 seconds
+            const storedPosition = parseFloat(localStorage.getItem('musicPosition')) || 10;
             
-            // Try to autoplay
-            const playPromise = backgroundMusic.play();
+            // Set initial volume - very low
+            backgroundMusic.volume = 0.05;
             
-            // Always keep the icon showing as unmuted initially
-            volumeIcon.className = 'fas fa-volume-up';
-            musicToggle.setAttribute('title', 'Mute music');
+            // Set music position based on stored value
+            backgroundMusic.currentTime = storedPosition;
             
-            // Handle autoplay restrictions
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log('Autoplay prevented by browser:', error);
-                    // Try playing again when user interacts with the page
-                    document.addEventListener('click', function playOnFirstInteraction() {
-                        backgroundMusic.play().then(() => {
-                            isMusicPlaying = true;
-                            document.removeEventListener('click', playOnFirstInteraction);
-                        }).catch(e => console.log('Still cannot play audio:', e));
-                    }, { once: false });
-                });
+            // Update UI based on stored preference
+            if (isMusicPlaying) {
+                volumeIcon.className = 'fas fa-volume-up';
+                musicToggle.setAttribute('title', 'Mute music');
+                // Try to autoplay
+                const playPromise = backgroundMusic.play();
+                
+                // Handle autoplay restrictions
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log('Autoplay prevented by browser:', error);
+                        // Try playing again when user interacts with the page
+                        document.addEventListener('click', function playOnFirstInteraction() {
+                            backgroundMusic.play().then(() => {
+                                document.removeEventListener('click', playOnFirstInteraction);
+                            }).catch(e => console.log('Still cannot play audio:', e));
+                        }, { once: false });
+                    });
+                }
+            } else {
+                volumeIcon.className = 'fas fa-volume-mute';
+                musicToggle.setAttribute('title', 'Play music');
             }
+            
+            // Save current position periodically
+            setInterval(() => {
+                if (isMusicPlaying && !backgroundMusic.paused) {
+                    localStorage.setItem('musicPosition', backgroundMusic.currentTime.toString());
+                }
+            }, 1000); // Save position every second
+            
+            // Save position before unload
+            window.addEventListener('beforeunload', () => {
+                localStorage.setItem('musicPosition', backgroundMusic.currentTime.toString());
+            });
             
             // Handle music toggle
             musicToggle.addEventListener('click', function() {
@@ -780,6 +800,7 @@
                     musicToggle.setAttribute('title', 'Mute music');
                 }
                 isMusicPlaying = !isMusicPlaying;
+                localStorage.setItem('isMusicPlaying', isMusicPlaying.toString());
             });
             
             // Theme switching functionality
