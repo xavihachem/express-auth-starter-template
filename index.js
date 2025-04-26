@@ -69,6 +69,13 @@ try {
 // Apply session middleware (secret is already set in sessionConfig)
 app.use(session(sessionConfig));
 
+// Clear old sessions (remove stale encrypted entries to avoid parse errors)
+if (sessionConfig.store && typeof sessionConfig.store.clear === 'function') {
+  sessionConfig.store.clear()
+    .then(() => console.log('Cleared stale sessions'))
+    .catch(err => console.error('Error clearing sessions:', err));
+}
+
 // Initialize passport and set user authentication middleware
 app.use(passport.initialize());
 app.use(passport.session());
