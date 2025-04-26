@@ -54,10 +54,7 @@ try {
         sessionConfig.store = MongoStore.create({
             mongoUrl: process.env.DB_CONNECTION,
             autoRemove: 'disabled',
-            ttl: 60 * 60 * 24, // 1 day
-            crypto: {
-                secret: process.env.SESSION_KEY
-            }
+            ttl: 60 * 60 * 24 // 1 day
         });
     } else {
         console.warn('⚠️ DB_CONNECTION environment variable not set! Using memory store for sessions.');
