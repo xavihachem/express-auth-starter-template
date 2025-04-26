@@ -24,9 +24,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" referrerpolicy="no-referrer" />
 
     <!-- Link to custom CSS file for layout -->
-    <link rel="stylesheet" href="/css/layout.css">
-    <link rel="stylesheet" href="/css/auth-cosmic.css">
-    <link rel="stylesheet" href="/css/cosmic-text.css">
+    <link rel="stylesheet" href="<%= CDN_URL %>/css/layout.css">
+    <link rel="stylesheet" href="<%= CDN_URL %>/css/auth-cosmic.css">
+    <link rel="stylesheet" href="<%= CDN_URL %>/css/cosmic-text.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Custom styles for modern UI with animations -->
@@ -1105,7 +1105,7 @@
     <div id="welcome-overlay" class="welcome-overlay">
         <div class="welcome-content">
             <div class="welcome-logo-container">
-                <img src="/css/images/Monifylogo.png" alt="Moonify Logo" class="welcome-logo">
+                <img src="<%= CDN_URL %>/css/images/Monifylogo.png" alt="Moonify Logo" class="welcome-logo">
             </div>
             <h2 class="welcome-title">Welcome back, <span class="user-name"><%= locals.user.name %></span>!</h2>
             <div class="welcome-stats">
@@ -1565,7 +1565,7 @@
         <div class="container">
             <a class="navbar-brand animate-fade-in" href="/">
                 <div class="navbar-logo-container">
-                    <img src="/css/images/Monifylogo.png" alt="Moonify Logo" class="navbar-logo">
+                    <img src="<%= CDN_URL %>/css/images/Monifylogo.png" alt="Moonify Logo" class="navbar-logo">
                 </div>
             </a>
             
@@ -1912,7 +1912,7 @@
         </div>
         
         <!-- Add cosmic background script -->
-        <script src="/js/cosmic-bg.js"></script>
+        <script src="<%= CDN_URL %>/js/cosmic-bg.js"></script>
     </section>
     <% } else { %>
     <!-- Original section for ALL other pages (unchanged) -->
@@ -2358,7 +2358,7 @@
             <i class="fas fa-volume-up" id="volume-icon" style="color: rgba(95, 145, 255, 1);"></i>
         </button>
         <audio id="background-music" loop>
-            <source src="/css/music/Oxygen for a Dying World.mp3" type="audio/mp3">
+            <source src="<%= CDN_URL %>/css/music/Oxygen for a Dying World.mp3" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
     </div>
