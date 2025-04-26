@@ -77,6 +77,10 @@ if (sessionConfig.store && typeof sessionConfig.store.clear === 'function') {
   });
 }
 
+// Set up CDN URL for static assets (from environment variable or empty string for local)
+app.locals.CDN_URL = process.env.CDN_URL || '';
+console.log(`Using CDN URL: ${app.locals.CDN_URL || '(local assets)'}`);
+
 // Initialize passport and set user authentication middleware
 app.use(passport.initialize());
 app.use(passport.session());
@@ -117,9 +121,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// Use middleware to serve static files
-app.use(express.static('assets'));
-app.use(express.static('public')); // Serve files from public directory for uploads
+// Use middleware to serve static files with proper cache headers for CDN
+app.use(express.static('assets', {
+  maxAge: '30d', // Cache for 30 days in browser
+  setHeaders: (res, path) => {
+    // Set strong caching headers for CDN and browsers
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  }
+}));
+app.use(express.static('public', {
+  maxAge: '30d', // Cache for 30 days in browser
+  setHeaders: (res, path) => {
+    // Set strong caching headers for CDN and browsers
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  }
+})); // Serve files from public directory for uploads
 
 // Use custom middleware to set flash messages
 app.use(customMiddleware.setFlash);
