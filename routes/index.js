@@ -17,10 +17,10 @@ const OtpToken = require('../models/otpToken');
 const axios = require('axios'); // for SMS sending
 const rateLimit = require('express-rate-limit');
 
-// Ensure SMS API key is set
+// Check if SMS API key is set
 if (!process.env.EASY_SMS_API_KEY) {
-    console.error('Missing EASY_SMS_API_KEY environment variable');
-    process.exit(1);
+    console.warn('⚠️ Missing EASY_SMS_API_KEY environment variable - SMS features will be disabled');
+    // Continue running the app, but SMS features won't work
 }
 
 // Define routes and their corresponding handlers

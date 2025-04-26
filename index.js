@@ -61,7 +61,10 @@ try {
     // Uses memory store by default if no store is specified
 }
 
-// Apply session middleware
+// Apply session middleware with explicit secret in the config to prevent deprecation warning
+if (!sessionConfig.secret && process.env.SESSION_KEY) {
+    sessionConfig.secret = process.env.SESSION_KEY;
+}
 app.use(session(sessionConfig));
 
 // Initialize passport and set user authentication middleware
