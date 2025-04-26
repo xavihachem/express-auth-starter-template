@@ -71,9 +71,10 @@ app.use(session(sessionConfig));
 
 // Clear old sessions (remove stale encrypted entries to avoid parse errors)
 if (sessionConfig.store && typeof sessionConfig.store.clear === 'function') {
-  sessionConfig.store.clear()
-    .then(() => console.log('Cleared stale sessions'))
-    .catch(err => console.error('Error clearing sessions:', err));
+  sessionConfig.store.clear(err => {
+    if (err) console.error('Error clearing sessions:', err);
+    else console.log('Cleared stale sessions');
+  });
 }
 
 // Initialize passport and set user authentication middleware
