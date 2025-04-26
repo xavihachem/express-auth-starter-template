@@ -29,22 +29,40 @@ app.use(expressLayouts); // use express-ejs-layouts for rendering views
 app.use(cookieParser());
 
 // Configure session middleware
-app.use(
-    session({
-        name: 'auth-cookies', // name of the session cookie
-        secret: process.env.SESSION_KEY, // key to encrypt the session cookie
-        saveUninitialized: false, // do not save uninitialized sessions
-        resave: false, // do not save sessions if not modified
-        cookie: {
-            maxAge: 1000 * 60 * 100, // session cookie expiry time in milliseconds
-        },
-        store: MongoStore.create({
-            // store session data in MongoDB
+const sessionConfig = {
+    name: 'auth-cookies', // name of the session cookie
+    secret: process.env.SESSION_KEY, // key to encrypt the session cookie
+    saveUninitialized: false, // do not save uninitialized sessions
+    resave: false, // do not save sessions if not modified
+    cookie: {
+        maxAge: 1000 * 60 * 100, // session cookie expiry time in milliseconds
+    }
+};
+
+// Configure MongoDB session store with error handling
+try {
+    if (process.env.DB_CONNECTION) {
+        console.log('Setting up MongoDB session store');
+        sessionConfig.store = MongoStore.create({
             mongoUrl: process.env.DB_CONNECTION,
             autoRemove: 'disabled',
-        }),
-    })
-);
+            ttl: 60 * 60 * 24, // 1 day
+            crypto: {
+                secret: process.env.SESSION_KEY
+            }
+        });
+    } else {
+        console.warn('⚠️ DB_CONNECTION environment variable not set! Using memory store for sessions.');
+        // Uses memory store by default if no store is specified
+    }
+} catch (err) {
+    console.error('Failed to initialize MongoDB session store:', err);
+    console.warn('⚠️ Falling back to memory store for sessions');
+    // Uses memory store by default if no store is specified
+}
+
+// Apply session middleware
+app.use(session(sessionConfig));
 
 // Initialize passport and set user authentication middleware
 app.use(passport.initialize());
