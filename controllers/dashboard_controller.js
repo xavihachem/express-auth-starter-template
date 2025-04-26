@@ -1310,9 +1310,7 @@ module.exports.viewTickets = async function(req, res) {
             return res.redirect('/dashboard');
         }
         
-        console.log('View tickets request received');
         const adminId = req.user._id;
-        console.log('Admin user accessing tickets:', adminId);
         
         // Get pagination parameters
         const page = parseInt(req.query.page) || 1;
@@ -1320,27 +1318,25 @@ module.exports.viewTickets = async function(req, res) {
         const skip = (page - 1) * limit;
         
         // Find all admin users with support notifications
-        console.log('Searching for admin users with support notifications');
+        // Find all admin users with support notifications
         const admins = await User.find({ role: 'admin' });
-        console.log('Admin users found:', admins.length);
         
         // Extract all support tickets from admin notifications
         const allTickets = [];
         
         for (const admin of admins) {
-            console.log(`Admin ${admin._id} (${admin.name})`);
-            console.log(`Admin ${admin._id} has ${admin.notifications.length} notifications`);
+
             
             // Filter notifications to only include support tickets
             const supportNotifications = admin.notifications.filter(notification => 
                 notification.type === 'support'
             );
             
-            console.log(`Admin ${admin._id} has ${supportNotifications.length} support notifications`);
+
             
             // Extract ticket details from each support notification
             for (const notification of supportNotifications) {
-                console.log('Support notification details:', notification);
+
                 
                 // Extract user info from the notification message
                 const messageParts = notification.message.match(/Support request from (.+) \((.+)\): (.+)/);
@@ -1380,14 +1376,14 @@ module.exports.viewTickets = async function(req, res) {
         // Sort tickets by date (newest first)
         uniqueTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         
-        console.log(`Deduplicated tickets: ${uniqueTickets.length} (from ${allTickets.length} total)`);
+
         
         // Apply pagination
         const totalTickets = uniqueTickets.length;
         const totalPages = Math.ceil(totalTickets / limit);
         const paginatedTickets = uniqueTickets.slice(skip, skip + limit);
         
-        console.log(`Rendering tickets page with ${paginatedTickets.length} tickets (page ${page} of ${totalPages})`);
+
         
         return res.render('tickets', {
             title: 'Support Tickets',
@@ -1400,7 +1396,7 @@ module.exports.viewTickets = async function(req, res) {
             }
         });
     } catch (err) {
-        console.error('Error in viewTickets controller:', err);
+        // Handle error silently
         req.flash('error', 'An error occurred while retrieving support tickets');
         return res.redirect('/admin');
     }
@@ -1412,8 +1408,6 @@ module.exports.viewTickets = async function(req, res) {
  */
 module.exports.viewTicketDetails = async function(req, res) {
     try {
-        console.log('View ticket details request received');
-        
         // Check if user is authenticated and is an admin
         if (!req.isAuthenticated() || req.user.role !== 'admin') {
             req.flash('error', 'You do not have permission to access this page');
@@ -1421,7 +1415,7 @@ module.exports.viewTicketDetails = async function(req, res) {
         }
         
         const { ticketId, adminId } = req.params;
-        console.log(`Viewing ticket: ${ticketId} from admin: ${adminId}`);
+
         
         // Find the admin user
         const admin = await User.findById(adminId);
@@ -1466,8 +1460,7 @@ module.exports.viewTicketDetails = async function(req, res) {
             responses: notification.responses || []
         };
         
-        console.log('Rendering ticket details page');
-        console.log('Session CSRF token for view:', req.csrfToken ? req.csrfToken() : 'No CSRF token function available');
+
         
         return res.render('ticket_details', {
             title: 'Ticket Details',
@@ -1476,7 +1469,7 @@ module.exports.viewTicketDetails = async function(req, res) {
             csrfToken: req.csrfToken ? req.csrfToken() : ''
         });
     } catch (err) {
-        console.error('Error in viewTicketDetails controller:', err);
+        // Handle error silently
         req.flash('error', 'An error occurred while loading ticket details');
         return res.redirect('/admin/tickets');
     }
@@ -1488,21 +1481,15 @@ module.exports.viewTicketDetails = async function(req, res) {
  */
 module.exports.respondToTicket = async function(req, res) {
     try {
-        console.log('Respond to ticket request received');
-        console.log('Request body:', req.body);
-        console.log('CSRF token in request:', req.body._csrf);
-        
         // Check if user is authenticated and is an admin
         if (!req.isAuthenticated() || req.user.role !== 'admin') {
-            console.log('User not authenticated or not admin');
+
             req.flash('error', 'You do not have permission to perform this action');
             return res.redirect('/dashboard');
         }
         
         const { ticketId, adminId, message } = req.body;
-        console.log('Ticket ID:', ticketId);
-        console.log('Admin ID:', adminId);
-        console.log('Message:', message);
+
         
         if (!ticketId || !adminId || !message || message.trim() === '') {
             req.flash('error', 'All fields are required');
@@ -1590,7 +1577,7 @@ module.exports.respondToTicket = async function(req, res) {
         req.flash('success', 'Response added successfully');
         return res.redirect(`/admin/ticket/${ticketId}/${adminId}`);
     } catch (err) {
-        console.error('Error in respond to ticket controller:', err);
+        // Handle error silently
         req.flash('error', 'An error occurred while responding to the ticket');
         return res.redirect('/admin/tickets');
     }

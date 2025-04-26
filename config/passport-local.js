@@ -74,7 +74,6 @@ passport.use(
                 
                 // For existing accounts without the isEmailVerified field, automatically mark them as verified
                 if (user.isEmailVerified === undefined) {
-                    console.log('Auto-verifying legacy account:', user.email);
                     // Update the user to set isEmailVerified to true
                     await User.findByIdAndUpdate(user._id, { isEmailVerified: true });
                 }
@@ -82,7 +81,6 @@ passport.use(
                 // Return authentication success with user object
                 return done(null, user);
             } catch (err) {
-                console.log('Error in passport : ', err); 
                 return done(err); // Return authentication failure with error object
             }
         }
@@ -100,7 +98,6 @@ passport.deserializeUser(async function (id, done) {
         let user = await User.findById(id).exec();
         return done(null, user);
     } catch (err) {
-        console.log('Error in passport : ', err);
         return done(err);
     }
 });

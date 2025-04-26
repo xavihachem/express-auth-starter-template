@@ -50,14 +50,14 @@ const sessionConfig = {
 // Configure MongoDB session store with error handling
 try {
     if (process.env.DB_CONNECTION) {
-        console.log('Setting up MongoDB session store');
+        // Configure MongoDB session store
         sessionConfig.store = MongoStore.create({
             mongoUrl: process.env.DB_CONNECTION,
             autoRemove: 'disabled',
             ttl: 60 * 60 * 24 // 1 day
         });
     } else {
-        console.warn('⚠️ DB_CONNECTION environment variable not set! Using memory store for sessions.');
+        // Fall back to memory store if DB_CONNECTION is not set
         // Uses memory store by default if no store is specified
     }
 } catch (err) {
@@ -72,8 +72,7 @@ app.use(session(sessionConfig));
 // Clear old sessions (remove stale encrypted entries to avoid parse errors)
 if (sessionConfig.store && typeof sessionConfig.store.clear === 'function') {
   sessionConfig.store.clear(err => {
-    if (err) console.error('Error clearing sessions:', err);
-    else console.log('Cleared stale sessions');
+    // Silently handle session clearing
   });
 }
 
@@ -164,6 +163,6 @@ app.listen(PORT, '0.0.0.0', (err) => {
         return;
     }
     
-    console.log(`Server running and listening on http://0.0.0.0:${PORT}`);
-    console.log(`Health endpoint available at http://0.0.0.0:${PORT}/health`);
+    // Server started successfully
+
 });

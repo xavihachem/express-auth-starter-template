@@ -39,27 +39,27 @@ module.exports.signup = function (req, res) {
 // Check invitation code and return inviter's name
 module.exports.checkInvitationCode = async function (req, res) {
     try {
-        console.log('Checking invitation code:', req.body); // Log the request body
+        // Code for checking invitation code
         const { code } = req.body;
         
         if (!code) {
-            console.log('No invitation code provided');
+
             return res.status(400).json({ success: false, message: 'No invitation code provided' });
         }
         
         // Trim the code to remove any whitespace
         const trimmedCode = code.trim();
-        console.log('Looking for user with code:', trimmedCode);
+
         
         // Find user with the provided code
         const inviter = await User.findOne({ userCode: trimmedCode });
         
         if (!inviter) {
-            console.log('No user found with code:', trimmedCode);
+
             return res.status(404).json({ success: false, message: 'Invalid invitation code' });
         }
         
-        console.log('Found inviter:', inviter.name);
+
         
         // Return inviter's name
         return res.status(200).json({

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Moonify Music Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden audio player -->
+    <audio id="background-music" loop>
+        <source src="/css/music/Oxygen for a Dying World.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Get the audio element
+        const music = document.getElementById('background-music');
+        
+        // Set initial volume
+        music.volume = 0.05;
+        
+        // Initialize based on parent window's localStorage
+        function initMusicState() {
+            try {
+                // Get music state from localStorage (through parent window if possible)
+                const isMusicPlaying = localStorage.getItem('isMusicPlaying') !== 'false';
+                const storedPosition = parseFloat(localStorage.getItem('musicPosition')) || 10;
+                
+                // Set position
+                music.currentTime = storedPosition;
+                
+                // Set play state
+                if (isMusicPlaying) {
+                    const playPromise = music.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Autoplay prevented:', error);
+                            
+                            // Listen for user interaction to enable audio
+                            window.addEventListener('click', function enableAudio() {
+                                music.play().catch(e => console.log('Still cannot play audio:', e));
+                                window.removeEventListener('click', enableAudio);
+                            }, { once: true });
+                            
+                            // Also listen for parent message to try playing
+                            window.addEventListener('message', function enableOnMessage(event) {
+                                if (event.data === 'play') {
+                                    music.play().catch(e => console.log('Cannot play via message:', e));
+                                    window.removeEventListener('message', enableOnMessage);
+                                }
+                            }, { once: true });
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Error initializing music player:', e);
+            }
+        }
+
+        // Listen for messages from parent window
+        window.addEventListener('message', function(event) {
+            if (event.data === 'play') {
+                music.play().catch(e => console.log('Play command failed:', e));
+            } else if (event.data === 'pause') {
+                music.pause();
+            }
+        });
+
+        // Save position periodically
+        setInterval(() => {
+            if (!music.paused) {
+                localStorage.setItem('musicPosition', music.currentTime.toString());
+            }
+        }, 1000);
+
+        // Handle audio end (loop manually to ensure consistent behavior)
+        music.addEventListener('ended', function() {
+            music.currentTime = 0;
+            music.play().catch(e => console.log('Failed to restart after end:', e));
+        });
+
+        // Initialize when loaded
+        document.addEventListener('DOMContentLoaded', initMusicState);
+    </script>
+</body>
+</html>

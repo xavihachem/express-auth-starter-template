@@ -90,7 +90,7 @@ module.exports.profile = async function(req, res) {
             topUsers: topUsers
         });
     } catch (err) {
-        console.log('Error in profile controller:', err);
+        // Handle error silently
         req.flash('error', 'An error occurred while loading your profile');
         return res.redirect('/');
     }
@@ -226,11 +226,11 @@ module.exports.showAvatarUpload = async function(req, res) {
  */
 module.exports.contactSupport = async function(req, res) {
     try {
-        console.log('Contact support request received:', req.body);
+        // Process contact support request
         
         // Check if user is authenticated
         if (!req.isAuthenticated()) {
-            console.log('User not authenticated');
+
             return res.status(401).json({ success: false, message: 'Please sign in to contact support' });
         }
         
@@ -239,17 +239,17 @@ module.exports.contactSupport = async function(req, res) {
         const subject = req.body.subject;
         const message = req.body.message;
         
-        console.log('Support request data:', { subject, message });
+
         
         // Validate input
         if (!subject || !message || subject.trim() === '' || message.trim() === '') {
-            console.log('Invalid input: subject or message is empty');
+
             return res.status(400).json({ success: false, message: 'Subject and message are required' });
         }
         
         // Find the current user
         const user = await User.findById(req.user._id);
-        console.log('User found:', user ? user._id : 'No user found');
+
         
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -260,7 +260,7 @@ module.exports.contactSupport = async function(req, res) {
         
         // Find all admin users to check for recent tickets from this user
         const adminUsers = await User.find({ role: 'admin' });
-        console.log('Admin users found:', adminUsers.length);
+
         let hasRecentTicket = false;
         
         // Check each admin's notifications for recent tickets from this user
@@ -280,7 +280,6 @@ module.exports.contactSupport = async function(req, res) {
         }
         
         if (hasRecentTicket) {
-            console.log('User has already submitted a ticket in the last 24 hours');
             return res.status(429).json({ 
                 success: false, 
                 message: 'You have already submitted a support ticket in the last 24 hours. Please wait before submitting another request.' 
@@ -301,8 +300,7 @@ module.exports.contactSupport = async function(req, res) {
                         createdAt: new Date(),
                     };
                     
-                    console.log('Adding support notification to admin:', admin._id);
-                    console.log('Notification:', supportNotification);
+
                     
                     // Use findByIdAndUpdate instead of save to avoid version conflicts
                     const updatedAdmin = await User.findByIdAndUpdate(
@@ -311,15 +309,13 @@ module.exports.contactSupport = async function(req, res) {
                         { new: true }
                     );
                     
-                    console.log('Admin after update - notifications count:', 
-                        updatedAdmin.notifications ? updatedAdmin.notifications.length : 'undefined');
-                    console.log('Admin notification saved');
+
                 } catch (error) {
-                    console.error('Error adding notification to admin:', error);
+                    // Handle error silently
                 }
             }
         } else {
-            console.log('No admin users found to notify');
+            // No admin users found to notify
         }
         
         // Add a confirmation notification to the user using findByIdAndUpdate to avoid version conflicts
@@ -330,7 +326,7 @@ module.exports.contactSupport = async function(req, res) {
             createdAt: new Date()
         };
         
-        console.log('Adding confirmation notification to user');
+
         
         // Use findByIdAndUpdate instead of save to avoid version conflicts
         await User.findByIdAndUpdate(
@@ -338,13 +334,11 @@ module.exports.contactSupport = async function(req, res) {
             { $push: { notifications: { $each: [confirmationNotification], $position: 0 } } }
         );
         
-        console.log('User notification saved');
         
         // Return success response
-        console.log('Support request submitted successfully');
         return res.status(200).json({ success: true, message: 'Your support request has been submitted successfully' });
     } catch (err) {
-        console.error('Error in contact support controller:', err);
+        // Handle error silently
         return res.status(500).json({ success: false, message: 'An error occurred while submitting your support request' });
     }
 };
