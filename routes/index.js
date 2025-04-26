@@ -144,6 +144,12 @@ router.post('/create-session', function(req, res, next) {
     failureRedirect: '/sign-in',
     failureFlash: true,
 }), async function(req, res, next) {
+    // Ensure session exists before connect-mongo touch
+    await new Promise(resolve => req.session.save(err => {
+      if (err) console.error('Session save error:', err);
+      resolve();
+    }));
+
     // Passport has set req.user
     // User successfully authenticated
 

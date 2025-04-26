@@ -5,7 +5,7 @@ const OtpToken = require('../models/otpToken');
 const Challenge = require('../models/challenge');
 const authMailer = require('../mailers/auth_mailer');
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 var validator = require('validator');
 var axios = require('axios');
 
