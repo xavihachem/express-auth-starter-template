@@ -23,12 +23,11 @@ const connectWithRetry = () => {
         return; // Exit function without attempting connection
     }
     
-    console.log('MongoDB connection attempt...');
+    // Attempting MongoDB connection
     mongoose
         .connect(process.env.DB_CONNECTION, connectOptions)
         .catch(err => {
-            console.error('MongoDB connection error:', err.message);
-            console.log('Retrying MongoDB connection in 5 seconds...');
+            // Silent error handling for MongoDB connection issues
             setTimeout(connectWithRetry, 5000);
         });
 };
@@ -41,15 +40,15 @@ const db = mongoose.connection;
 
 // In case of error
 db.on('error', (err) => {
-    console.error('MongoDB error event:', err.message);
+    // Handle MongoDB error event silently
 });
 
 // If connection is disconnected
 db.on('disconnected', () => {
-    console.log('MongoDB disconnected, attempting to reconnect...');
+    // Handle MongoDB disconnection silently
 });
 
 // If db up and running print this msg (once)
 db.once('open', function () {
-    console.log('Connected to database!');
+    // Successfully connected to database
 });

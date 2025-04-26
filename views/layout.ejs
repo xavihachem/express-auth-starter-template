@@ -2346,7 +2346,13 @@
       });
     </script>
     
-    <!-- Global Background Music -->
+    <!-- Global Background Music - Only shown on landing, signin and signup pages -->
+    <% 
+    // Only show music player on specific pages
+    const musicAllowedPages = ['landing', 'sign_in', 'sign_up'];
+    const currentPage = locals.page || '';
+    if (musicAllowedPages.includes(currentPage)) { 
+    %>
     <div class="music-control" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
         <button id="music-toggle" class="music-btn" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(30, 50, 100, 0.7); border: 2px solid rgba(95, 145, 255, 0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 10px rgba(95, 145, 255, 0.3);">
             <i class="fas fa-volume-up" id="volume-icon" style="color: rgba(95, 145, 255, 1);"></i>
@@ -2437,6 +2443,7 @@
         });
       });
     </script>
+    <% } %>
 
   </body>
 
