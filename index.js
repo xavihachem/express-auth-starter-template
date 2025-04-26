@@ -28,10 +28,18 @@ app.use(expressLayouts); // use express-ejs-layouts for rendering views
 // Use middleware to parse cookies *before* session
 app.use(cookieParser());
 
-// Configure session middleware
+// Configure session middleware with fallback for secret
+const DEFAULT_SECRET = 'moonify-default-secret-key-for-session-do-not-use-in-production';
+
+// Log warning if SESSION_KEY isn't set
+if (!process.env.SESSION_KEY) {
+    console.warn('⚠️ SESSION_KEY environment variable not set! Using default secret - NOT SECURE for production');
+}
+
+// Configure session with guaranteed secret (either from env or default)
 const sessionConfig = {
     name: 'auth-cookies', // name of the session cookie
-    secret: process.env.SESSION_KEY, // key to encrypt the session cookie
+    secret: process.env.SESSION_KEY || DEFAULT_SECRET, // key to encrypt the session cookie with fallback
     saveUninitialized: false, // do not save uninitialized sessions
     resave: false, // do not save sessions if not modified
     cookie: {
@@ -61,10 +69,7 @@ try {
     // Uses memory store by default if no store is specified
 }
 
-// Apply session middleware with explicit secret in the config to prevent deprecation warning
-if (!sessionConfig.secret && process.env.SESSION_KEY) {
-    sessionConfig.secret = process.env.SESSION_KEY;
-}
+// Apply session middleware (secret is already set in sessionConfig)
 app.use(session(sessionConfig));
 
 // Initialize passport and set user authentication middleware

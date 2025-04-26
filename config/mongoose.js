@@ -15,6 +15,14 @@ const connectOptions = {
 
 // Connect with retry logic
 const connectWithRetry = () => {
+    // Check if DB_CONNECTION is defined
+    if (!process.env.DB_CONNECTION) {
+        console.warn('⚠️ DB_CONNECTION environment variable is not defined!');
+        console.warn('⚠️ No database connection will be established.');
+        console.warn('⚠️ Application will run with limited functionality.');
+        return; // Exit function without attempting connection
+    }
+    
     console.log('MongoDB connection attempt...');
     mongoose
         .connect(process.env.DB_CONNECTION, connectOptions)
