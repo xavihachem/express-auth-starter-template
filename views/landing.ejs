@@ -7,23 +7,32 @@
     <title>Moonify</title>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="data:,">
+    <!-- Favicon with largest size prioritized for browsers -->
+    <link rel="icon" href="/moonBlue.png" type="image/png" sizes="512x512">
+    <link rel="icon" href="/moonBlue.png" type="image/png" sizes="256x256">
+    <link rel="icon" href="/moonBlue.png" type="image/png" sizes="192x192">
+    <link rel="shortcut icon" href="/moonBlue.png" type="image/png">
+    <link rel="apple-touch-icon" href="/moonBlue.png" sizes="512x512">
+    <meta name="msapplication-TileImage" content="/moonBlue.png">
+    <meta name="msapplication-TileColor" content="#0d192a">
+    <!-- Make sure icon is visible in all browsers -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Add a subtle pulse effect to the background - Blue Theme */
         @keyframes backgroundPulse-blue {
-            0% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); }
-            50% { background: radial-gradient(ellipse at bottom, #0F2440, #111 90%); }
-            100% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); }
+            0% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); background-attachment: fixed; }
+            50% { background: radial-gradient(ellipse at bottom, #0F2440, #111 90%); background-attachment: fixed; }
+            100% { background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%); background-attachment: fixed; }
         }
         
         /* Add a subtle pulse effect to the background - Eclipse Theme */
         @keyframes backgroundPulse-eclipse {
-            0% { background: radial-gradient(ellipse at bottom, #1D0D0D, #111 90%); }
-            50% { background: radial-gradient(ellipse at bottom, #240F0F, #111 90%); }
-            100% { background: radial-gradient(ellipse at bottom, #1D0D0D, #111 90%); }
+            0% { background: radial-gradient(ellipse at bottom, #1D0D0D, #111 90%); background-attachment: fixed; }
+            50% { background: radial-gradient(ellipse at bottom, #240F0F, #111 90%); background-attachment: fixed; }
+            100% { background: radial-gradient(ellipse at bottom, #1D0D0D, #111 90%); background-attachment: fixed; }
         }
         
         /* Add a subtle floating effect for the moon */
@@ -49,51 +58,64 @@
         /* Animation styles for removed elements deleted */
         
         html, body {
-            height: 100vh;
+            height: 100%;
             width: 100%;
             max-width: 100%;
             margin: 0;
             padding: 0;
             font-family: 'Montserrat', Arial, sans-serif;
-            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
+            overflow-x: hidden; /* Allow vertical scrolling */
             position: relative;
             perspective: 1000px;
             box-sizing: border-box;
             transition: all 1.5s ease-in-out;
+            scroll-behavior: smooth;
+            background-attachment: fixed;
         }
         
         /* Blue Theme Body */
         body.theme-blue {
             background: radial-gradient(ellipse at bottom, #0D1E31, #111 90%);
             animation: backgroundPulse-blue 15s ease-in-out infinite;
+            background-attachment: fixed;
         }
         
         /* Eclipse Theme Body */
         body.theme-eclipse {
             background: radial-gradient(ellipse at bottom, #1D0D0D, #111 90%);
             animation: backgroundPulse-eclipse 15s ease-in-out infinite;
+            background-attachment: fixed;
         }
         .nav {
-            position: absolute;
+            position: fixed;
             top: 30px;
-            right: 80px; /* Position from right edge */
+            right: 80px;
             display: flex;
-            z-index: 2;
+            z-index: 9999;
         }
         .nav-btn {
+            display: inline-block;
             background: rgba(20, 30, 50, 0.5);
             padding: 10px 25px;
             margin-left: 18px;
             font-size: 1.1rem;
             font-family: 'Orbitron', Arial, sans-serif;
             letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-weight: bold;
+            transition: all 0.3s ease-in-out;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+            min-width: 100px;
+            text-align: center;
+            outline: none;
+            transform: translateY(0);
+            text-decoration: none;
         }
         
         /* Blue Theme Buttons */
@@ -110,7 +132,7 @@
             box-shadow: 0 0 15px rgba(255, 48, 48, 0.3), inset 0 0 10px rgba(255, 48, 48, 0.1);
         }
         .nav-btn::before {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: -100%;
@@ -118,11 +140,13 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(95, 145, 255, 0.2), transparent);
             transition: all 0.4s ease;
+            pointer-events: none;
         }
         .nav-btn:hover {
             background: rgba(30, 40, 70, 0.8);
             color: #fff;
             transform: translateY(-3px);
+            text-decoration: none;
         }
         
         /* Blue Theme Button Hover */
@@ -136,18 +160,21 @@
         }
         .nav-btn:hover::before {
             left: 100%;
+            pointer-events: none;
         }
         .moonify-logo {
             position: absolute;
             left: 50%;
-            top: 18%;
-            transform: translateX(-50%);
-            z-index: 2; /* Higher z-index to appear above stars */
+            top: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
+            perspective: 800px;
+            z-index: 2; /* Adjusted to be above background but below nav */
+            pointer-events: none; /* This prevents it from capturing clicks intended for nav */
         }
-        /* Moon Base Styles */
         .moonify-logo .moon {
             width: 180px;
             height: 180px;
@@ -352,6 +379,7 @@
             width: 100vw; /* Limit to viewport width */
             height: 100vh; /* Limit to viewport height */
             left: 0; top: 0;
+            pointer-events: none; /* Prevent capturing clicks */
             z-index: 0; /* Lower z-index so stars appear behind other elements */
             pointer-events: none;
             overflow: hidden;
@@ -604,6 +632,753 @@
             height: 100%;
             transform: translateZ(var(--depth)) scale(calc(1 + var(--depth-factor)));
         }
+            /* Hero Section with Moon and Stars */
+        .hero-section {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1; /* Lower than nav */
+            margin-bottom: -1px; /* Remove gap between sections */
+            pointer-events: none; /* Don't capture clicks that should go to nav */
+        }
+        
+        .hero-content {
+            pointer-events: auto; /* Allow clicks on the content itself */
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            z-index: 10;
+            cursor: pointer;
+            color: #5F91FF;
+            text-align: center;
+        }
+        
+
+        
+        .theme-eclipse .scroll-indicator {
+            color: #FF3030;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-20px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+        }
+        
+        /* Content Section (both themes) */
+        .content-section {
+            min-height: 100vh;
+            width: 100%;
+            padding: 80px 0;
+            position: relative;
+            z-index: 5;
+            border-top: none;
+            margin-top: -1px; /* Remove gap between sections */
+            background: transparent; /* Make background transparent to show body background */
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Blue Theme Section Title */
+        .theme-blue .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            text-shadow: 0 0 15px rgba(95, 145, 255, 0.7);
+        }
+        
+        .theme-blue .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #5F91FF, transparent);
+        }
+        
+        /* Eclipse Theme Section Title */
+        .theme-eclipse .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            text-shadow: 0 0 15px rgba(255, 48, 48, 0.7);
+        }
+        
+        .theme-eclipse .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #FF3030, transparent);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        /* Blue Theme Feature Card */
+        .theme-blue .feature-card {
+            background: rgba(13, 30, 49, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(95, 145, 255, 0.2);
+            border: 1px solid rgba(95, 145, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-blue .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(95, 145, 255, 0.2);
+            border-color: rgba(95, 145, 255, 0.5);
+        }
+        
+        .theme-blue .feature-icon {
+            font-size: 2.5rem;
+            color: #5F91FF;
+            margin-bottom: 20px;
+        }
+        
+        /* Eclipse Theme Feature Card */
+        .theme-eclipse .feature-card {
+            background: rgba(29, 13, 13, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 48, 48, 0.2);
+            border: 1px solid rgba(255, 48, 48, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-eclipse .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(255, 48, 48, 0.2);
+            border-color: rgba(255, 48, 48, 0.5);
+        }
+        
+        .theme-eclipse .feature-icon {
+            font-size: 2.5rem;
+            color: #FF3030;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .feature-description {
+            color: #ccc;
+            line-height: 1.6;
+        }
+        
+        .cosmic-image-container {
+            position: relative;
+            margin: 80px 0;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(95, 145, 255, 0.3);
+            z-index: 10;
+        }
+        
+        .theme-eclipse .cosmic-image-container {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 48, 48, 0.3);
+        }
+        
+        .cosmic-image {
+            width: 100%;
+            display: block;
+            transition: transform 1s ease;
+        }
+        
+        .cosmic-image-container:hover .cosmic-image {
+            transform: scale(1.05);
+        }
+        
+        /* Blue Theme Cosmic Overlay */
+        .theme-blue .cosmic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(13, 30, 49, 0.1), rgba(13, 30, 49, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        
+        /* Eclipse Theme Cosmic Overlay */
+        .theme-eclipse .cosmic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(29, 13, 13, 0.1), rgba(29, 13, 13, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        
+        /* Blue Theme Cosmic Title */
+        .theme-blue .cosmic-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(95, 145, 255, 0.7);
+        }
+        
+        /* Eclipse Theme Cosmic Title */
+        .theme-eclipse .cosmic-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 48, 48, 0.7);
+        }
+        
+        .cosmic-description {
+            color: #eee;
+            line-height: 1.6;
+            max-width: 90%;
+            margin-bottom: 20px;
+        }
+        
+        /* Blue Theme CTA Button */
+        .theme-blue .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #3a6fc9, #5F91FF);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(95, 145, 255, 0.4);
+        }
+        
+        .theme-blue .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(95, 145, 255, 0.6);
+        }
+        
+        /* Eclipse Theme CTA Button */
+        .theme-eclipse .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #c93a3a, #FF3030);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 48, 48, 0.4);
+        }
+        
+        .theme-eclipse .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 48, 48, 0.6);
+        }
+        
+        .about-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .about-text {
+            color: #ddd;
+            line-height: 1.8;
+        }
+        
+        .about-text p {
+            margin-bottom: 20px;
+        }
+        
+        /* Blue Theme About Text */
+        .theme-blue .about-text h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #5F91FF;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        /* Eclipse Theme About Text */
+        .theme-eclipse .about-text h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #FF3030;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        /* Blue Theme Stat Item */
+        .theme-blue .stat-item {
+            background: rgba(13, 30, 49, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(95, 145, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(95, 145, 255, 0.2);
+        }
+        
+        .theme-blue .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5F91FF;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Eclipse Theme Stat Item */
+        .theme-eclipse .stat-item {
+            background: rgba(29, 13, 13, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 48, 48, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 48, 48, 0.2);
+        }
+        
+        .theme-eclipse .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FF3030;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        /* Partnerships Section Styles */
+        .partnerships-section {
+            padding: 100px 0;
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(100, 150, 255, 0.1);
+            border-bottom: 1px solid rgba(100, 150, 255, 0.1);
+        }
+        
+        .partnerships-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 5;
+            text-align: center;
+        }
+        
+        .partnerships-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.6rem;
+            color: #fff;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+        }
+        
+        .partnerships-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 700px;
+            margin: 0 auto 60px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+        
+        .partners-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 0 auto;
+            max-width: 1100px;
+            position: relative;
+        }
+        
+        .cosmic-connector {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(100, 150, 255, 0.1) 20%, 
+                rgba(100, 150, 255, 0.3) 50%, 
+                rgba(100, 150, 255, 0.1) 80%, 
+                transparent 100%);
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(100, 150, 255, 0.5);
+        }
+        
+        .partner-item {
+            position: relative;
+            width: 180px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 10;
+            transition: all 0.4s ease;
+            border-radius: 5px;
+            background: rgba(15, 25, 45, 0.3);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+        }
+        
+        .partner-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(70, 120, 200, 0.05) 0%, rgba(10, 20, 40, 0.05) 100%);
+            border-radius: 5px;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .partner-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0, 0, 30, 0.3), 0 0 15px rgba(100, 150, 255, 0.1);
+            border-color: rgba(100, 150, 255, 0.3);
+        }
+        
+        .partner-item:hover::before {
+            opacity: 0.8;
+        }
+        
+        .partner-glow {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, transparent, rgba(100, 150, 255, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .partner-item:hover .partner-glow {
+            opacity: 1;
+            box-shadow: 0 0 15px rgba(100, 150, 255, 0.4);
+            animation: glow-pulse 2s infinite;
+        }
+        
+        @keyframes glow-pulse {
+            0% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.3;
+            }
+        }
+        
+        .partner-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: 1;
+        }
+        
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Partner specific styles */
+        .tsystems-logo .logo-text {
+            background: linear-gradient(45deg, #E20074, #ff6bb5);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .tsystems-logo .logo-placeholder {
+            background: linear-gradient(135deg, #E20074, #aa0050);
+            box-shadow: 0 0 15px rgba(226, 0, 116, 0.5);
+        }
+        
+        .inter-logo .logo-text {
+            background: linear-gradient(45deg, #0057b8, #43a1ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .inter-logo .logo-placeholder {
+            background: linear-gradient(135deg, #0057b8, #003b7e);
+            box-shadow: 0 0 15px rgba(0, 87, 184, 0.5);
+        }
+        
+        .etherfi-logo .logo-text {
+            background: linear-gradient(45deg, #6e42ca, #bb9eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .etherfi-logo .logo-placeholder {
+            background: linear-gradient(135deg, #6e42ca, #4a2c88);
+            box-shadow: 0 0 15px rgba(110, 66, 202, 0.5);
+        }
+        
+        .lombard-logo .logo-text {
+            background: linear-gradient(45deg, #ffc709, #ffdf7d);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .lombard-logo .logo-placeholder {
+            background: linear-gradient(135deg, #ffc709, #c99b00);
+            box-shadow: 0 0 15px rgba(255, 199, 9, 0.5);
+        }
+        
+        .swisscom-logo .logo-text {
+            background: linear-gradient(45deg, #0b8fff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .swisscom-logo .logo-placeholder {
+            background: linear-gradient(135deg, #0b8fff, #0060b1);
+            box-shadow: 0 0 15px rgba(11, 143, 255, 0.5);
+        }
+        
+        .partner-item:hover .partner-logo-container {
+            transform: scale(1.05);
+        }
+        
+        .partner-item:hover .logo-text {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .partner-item:hover .logo-placeholder {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .partnerships-title {
+                font-size: 2.2rem;
+            }
+            
+            .partnerships-subtitle {
+                font-size: 1rem;
+                margin-bottom: 40px;
+            }
+            
+            .partners-showcase {
+                gap: 25px;
+            }
+            
+            .partner-item {
+                width: 150px;
+                height: 80px;
+            }
+            
+            .partner-logo {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .partnerships-section {
+                padding: 70px 0;
+            }
+            
+            .partnerships-title {
+                font-size: 1.8rem;
+            }
+            
+            .partner-item {
+                width: 130px;
+                height: 70px;
+            }
+            
+            .partner-logo {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Footer (both themes) */
+        .footer {
+            padding: 40px 0;
+            text-align: center;
+            position: relative;
+            z-index: 5;
+            background: transparent;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Blue Theme Footer Elements */
+        .theme-blue .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #5F91FF;
+            margin-bottom: 20px;
+        }
+        
+        /* Eclipse Theme Footer Elements */
+        .theme-eclipse .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #FF3030;
+            margin-bottom: 20px;
+        }
+        
+
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-link {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        /* Blue Theme Footer Link Hover */
+        .theme-blue .footer-link:hover {
+            color: #5F91FF;
+        }
+        
+        /* Eclipse Theme Footer Link Hover */
+        .theme-eclipse .footer-link:hover {
+            color: #FF3030;
+        }
+        
+        .footer-copyright {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 900px) {
+            .about-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .cosmic-title {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body class="theme-blue">
@@ -620,14 +1395,19 @@
     <!-- Background stars -->
     <div class="stars" id="stars"></div>
     
+
+    
     <!-- Planets removed -->
     
-    <div class="nav">
-        <a href="/sign-in" style="margin-right:10px;"><button class="nav-btn">LOG IN</button></a>
-        <a href="/sign-up"><button class="nav-btn">SIGN UP</button></a>
+
+    
+    <!-- Navigation Bar (deliberately placed outside other elements) -->
+    <div class="nav" id="navigation-bar" style="position: fixed; top: 30px; right: 80px; z-index: 9999;">
+        <a href="/sign-in" class="nav-btn" style="margin-right:10px;">LOG IN</a>
+        <a href="/sign-up" class="nav-btn">SIGN UP</a>
     </div>
     
-    <div class="moonify-logo">
+<div class="moonify-logo">
         <div class="moon"></div>
         <h1>
             <span class="letter" id="letter-0">M</span>
@@ -670,9 +1450,192 @@
         <div class="star"><div class="trail"></div><div class="star-core"></div></div>
     </div>
     
+    <!-- Hero Section with existing moon and animation -->
+    <section class="hero-section" id="hero">
+        <div class="hero-content">
+            <div class="moonify-logo">
+                <div class="moon"></div>
+                <h1>
+                    <span class="letter" id="letter-0">M</span>
+                    <span class="letter" id="letter-1">o</span>
+                    <span class="letter" id="letter-2">o</span>
+                    <span class="letter" id="letter-3">n</span>
+                    <span class="letter" id="letter-4">i</span>
+                    <span class="letter" id="letter-5">f</span>
+                    <span class="letter" id="letter-6">y</span>
+                </h1>
+                <div class="tagline">
+                    <!-- Blue Theme Taglines -->
+                    <div class="blue-taglines">
+                        <span class="tagline-line">Where your ambitions shoot for the stars.</span>
+                        <span class="tagline-line">Welcome to the future of investing.</span>
+                    </div>
+                    <!-- Eclipse Theme Taglines -->
+                    <div class="eclipse-taglines">
+                        <span class="tagline-line">Where cosmic power meets opportunity.</span>
+                        <span class="tagline-line">Embrace the eclipse of financial evolution.</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="scroll-indicator" id="scroll-down">
+                <div>Explore the Cosmos</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+
+    <section class="content-section" id="features">
+        <div class="container">
+            <h2 class="section-title">Cosmic Features</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Secure Transactions</h3>
+                    <p class="feature-description">Your investments are protected with military-grade encryption and multi-layered security protocols, ensuring your assets remain safe in the cosmic vault.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">Navigate the financial universe with our AI-powered analytics, providing real-time insights and predictions to optimize your investment strategy.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="feature-title">Rapid Growth</h3>
+                    <p class="feature-description">Launch your financial goals into orbit with our accelerated growth strategies, designed to maximize returns while minimizing risk exposure.</p>
+                </div>
+            </div>
+            
+            <div class="cosmic-image-container">
+                <img src="/images/cosmic-finance.jpeg" alt="Cosmic Financial Universe" class="cosmic-image">
+                <div class="cosmic-overlay">
+                    <h3 class="cosmic-title">Explore the Financial Cosmos</h3>
+                    <p class="cosmic-description">Moonify opens the gateway to a universe of investment opportunities, where traditional finance meets cosmic innovation. Our platform harnesses the power of cutting-edge technology to navigate the vast expanse of global markets.</p>
+                    <a href="/sign-up" class="cta-button">Begin Your Journey</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Partnerships Section -->
+    <section class="partnerships-section">
+        <div class="partnerships-container">
+            <h2 class="partnerships-title">Our Strategic Partners</h2>
+            <p class="partnerships-subtitle">Collaborating with industry leaders to redefine financial frontiers</p>
+            
+            <div class="partners-showcase">
+                <div class="partner-item">
+                    <div class="partner-logo-container tsystems-logo">
+                        <div class="logo-placeholder">T</div>
+                        <div class="logo-text">T-Systems</div>
+                    </div>
+                    <div class="partner-glow"></div>
+                </div>
+                
+                <div class="partner-item">
+                    <div class="partner-logo-container inter-logo">
+                        <div class="logo-placeholder">I</div>
+                        <div class="logo-text">Inter</div>
+                    </div>
+                    <div class="partner-glow"></div>
+                </div>
+                
+                <div class="partner-item">
+                    <div class="partner-logo-container etherfi-logo">
+                        <div class="logo-placeholder">E</div>
+                        <div class="logo-text">Ether.fi</div>
+                    </div>
+                    <div class="partner-glow"></div>
+                </div>
+                
+                <div class="partner-item">
+                    <div class="partner-logo-container lombard-logo">
+                        <div class="logo-placeholder">L</div>
+                        <div class="logo-text">Lombard</div>
+                    </div>
+                    <div class="partner-glow"></div>
+                </div>
+                
+
+            </div>
+            
+            <div class="cosmic-connector"></div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section class="content-section" id="about">
+        <div class="container">
+            <h2 class="section-title">About Moonify</h2>
+            
+            <div class="about-columns">
+                <div class="about-text">
+                    <h3>The Future of Financial Evolution</h3>
+                    <p>Moonify was born from a vision to transform how people interact with their investments. We've created a platform that combines the stability of traditional finance with the limitless potential of cosmic innovation.</p>
+                    <p>Our team of financial experts and technology visionaries work tirelessly to ensure that every aspect of your experience is seamless, secure, and revolutionary.</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <div class="stat-value">$2.5B+</div>
+                            <div class="stat-label">Assets Managed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">250K+</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">Uptime Reliability</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cosmic-image-container">
+                    <img src="/images/cosmic-dashboard.jpeg" alt="Moonify Dashboard Interface" class="cosmic-image">
+                    <div class="cosmic-overlay">
+                        <h3 class="cosmic-title">Intuitive Interface</h3>
+                        <p class="cosmic-description">Our dashboard puts the power of the financial universe at your fingertips, with real-time visualization and seamless controls.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo">MOONIFY</div>
+            
+            <div class="footer-links">
+                <a href="/sign-in" class="footer-link">Login</a>
+                <a href="/sign-up" class="footer-link">Sign Up</a>
+            </div>
+            
+            <div class="footer-copyright">
+                &copy; 2025 Moonify. All rights reserved. Your gateway to the financial cosmos.
+            </div>
+        </div>
+    </footer>
+    
     <script>
         // Moonify title animation
         document.addEventListener('DOMContentLoaded', function() {
+            // Scroll indicator functionality
+            document.getElementById('scroll-down').addEventListener('click', function() {
+                document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+            });
+            
             const letters = document.querySelectorAll('.letter');
             const totalLetters = letters.length;
             const letterDuration = 1.5; // seconds for each letter animation
@@ -834,6 +1797,8 @@
             
             // Switch themes every 20 seconds
             setInterval(switchTheme, 20000);
+            
+
         });
     </script>
 </body>
