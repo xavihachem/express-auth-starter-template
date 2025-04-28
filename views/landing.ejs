@@ -1312,50 +1312,79 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Blue Theme Footer Elements */
-        .theme-blue .footer-logo {
+        /* Footer styling */
+        .footer {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(95, 145, 255, 0.5), transparent);
+        }
+        
+        .footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .footer-logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: #5F91FF;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(95, 145, 255, 0.5);
+            letter-spacing: 2px;
         }
-        
-        /* Eclipse Theme Footer Elements */
-        .theme-eclipse .footer-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            color: #FF3030;
-            margin-bottom: 20px;
-        }
-        
-
         
         .footer-links {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 40px;
+            margin-bottom: 35px;
         }
         
         .footer-link {
             color: #ccc;
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 10px;
+            border-radius: 20px;
         }
         
-        /* Blue Theme Footer Link Hover */
-        .theme-blue .footer-link:hover {
-            color: #5F91FF;
+        .footer-link:hover {
+            color: #fff;
+            background: rgba(95, 145, 255, 0.1);
+            box-shadow: 0 0 15px rgba(95, 145, 255, 0.2);
         }
         
-        /* Eclipse Theme Footer Link Hover */
-        .theme-eclipse .footer-link:hover {
-            color: #FF3030;
+        .footer-link i {
+            margin-right: 5px;
         }
         
         .footer-copyright {
             color: #888;
             font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-top: 15px;
+        }
+        
+        .footer-copyright::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30%;
+            right: 30%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
         
         @media (max-width: 900px) {
@@ -1584,21 +1613,6 @@
                     <h3>The Future of Financial Evolution</h3>
                     <p>Moonify was born from a vision to transform how people interact with their investments. We've created a platform that combines the stability of traditional finance with the limitless potential of cosmic innovation.</p>
                     <p>Our team of financial experts and technology visionaries work tirelessly to ensure that every aspect of your experience is seamless, secure, and revolutionary.</p>
-                    
-                    <div class="stats-container">
-                        <div class="stat-item">
-                            <div class="stat-value">$2.5B+</div>
-                            <div class="stat-label">Assets Managed</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">250K+</div>
-                            <div class="stat-label">Active Users</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">99.9%</div>
-                            <div class="stat-label">Uptime Reliability</div>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="cosmic-image-container">
@@ -1618,8 +1632,9 @@
             <div class="footer-logo">MOONIFY</div>
             
             <div class="footer-links">
-                <a href="/sign-in" class="footer-link">Login</a>
-                <a href="/sign-up" class="footer-link">Sign Up</a>
+                <a href="/sign-in" class="footer-link"><i class="fas fa-sign-in-alt"></i>Login</a>
+                <a href="/sign-up" class="footer-link"><i class="fas fa-user-plus"></i>Sign Up</a>
+                <a href="https://t.me/YourTelegramChannel" class="footer-link"><i class="fab fa-telegram-plane"></i>Telegram</a>
             </div>
             
             <div class="footer-copyright">

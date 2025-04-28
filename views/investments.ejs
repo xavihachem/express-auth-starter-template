@@ -384,7 +384,7 @@
                             id="withdrawWallet" 
                             name="withdrawWallet" 
                             value="<%= withdrawWallet %>" 
-                            placeholder="<%= locals.user && locals.user.language === 'ar' ? 'أدخل عنوان محفظة USDT BNB Smart Chain الخاصة بك' : 'Enter your USDT BNB Smart Chain wallet address' %>"
+                            placeholder="<%= locals.user && locals.user.language === 'ar' ? ' قم بادخال عنوان محفظة البي أن بي الذكية' : 'Enter your USDT BNB Smart Chain wallet address' %>"
                             <%= withdrawWallet ? 'disabled' : '' %>
                             required
                         >
@@ -436,9 +436,9 @@
                     <ul class="mb-0 instruction-list">
                         <li><%= locals.user && locals.user.language === 'ar' ? 'الحد الأدنى للسحب: 40 دولارًا' : 'Minimum withdrawal: 40 USD' %></li>
                         <li><%= locals.user && locals.user.language === 'ar' ? 'مدة المعالجة: 24-48 ساعة' : 'Processing time: 24-48 hours' %></li>
-                        <li><%= locals.user && locals.user.language === 'ar' ? 'رسوم السحب: 2%' : 'Withdrawal fee: 2%' %></li>
+                        <li><%= locals.user && locals.user.language === 'ar' ? 'رسوم السحب: %2' : 'Withdrawal fee: 2%' %></li>
                         <li><%= locals.user && locals.user.language === 'ar' ? 'لا يمكنك سحب أكثر من رصيدك المتاح' : 'You cannot withdraw more than your available balance' %></li>
-                        <li><strong><%= locals.user && locals.user.language === 'ar' ? 'مهم:' : 'Important:' %></strong> <%= locals.user && locals.user.language === 'ar' ? 'يجب أن يكون عنوان محفظتك هو USDT على شبكة BNB الذكية فقط' : 'Your wallet address must be USDT on BNB Smart Chain network only' %></li>
+                        <li><strong><%= locals.user && locals.user.language === 'ar' ? 'مهم:' : 'Important:' %></strong> <%= locals.user && locals.user.language === 'ar' ? 'يجب أن يكون عنوان المحفظة على شبكة بي أن بي الذكية' : 'Your wallet address must be USDT on BNB Smart Chain network only' %></li>
                         <li><strong><%= locals.user && locals.user.language === 'ar' ? 'فترة قفل السحب:' : 'Withdrawal Lock Period:' %></strong> <%= locals.user && locals.user.language === 'ar' ? 'السحوبات متاحة فقط بعد 45 يومًا من أول إيداع' : 'Withdrawals are only available after 45 days from your first deposit' %></li>
                     </ul>
                 </div>

@@ -1,7 +1,7 @@
 <div class="container-fluid animate-fade-in">
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-4 animate-fade-in"><i class="fas fa-user-circle me-2"></i>User Profile</h3>
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-user-circle me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'الملف الشخصي' : 'User Profile' %></h3>
         </div>
     </div>
 
@@ -70,40 +70,40 @@
                 <div class="card-body profile-scrollable-body" style="max-height: 50vh !important; overflow-y: auto !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;">
                     <div class="row">
                         <div class="col-md-6">
-                            <h5 class="mb-3">Personal Information</h5>
+                            <h5 class="mb-3"><%= locals.user && locals.user.language === 'ar' ? 'المعلومات الشخصية' : 'Personal Information' %></h5>
                             <div class="mb-3">
-                                <p class="text-muted mb-1">Email Address</p>
+                                <p class="text-muted mb-1"><%= locals.user && locals.user.language === 'ar' ? 'عنوان البريد الإلكتروني' : 'Email Address' %></p>
                                 <p class="mb-0 fw-bold"><i class="fas fa-envelope me-2 text-primary"></i><%= user.email %></p>
                             </div>
                             <div class="mb-3">
-                                <p class="text-muted mb-1">Account Type</p>
+                                <p class="text-muted mb-1"><%= locals.user && locals.user.language === 'ar' ? 'نوع الحساب' : 'Account Type' %></p>
                                 <span class="badge rounded-pill <%= user.role === 'admin' ? 'bg-danger' : 'bg-success' %> px-3 py-2">
                                     <i class="<%= user.role === 'admin' ? 'fas fa-user-shield' : 'fas fa-user' %> me-2"></i>
                                     <%= user.role === 'admin' ? 'Administrator' : 'Regular User' %>
                                 </span>
                             </div>
                             <div class="mb-3">
-                                <p class="text-muted mb-1">Your User Code</p>
+                                <p class="text-muted mb-1"><%= locals.user && locals.user.language === 'ar' ? 'رمز المستخدم الخاص بك' : 'Your User Code' %></p>
                                 <div class="user-code">
                                     <%= user.userCode || 'N/A' %>
                                 </div>
-                                <p class="small text-muted mt-2">Share this code with friends for referrals</p>
+                                <p class="small text-muted mt-2"><%= locals.user && locals.user.language === 'ar' ? 'شارك هذا الرمز مع أصدقائك للحصول على إحالات' : 'Share this code with friends for referrals' %></p>
                             </div>
                             <div class="mb-3">
                                 <a href="/change-password" class="btn btn-warning">
-                                    <i class="fas fa-key me-2"></i>Change Password
+                                    <i class="fas fa-key me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password' %>
                                 </a>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h5 class="mb-3 text-light">Account Statistics</h5>
+                            <h5 class="mb-3 text-light"><%= locals.user && locals.user.language === 'ar' ? 'إحصائيات الحساب' : 'Account Statistics' %></h5>
                             <div class="card mb-3 stat-card dark-card">
                                 <div class="card-body p-3">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <p class="text-light mb-1">Challenge Points</p>
+                                            <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'نقاط التحدي' : 'Challenge Points' %></p>
                                             <h4 class="text-warning mb-0"><%= stats.challengePoints %> points</h4>
-                                            <p class="small text-info mt-2">Completed <%= stats.completedChallenges %> challenges</p>
+                                            <p class="small text-info mt-2"><%= locals.user && locals.user.language === 'ar' ? 'أكملت ' + stats.completedChallenges + ' تحديات' : 'Completed ' + stats.completedChallenges + ' challenges' %></p>
                                         </div>
                                         <div class="stat-icon-box bg-dark-gradient">
                                             <i class="fas fa-trophy text-warning"></i>
@@ -119,16 +119,25 @@
                                 <div class="card-body p-3">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <p class="text-light mb-1">Investment Access</p>
+                                            <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'الوصول للاستثمار' : 'Investment Access' %></p>
                                             <h5 class="<%= stats.investmentAccess === 'access' ? 'text-success' : (stats.investmentAccess === 'pending' ? 'text-warning' : 'text-danger') %> mb-0">
-                                                <%= stats.investmentAccess === 'access' ? 'Approved' : (stats.investmentAccess === 'pending' ? 'Pending Approval' : 'Not Requested') %>
+                                                <%= locals.user && locals.user.language === 'ar'
+                                                   ? (stats.investmentAccess === 'access' ? 'موافق'
+                                                      : (stats.investmentAccess === 'pending' ? 'قيد المراجعة' : 'لم يُطلب'))
+                                                   : (stats.investmentAccess === 'access' ? 'Approved'
+                                                      : (stats.investmentAccess === 'pending' ? 'Pending Approval' : 'Not Requested'))
+                                                %>
                                             </h5>
                                             <% if (stats.investmentAccess !== 'access') { %>
                                                 <p class="small text-info mt-2">
                                                     <% if (stats.investmentAccess === 'pending') { %>
-                                                        Your request is being reviewed by admins
+                                                        <%= locals.user && locals.user.language === 'ar'
+                                                           ? 'طلبك قيد المراجعة من المسؤولين'
+                                                           : 'Your request is being reviewed by admins' %>
                                                     <% } else { %>
-                                                        Request access from the investments page
+                                                        <%= locals.user && locals.user.language === 'ar'
+                                                           ? 'اطلب الوصول من صفحة الاستثمارات'
+                                                           : 'Request access from the investments page' %>
                                                     <% } %>
                                                 </p>
                                             <% } %>
@@ -154,7 +163,7 @@
         <div class="col-md-6">
             <div class="card animate-fade-in delay-2 dark-card">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Wallet Information</h5>
+                    <h5 class="mb-0"><i class="fas fa-wallet me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'معلومات المحفظة' : 'Wallet Information' %></h5>
                 </div>
                 <div class="card-body dark-card-body">
                     <% if (stats.investmentAccess === 'access') { %>
@@ -162,7 +171,7 @@
                         <div class="wallet-info-container">
                             <div class="wallet-card mb-4">
                                 <div class="wallet-header deposit-header">
-                                    <i class="fas fa-arrow-down me-2"></i> Deposit Wallet
+                                    <i class="fas fa-arrow-down me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'محفظة الإيداع' : 'Deposit Wallet' %>
                                 </div>
                                 <div class="wallet-body">
                                     <div class="code-display">
@@ -171,13 +180,13 @@
                                             <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
-                                    <p class="wallet-info">This wallet is set by admins for deposits</p>
+                                    <p class="wallet-info"><%= locals.user && locals.user.language === 'ar' ? 'تم تعيين هذه المحفظة من قبل المسؤولين للإيداع' : 'This wallet is set by admins for deposits' %></p>
                                 </div>
                             </div>
                             
                             <div class="wallet-card mb-4">
                                 <div class="wallet-header withdraw-header">
-                                    <i class="fas fa-arrow-up me-2"></i> Withdraw Wallet
+                                    <i class="fas fa-arrow-up me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'محفظة السحب' : 'Withdraw Wallet' %>
                                 </div>
                                 <div class="wallet-body">
                                     <div class="code-display">
@@ -186,13 +195,13 @@
                                             <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
-                                    <p class="wallet-info">Your personal wallet for withdrawals</p>
+                                    <p class="wallet-info"><%= locals.user && locals.user.language === 'ar' ? 'محفظتك الشخصية للسحب' : 'Your personal wallet for withdrawals' %></p>
                                 </div>
                             </div>
                             
                             <div class="d-grid gap-2">
                                 <a href="/investments" class="btn btn-glow-primary w-100">
-                                    <i class="fas fa-chart-line me-2"></i>Manage Investments
+                                    <i class="fas fa-chart-line me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'إدارة الاستثمارات' : 'Manage Investments' %>
                                 </a>
                             </div>
                         </div>
@@ -202,12 +211,12 @@
                             <div class="pending-icon-container mb-3">
                                 <i class="fas fa-clock fa-3x text-warning"></i>
                             </div>
-                            <h5 class="text-light">Investment Access Pending</h5>
-                            <p class="text-info">Your investment access request is being reviewed by our team.</p>
+                            <h5 class="text-light"><%= locals.user && locals.user.language === 'ar' ? 'طلب الوصول للاستثمار قيد الانتظار' : 'Investment Access Pending' %></h5>
+                            <p class="text-info"><%= locals.user && locals.user.language === 'ar' ? 'طلب الوصول للاستثمار الخاص بك قيد المراجعة من فريقنا.' : 'Your investment access request is being reviewed by our team.' %></p>
                             <div class="progress mt-3 dark-progress">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <p class="small text-light mt-2">Wallet information will be available once your request is approved</p>
+                            <p class="small text-light mt-2"><%= locals.user && locals.user.language === 'ar' ? 'ستتوفر معلومات المحفظة بمجرد الموافقة على طلبك' : 'Wallet information will be available once your request is approved' %></p>
                         </div>
                     <% } else { %>
                         <!-- Locked wallet for rejected users -->
@@ -215,11 +224,11 @@
                             <div class="locked-icon-container mb-3">
                                 <i class="fas fa-lock fa-3x text-danger"></i>
                             </div>
-                            <h5 class="text-light">Wallet Access Restricted</h5>
-                            <p class="text-info">You don't currently have access to investment features.</p>
+                            <h5 class="text-light"><%= locals.user && locals.user.language === 'ar' ? 'تم تقييد وصول المحفظة' : 'Wallet Access Restricted' %></h5>
+                            <p class="text-info"><%= locals.user && locals.user.language === 'ar' ? 'لا يمكنك الوصول إلى ميزات الاستثمار حالياً.' : 'You don\'t currently have access to investment features.' %></p>
                             <div class="alert dark-alert mt-3">
                                 <i class="fas fa-info-circle me-2"></i>
-                                To gain access to investment features and wallet information, please contact our support team.
+                                <%= locals.user && locals.user.language === 'ar' ? 'للحصول على الوصول إلى ميزات الاستثمار ومعلومات المحفظة، يرجى الاتصال بفريق الدعم لدينا.' : 'To gain access to investment features and wallet information, please contact our support team.' %>
                             </div>
                         </div>
                     <% } %>
@@ -229,13 +238,13 @@
         <div class="col-md-6">
             <div class="card animate-fade-in delay-2 dark-card">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Account Statistics</h5>
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'إحصائيات الحساب' : 'Account Statistics' %></h5>
                 </div>
                 <div class="card-body dark-card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded stat-inner-card dark-stat-card">
-                                <p class="text-light mb-1">Current Balance</p>
+                                <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'الرصيد الحالي' : 'Current Balance' %></p>
                                 <h3 class="mb-0 text-success">$<%= stats.balance.toFixed(2) %></h3>
                                 <div class="progress mt-2 dark-progress">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -244,7 +253,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded stat-inner-card dark-stat-card">
-                                <p class="text-light mb-1">Total Withdrawn</p>
+                                <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'الإجمالي المسحوب' : 'Total Withdrawn' %></p>
                                 <h3 class="mb-0 text-primary">$<%= stats.withdraw.toFixed(2) %></h3>
                                 <div class="progress mt-2 dark-progress">
                                     <div class="progress-bar bg-primary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -253,7 +262,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded stat-inner-card dark-stat-card">
-                                <p class="text-light mb-1">Challenges Completed</p>
+                                <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'التحديات المكتملة' : 'Challenges Completed' %></p>
                                 <h3 class="mb-0 text-warning"><%= stats.completedChallenges %></h3>
                                 <div class="progress mt-2 dark-progress">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -262,7 +271,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded stat-inner-card dark-stat-card">
-                                <p class="text-light mb-1">Weekly Target</p>
+                                <p class="text-light mb-1"><%= locals.user && locals.user.language === 'ar' ? 'الهدف الأسبوعي' : 'Weekly Target' %></p>
                                 <h3 class="mb-0 text-info"><%= stats.completedTargets %> / <%= stats.weeklyTargets %></h3>
                                 <div class="progress mt-2 dark-progress">
                                     <div class="progress-bar bg-info" role="progressbar" style="width: <%= (stats.completedTargets / stats.weeklyTargets) * 100 %>%" aria-valuenow="<%= (stats.completedTargets / stats.weeklyTargets) * 100 %>" aria-valuemin="0" aria-valuemax="100"></div>

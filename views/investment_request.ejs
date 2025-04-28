@@ -1,25 +1,44 @@
 <h3 class="mb-5">Investment Access</h3>
 
-<div class="card mb-4">
+<style>
+    /* Scrollable inner card-body for investment access - always on mobile and tablet */
+    @media (max-width: 991px) {
+        .investment-access-card {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        .investment-access-card .card-header {
+            flex: 0 0 auto !important;
+        }
+        .investment-access-card .card-body {
+            flex: 1 1 auto !important;
+            max-height: 60vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+    }
+</style>
+
+<div class="card mb-4 investment-access-card">
     <div class="card-header bg-primary text-white">
-        <h4><i class="fas fa-lock me-2"></i> Investment Access Required</h4>
+        <h4><i class="fas fa-lock me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'الوصول للاستثمار مطلوب' : 'Investment Access Required' %></h4>
     </div>
-    <div class="card-body">
+    <div class="card-body investment-access-card-body" style="overflow-y:auto !important; max-height:60vh !important; -webkit-overflow-scrolling:touch !important;">
         <div class="text-center mb-4">
             <div class="mb-4">
                 <i class="fas fa-wallet fa-4x text-muted"></i>
             </div>
-            <h5>You need admin approval to access the investment platform</h5>
-            <p class="text-muted">Our team will create a custom wallet for your deposits</p>
+            <h5><%= locals.user && locals.user.language === 'ar' ? 'تحتاج إلى موافقة المسؤول للوصول إلى منصة الاستثمار' : 'You need admin approval to access the investment platform' %></h5>
+            <p class="text-muted"><%= locals.user && locals.user.language === 'ar' ? 'سيقوم فريقنا بإنشاء محفظة مخصصة لودائعك' : 'Our team will create a custom wallet for your deposits' %></p>
         </div>
 
         <div class="alert alert-info">
-            <h6><i class="fas fa-info-circle me-2"></i> How it works:</h6>
+            <h6><i class="fas fa-info-circle me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'كيفية العمل:' : 'How it works:' %></h6>
             <ol class="mb-0">
-                <li>Request investment access by clicking the button below</li>
-                <li>Our admin team will review your request</li>
-                <li>Once approved, you'll receive a custom deposit wallet</li>
-                <li>You'll then have full access to the investment platform</li>
+                <li><%= locals.user && locals.user.language === 'ar' ? 'اطلب الوصول للاستثمار بالنقر على الزر أدناه' : 'Request investment access by clicking the button below' %></li>
+                <li><%= locals.user && locals.user.language === 'ar' ? 'سيراجع فريق المسؤولين طلبك' : 'Our admin team will review your request' %></li>
+                <li><%= locals.user && locals.user.language === 'ar' ? 'بمجرد الموافقة، ستتلقى محفظة مخصصة للإيداع' : 'Once approved, you\'ll receive a custom deposit wallet' %></li>
+                <li><%= locals.user && locals.user.language === 'ar' ? 'ثم ستحصل على وصول كامل إلى منصة الاستثمار' : 'You\'ll then have full access to the investment platform' %></li>
             </ol>
         </div>
 
@@ -27,7 +46,7 @@
             <div class="text-center mt-4">
                 <form action="/request-investment-access" method="post">
                     <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-unlock-alt me-2"></i> Request Investment Access
+                        <i class="fas fa-unlock-alt me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'طلب الوصول للاستثمار' : 'Request Investment Access' %>
                     </button>
                 </form>
             </div>
@@ -49,6 +68,6 @@
 
 <div class="text-center mt-4">
     <a href="/" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        <i class="fas fa-arrow-left me-2"></i> <%= locals.user && locals.user.language === 'ar' ? 'العودة إلى لوحة التحكم' : 'Back to Dashboard' %>
     </a>
 </div>
