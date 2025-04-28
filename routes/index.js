@@ -14,6 +14,7 @@ const passport = require('passport');
 const roleMiddleware = require('../middleware/role_middleware');
 const Token = require('../models/token');
 const OtpToken = require('../models/otpToken');
+const User = require('../models/user');
 const axios = require('axios'); // for SMS sending
 const rateLimit = require('express-rate-limit');
 
@@ -350,6 +351,22 @@ router.get('/check-notifications', passport.checkAuthentication, async (req, res
 // Daily reward system routes
 router.get('/check-daily-reward', passport.checkAuthentication, dashboardController.checkDailyRewardEligibility);
 router.post('/claim-daily-reward', passport.checkAuthentication, dashboardController.claimDailyReward);
+
+// Language selection endpoint
+router.post('/set-language', passport.checkAuthentication, async (req, res) => {
+  const { lang } = req.body;
+  if (!['en', 'ar'].includes(lang)) {
+    return res.status(400).json({ error: 'Invalid language' });
+  }
+  try {
+    req.user.language = lang;
+    await req.user.save();
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('Error setting language:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // Export the router module
 module.exports = router;

@@ -1711,6 +1711,26 @@
     <% } %>
     <meta name="csrf-token" content="<%= csrfToken %>">
     <link rel="icon" href="/images/moonBlue.png" type="image/png">
+    <!-- Using Unicode flag emojis for language selector -->
+    <style>
+        /* Majestic language dropdown theme */
+        .language-menu {
+            background: rgba(13,25,42,0.9) !important;
+            backdrop-filter: blur(8px) !important;
+            border: 1px solid rgba(95,145,255,0.3) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+        }
+        .language-menu .dropdown-item {
+            color: #fff !important;
+            padding: 0.6rem 1rem !important;
+            transition: background 0.3s ease !important;
+        }
+        .language-menu .dropdown-item:hover {
+            background: rgba(95,145,255,0.3) !important;
+        }
+
+    </style>
 </head>
 
 <body class="<%= locals.user ? 'platform' : 'auth' %>">
@@ -1731,6 +1751,17 @@
             <!-- Mobile-visible user controls - Only visible on small screens -->
             <div class="d-flex align-items-center order-lg-2">
                 <div class="d-flex align-items-center d-lg-none me-2">
+                    <!-- Language Dropdown (Mobile only) -->
+                    <div class="dropdown ms-3 me-2">
+                        <a class="nav-link" href="#" id="languageDropdownMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose Language">
+                            <i class="fas fa-language text-white"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute language-menu" aria-labelledby="languageDropdownMobile" style="min-width: 120px; z-index: 9999 !important;">
+                            <li><a class="dropdown-item" href="#" data-lang="en"><img src="<%= CDN_URL %>/css/images/flag-for-flag-united-kingdom-svgrepo-com.svg" class="me-2" style="width: 24px; height: 16px;" alt="UK Flag"> English</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="ar"><img src="<%= CDN_URL %>/css/images/flag-for-flag-saudi-arabia-svgrepo-com.svg" class="me-2" style="width: 24px; height: 16px;" alt="Saudi Flag"> العربية</a></li>
+                        </ul>
+                    </div>
+                    
                     <!-- Notification Dropdown (Mobile) -->
                     <div class="dropdown me-2">
                         <a class="nav-link position-relative" href="#" id="notificationDropdownMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -1913,17 +1944,18 @@
                     </li>
                     <% } %>
                 </ul>
+                <!-- Language Dropdown (Desktop only) -->
                 <div class="d-flex align-items-center animate-fade-in d-none d-lg-flex">
-                    <!-- Language Dropdown (Desktop only) -->
-                    <div class="dropdown me-3 d-none d-lg-block">
+                    <div class="dropdown me-3">
                         <a class="nav-link" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose Language">
                             <i class="fas fa-language text-white"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="languageDropdown" style="min-width: 120px; z-index: 9999 !important;">
-                            <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
-                            <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute language-menu" aria-labelledby="languageDropdown" style="min-width: 120px; z-index: 9999 !important;">
+                            <li><a class="dropdown-item" href="#" data-lang="en"><img src="<%= CDN_URL %>/css/images/flag-for-flag-united-kingdom-svgrepo-com.svg" class="me-2" style="width: 24px; height: 16px;" alt="UK Flag"> English</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="ar"><img src="<%= CDN_URL %>/css/images/flag-for-flag-saudi-arabia-svgrepo-com.svg" class="me-2" style="width: 24px; height: 16px;" alt="Saudi Flag"> العربية</a></li>
                         </ul>
                     </div>
+                    
                     <!-- Notification Dropdown (Desktop only) -->
                     <div class="dropdown me-3 d-none d-lg-block">
                         <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -1987,7 +2019,7 @@
                             </div>
                             <span class="d-none d-md-inline username-gold"><%= locals.user.name.split(' ')[0] %> <i class="fas fa-caret-down ms-1 opacity-75" style="font-size: 12px;"></i></span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute premium-profile-dropdown" aria-labelledby="userDropdown" style="width: 260px; z-index: 9999 !important; right: 0; left: auto; margin-top: 5px;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute premium-profile-dropdown" aria-labelledby="userDropdown" style="width: 260px; right: 0; left: auto; z-index: 9999 !important; margin-top: 5px;">
                             <li class="user-card mb-2">
                                 <div class="text-center p-3">
                                     <div class="avatar-large mx-auto mb-2">
@@ -2172,10 +2204,11 @@
             } catch (err) {
                 console.log('Welcome overlay init error:', err);
             }
-        }, 100); // Small delay to ensure other scripts are loaded
+        }, 100); // Small delay to ensure container is ready
     });
     </script>
     <% } %>
+    
     <!-- Custom Cosmic Notification System -->
     <style>
         /* Cosmic Notification Container */
@@ -2652,3 +2685,33 @@
     });
   });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const items = document.querySelectorAll('a.dropdown-item[data-lang]');
+      items.forEach(item => {
+        item.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const lang = item.getAttribute('data-lang');
+          console.log('Switching language to', lang);
+          try {
+            const res = await fetch('/set-language', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': '<%= csrfToken %>'
+              },
+              body: JSON.stringify({ lang })
+            });
+            if (res.ok) {
+              console.log('Language set successfully');
+              window.location.reload();
+            } else {
+              console.error('Failed to set language');
+            }
+          } catch (err) {
+            console.error('Error switching language', err);
+          }
+        });
+      });
+    });
+  </script>

@@ -1,7 +1,8 @@
 <div class="container-fluid animate-fade-in">
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-4 animate-fade-in"><i class="fas fa-gem me-2"></i>VIP Offers</h3>
+            <% const isArabic = locals.user && locals.user.language === 'ar'; %>
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-gem me-2"></i><%= isArabic ? 'عروض VIP' : 'VIP Offers' %></h3>
         </div>
     </div>
 
@@ -9,7 +10,7 @@
         <div class="col-12">
             <div class="card shadow-sm mb-4 animate-fade-in delay-1 vip-levels-card">
                 <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0 text-center">VIP Levels</h2>
+                    <h2 class="mb-0 text-center"><%= isArabic ? 'مستويات VIP' : 'VIP Levels' %></h2>
                 </div>
                 <div class="card-body dark-theme-card" style="border-radius: 0 0 12px 12px;">
                     <div class="vip-levels-scrollable">
@@ -18,22 +19,22 @@
                             <div class="card h-100 border-primary hover-card">
                                 <div class="card-header bg-primary text-white text-center">
                                     <div class="vip-header">
-                                        <div>Beginner VIP</div>
-                                        <span class="level-badge level-1">Level I</span>
+                                        <div><%= isArabic ? 'VIP المبتدئ' : 'Beginner VIP' %></div>
+                                        <span class="level-badge level-1"><%= isArabic ? 'المستوى الأول' : 'Level I' %></span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
-                                        <h5 class="mb-2">Investment Range</h5>
+                                        <h5 class="mb-2"><%= isArabic ? 'نطاق الاستثمار' : 'Investment Range' %></h5>
                                         <p class="mb-0 lead">$80 - $200</p>
                                         <p class="text-muted">1.78$ - 4.45$</p>
                                     </div>
                                     <div class="benefits mt-auto">
-                                        <h6 class="text-center mb-3">Benefits</h6>
+                                        <h6 class="text-center mb-3"><%= isArabic ? 'المزايا' : 'Benefits' %></h6>
                                         <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Basic VIP support</li>
-                                            <li class="list-group-item">Standard earning rates</li>
-                                            <li class="list-group-item">100 Points per referral deposit</li>
+                                            <li class="list-group-item"><%= isArabic ? ' الأساسي VIP دعم' : 'Basic VIP support' %></li>
+                                            <li class="list-group-item"><%= isArabic ? 'معدلات كسب قياسية' : 'Standard earning rates' %></li>
+                                            <li class="list-group-item"><%= isArabic ? '100 نقطة لكل إيداع إحالة' : '100 Points per referral deposit' %></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -46,22 +47,22 @@
                             <div class="card h-100 border-info hover-card">
                                 <div class="card-header bg-info text-white text-center">
                                     <div class="vip-header">
-                                        <div>Semi-Professional VIP</div>
-                                        <span class="level-badge level-2">Level II</span>
+                                        <div><%= isArabic ? 'VIP شبه محترف' : 'Semi-Professional VIP' %></div>
+                                        <span class="level-badge level-2"><%= isArabic ? 'المستوى الثاني' : 'Level II' %></span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
-                                        <h5 class="mb-2">Investment Range</h5>
+                                        <h5 class="mb-2"><%= isArabic ? 'نطاق الاستثمار' : 'Investment Range' %></h5>
                                         <p class="mb-0 lead">$200 - $500</p>
                                         <p class="text-muted">4.45$ - 11.12$</p>
                                     </div>
                                     <div class="benefits mt-auto">
-                                        <h6 class="text-center mb-3">Benefits</h6>
+                                        <h6 class="text-center mb-3"><%= isArabic ? 'المزايا' : 'Benefits' %></h6>
                                         <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Enhanced VIP support</li>
-                                            <li class="list-group-item">Improved earning rates</li>
-                                            <li class="list-group-item">200 Points per referral deposit</li>
+                                            <li class="list-group-item"><%= isArabic ? 'دعم VIP معزز' : 'Enhanced VIP support' %></li>
+                                            <li class="list-group-item"><%= isArabic ? 'معدلات كسب محسنة' : 'Improved earning rates' %></li>
+                                            <li class="list-group-item"><%= isArabic ? '200 نقطة لكل إيداع إحالة' : '200Points per referral deposit' %></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -74,22 +75,22 @@
                             <div class="card h-100 border-success hover-card">
                                 <div class="card-header bg-success text-white text-center">
                                     <div class="vip-header">
-                                        <div>Professional VIP</div>
-                                        <span class="level-badge level-3">Level III</span>
+                                        <div><%= isArabic ? 'VIP محترف' : 'Professional VIP' %></div>
+                                        <span class="level-badge level-3"><%= isArabic ? 'المستوى الثالث' : 'Level III' %></span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
-                                        <h5 class="mb-2">Investment Range</h5>
+                                        <h5 class="mb-2"><%= isArabic ? 'نطاق الاستثمار' : 'Investment Range' %></h5>
                                         <p class="mb-0 lead">$500 - $1000</p>
                                         <p class="text-muted">11.12$ - 22.23$</p>
                                     </div>
                                     <div class="benefits mt-auto">
-                                        <h6 class="text-center mb-3">Benefits</h6>
+                                        <h6 class="text-center mb-3"><%= isArabic ? 'المزايا' : 'Benefits' %></h6>
                                         <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Premium VIP support</li>
-                                            <li class="list-group-item">High earning rates</li>
-                                            <li class="list-group-item">300 Points per referral deposit</li>
+                                            <li class="list-group-item"><%= isArabic ? 'دعم VIP ممتاز' : 'Premium VIP support' %></li>
+                                            <li class="list-group-item"><%= isArabic ? 'معدلات كسب عالية' : 'High earning rates' %></li>
+                                            <li class="list-group-item"><%= isArabic ? '300 نقطة لكل إيداع إحالة' : '300 Points per referral deposit' %></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -102,22 +103,22 @@
                             <div class="card h-100 border-warning hover-card special-vip">
                                 <div class="card-header bg-warning text-dark text-center">
                                     <div class="vip-header">
-                                        <div>Highly Professional</div>
-                                        <span class="level-badge level-4">Level IV</span>
+                                        <div><%= isArabic ? 'محترف متقدم' : 'Highly Professional' %></div>
+                                        <span class="level-badge level-4"><%= isArabic ? 'المستوى الرابع' : 'Level IV' %></span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <div class="price-range mb-3 text-center">
-                                        <h5 class="mb-2">Investment Range</h5>
+                                        <h5 class="mb-2"><%= isArabic ? 'نطاق الاستثمار' : 'Investment Range' %></h5>
                                         <p class="mb-0 lead">$2000 - $5000</p>
                                         <p class="text-muted">44.45$ - 112$</p>
                                     </div>
                                     <div class="benefits mt-auto">
-                                        <h6 class="text-center mb-3">Benefits</h6>
+                                        <h6 class="text-center mb-3"><%= isArabic ? 'المزايا' : 'Benefits' %></h6>
                                         <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Elite VIP support</li>
-                                            <li class="list-group-item">Maximum earning rates</li>
-                                            <li class="list-group-item">400 Points per referral deposit</li>
+                                            <li class="list-group-item"><%= isArabic ? 'دعم VIP ممتاز' : 'Elite VIP support' %></li>
+                                            <li class="list-group-item"><%= isArabic ? 'معدلات كسب أقصى' : 'Maximum earning rates' %></li>
+                                            <li class="list-group-item"><%= isArabic ? '400 نقطة لكل إيداع إحالة' : '400 Points per referral deposit' %></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -131,14 +132,14 @@
             <!-- Referral Program Card -->
             <div class="card shadow-sm mb-4 vip-levels-card">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Referral Program</h3>
+                    <h3 class="mb-0"><%= isArabic ? 'برنامج الإحالة' : 'Referral Program' %></h3>
                 </div>
                 <div class="card-body dark-theme-card mobile-scroll" style="overflow-x: hidden; border-radius: 0 0 12px 12px;">
                     <div class="row">
                         <div class="col-12 mb-4">
                             <div class="referral-header text-center mb-4">
-                                <h4><i class="fas fa-users me-2"></i>Invite Friends & Earn Points</h4>
-                                <p class="text-muted">Earn premium rewards when your friends make deposits</p>
+                                <h4><i class="fas fa-users me-2"></i><%= isArabic ? 'ادعُ الأصدقاء واكسب النقاط' : 'Invite Friends & Earn Points' %></h4>
+                                <p class="text-muted"><%= isArabic ? 'اكسب مكافآت مميزة عندما يقوم أصدقاؤك بالإيداع' : 'Earn premium rewards when your friends make deposits' %></p>
                             </div>
                         </div>
                         
@@ -149,12 +150,12 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="referral-tier">
                                             <div class="tier-header level-1">
-                                                <span class="level-name">VIP Level I</span>
+                                                <span class="level-name"><%= isArabic ? 'VIP المبتدئ' : 'VIP Level I' %></span>
                                                 <span class="level-points">100</span>
                                             </div>
                                             <div class="tier-body">
                                                 <i class="fas fa-gift tier-icon"></i>
-                                                <span>Beginner Tier</span>
+                                                <span><%= isArabic ? 'مبتدئ' : 'Beginner' %></span>
                                             </div>
                                         </div>
                                     </div>
@@ -162,12 +163,12 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="referral-tier">
                                             <div class="tier-header level-2">
-                                                <span class="level-name">VIP Level II</span>
+                                                <span class="level-name"><%= isArabic ? 'VIP شبه محترف' : 'VIP Level II' %></span>
                                                 <span class="level-points">200</span>
                                             </div>
                                             <div class="tier-body">
                                                 <i class="fas fa-trophy tier-icon"></i>
-                                                <span>Semi-Pro Tier</span>
+                                                <span><%= isArabic ? 'شبه محترف' : 'Semi-Pro' %></span>
                                             </div>
                                         </div>
                                     </div>
@@ -176,12 +177,12 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="referral-tier">
                                             <div class="tier-header level-3">
-                                                <span class="level-name">VIP Level III</span>
+                                                <span class="level-name"><%= isArabic ? 'VIP محترف' : 'VIP Level III' %></span>
                                                 <span class="level-points">300</span>
                                             </div>
                                             <div class="tier-body">
                                                 <i class="fas fa-star tier-icon"></i>
-                                                <span>Professional Tier</span>
+                                                <span><%= isArabic ? 'محترف' : 'Professional' %></span>
                                             </div>
                                         </div>
                                     </div>
@@ -189,12 +190,12 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="referral-tier">
                                             <div class="tier-header level-4">
-                                                <span class="level-name">VIP Level IV</span>
+                                                <span class="level-name"><%= isArabic ? 'VIP محترف متقدم' : 'VIP Level IV' %></span>
                                                 <span class="level-points">400</span>
                                             </div>
                                             <div class="tier-body">
                                                 <i class="fas fa-crown tier-icon"></i>
-                                                <span>Elite Tier</span>
+                                                <span><%= isArabic ? 'محترف متقدم' : 'Elite' %></span>
                                             </div>
                                         </div>
                                     </div>
@@ -204,11 +205,11 @@
                             <div class="text-center mt-2 mb-3 referral-cta">
                                 <% if (locals.user) { %>
                                      <a href="/team" class="btn btn-primary btn-lg btn-glow view-referrals-btn">
-                                         <i class="fas fa-users me-2"></i>View My Referrals
+                                         <i class="fas fa-users me-2"></i><%= isArabic ? 'عرض الإحالات الخاصة بي' : 'View My Referrals' %>
                                      </a>
                                 <% } else { %>
                                      <a href="/sign-up" class="btn btn-primary btn-lg btn-glow">
-                                         <i class="fas fa-user-plus me-2"></i>Join Now
+                                         <i class="fas fa-user-plus me-2"></i><%= isArabic ? 'انضم الآن' : 'Join Now' %>
                                      </a>
                                 <% } %>
                             </div>
@@ -220,7 +221,7 @@
             <!-- Moonify Coin Card -->
             <div class="card shadow-sm mb-4 vip-levels-card animate-fade-in">
                 <div class="card-header bg-warning text-dark">
-                    <h3 class="mb-0"><i class="fas fa-coins me-2"></i>Moonify Coin</h3>
+                    <h3 class="mb-0"><i class="fas fa-coins me-2"></i><%= isArabic ? 'عملة مونيفاي' : 'Moonify Coin' %></h3>
                 </div>
                 <div class="card-body dark-theme-card text-center" style="overflow-x: hidden; border-radius: 0 0 12px 12px;">
                     <div class="moonify-coin-card mx-auto" style="max-width: 600px;">
@@ -230,18 +231,18 @@
                                 <i class="fas fa-moon"></i>
                                 <i class="fas fa-coins coin-stack"></i>
                             </div>
-                            <h5 class="moonify-title">COMING SOON</h5>
-                            <h3 class="moonify-name">Moonify Coin <span class="moonify-symbol">🔸</span></h3>
-                            <p class="moonify-description">Your earned points will soon be convertible to exclusive Moonify Coins - our premium digital currency</p>
+                            <h5 class="moonify-title"><%= isArabic ? 'قريباً' : 'COMING SOON' %></h5>
+                            <h3 class="moonify-name"><%= isArabic ? 'عملة مونيفاي' : 'Moonify Coin' %> <span class="moonify-symbol">🔸</span></h3>
+                            <p class="moonify-description"><%= isArabic ? 'ستكون نقاطك المكتسبة قابلة للتحويل قريباً إلى عملات مونيفاي الحصرية - عملتنا الرقمية المميزة' : 'Your earned points will soon be convertible to exclusive Moonify Coins - our premium digital currency' %></p>
                             <div class="moonify-features">
-                                <span><i class="fas fa-lock-open"></i> Exclusive Access</span>
-                                <span><i class="fas fa-exchange-alt"></i> Point Conversion</span>
-                                <span><i class="fas fa-rocket"></i> Premium Features</span>
+                                <span><i class="fas fa-lock-open"></i><%= isArabic ? 'وصول حصري' : 'Exclusive Access' %></span>
+                                <span><i class="fas fa-exchange-alt"></i><%= isArabic ? 'تحويل النقاط' : 'Point Conversion' %></span>
+                                <span><i class="fas fa-rocket"></i><%= isArabic ? 'ميزات مميزة' : 'Premium Features' %></span>
                             </div>
                             <% if (locals.user) { %>
-                                <a href="/team" class="btn btn-moonify">View My Referrals</a>
+                                <a href="/team" class="btn btn-moonify"><%= isArabic ? 'عرض الإحالات الخاصة بي' : 'View My Referrals' %></a>
                             <% } else { %>
-                                <a href="/sign-up" class="btn btn-moonify">Join Now</a>
+                                <a href="/sign-up" class="btn btn-moonify"><%= isArabic ? 'انضم الآن' : 'Join Now' %></a>
                             <% } %>
                         </div>
                     </div>

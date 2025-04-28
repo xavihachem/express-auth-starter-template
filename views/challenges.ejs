@@ -307,25 +307,27 @@
     }
 </style>
 
-<h3 class="mb-5">Daily Challenges</h3>
+<% const isArabic = locals.user && locals.user.language === 'ar'; %>
+
+<h3 class="mb-5"><%= isArabic ? 'التحديات اليومية' : 'Daily Challenges' %></h3>
 
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
-        <h4><i class="fas fa-trophy me-2"></i> Challenge Progress</h4>
+        <h4><i class="fas fa-trophy me-2"></i> <%= isArabic ? 'تقدم التحديات' : 'Challenge Progress' %></h4>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-4 text-center border-end">
-                <h6 class="text-muted mb-2">Challenge Points</h6>
+                <h6 class="text-muted mb-2"><%= isArabic ? 'نقاط التحدي' : 'Challenge Points' %></h6>
                 <h3 class="text-success"><%= challengePoints %></h3>
             </div>
             <div class="col-md-4 text-center border-end">
-                <h6 class="text-muted mb-2">Completed Today</h6>
+                <h6 class="text-muted mb-2"><%= isArabic ? 'المكتملة اليوم' : 'Completed Today' %></h6>
                 <h3 class="text-primary"><%= completedToday %> / 2</h3>
             </div>
             <div class="col-md-4 text-center">
-                <h6 class="text-muted mb-2">Next Reset</h6>
-                <h3 class="text-warning" id="countdown">Loading...</h3>
+                <h6 class="text-muted mb-2"><%= isArabic ? 'إعادة التعيين القادمة' : 'Next Reset' %></h6>
+                <h3 class="text-warning" id="countdown"><%= isArabic ? 'جاري التحميل...' : 'Loading...' %></h3>
             </div>
         </div>
     </div>
@@ -338,9 +340,9 @@
     <div class="col-md-6">
         <div class="card mb-4 challenges-card primary-theme">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Available Challenges</h5>
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> <%= isArabic ? 'التحديات المتاحة' : 'Available Challenges' %></h5>
                 <!-- Use dynamic count -->
-                <span class="badge rounded-pill bg-primary"><%= availableChallenges.length %> remaining</span>
+                <span class="badge rounded-pill bg-primary"><%= isArabic ? availableChallenges.length + ' متبقي' : availableChallenges.length + ' remaining' %></span>
             </div>
             <div class="card-body p-0">
                 <!-- Replace hardcoded list with dynamic loop -->
@@ -350,11 +352,25 @@
                             <li class="list-group-item">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="challenge-info">
-                                        <h6 class="mb-1"><%= challenge.title %></h6>
-                                        <p class="text-muted mb-0 small"><%= challenge.description %></p>
+                                        <h6 class="mb-1"><%= isArabic
+                                            ? (challenge.id === 'daily-login'
+                                                ? 'تسجيل الدخول اليومي'
+                                                : challenge.id === 'start-investing'
+                                                    ? 'ابدأ الاستثمار'
+                                                    : challenge.title)
+                                            : challenge.title %></h6>
+                                        <p class="text-muted mb-0 small"><%= isArabic
+                                            ? (challenge.id === 'daily-login'
+                                                ? 'قم بتسجيل الدخول إلى حسابك اليوم'
+                                                : challenge.id === 'start-investing'
+                                                    ? 'قم بزيارة صفحة الاستثمارات وابدأ أول استثمار لك'
+                                                    : challenge.description)
+                                            : challenge.description %></p>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <span class="badge bg-primary rounded-pill me-3"><i class="fas fa-star me-1"></i> <%= challenge.points %> points</span>
+                                        <span class="badge bg-primary rounded-pill me-3"><i class="fas fa-star me-1"></i> <%= isArabic
+                                            ? challenge.points + ' نقطة'
+                                            : challenge.points + ' points' %></span>
                                         <!-- Ensure CSRF token is available -->
                                         <% if (typeof csrfToken !== 'undefined') { %> 
                                             <form action="/complete-challenge" method="POST" class="d-inline">
@@ -374,8 +390,8 @@
                 <% } else { %>
                     <div class="text-center py-4">
                         <i class="fas fa-check-double fa-3x text-light mb-3"></i>
-                        <h5 class="text-white">All challenges completed!</h5>
-                        <p style="color: rgba(255, 255, 255, 0.7) !important;">Come back tomorrow for more</p>
+                        <h5 class="text-white"><%= isArabic ? 'تم إكمال جميع التحديات!' : 'All challenges completed!' %></h5>
+                        <p style="color: rgba(255, 255, 255, 0.7) !important;"><%= isArabic ? 'رجاءً عد في الغد لتحديات جديدة' : 'Come back tomorrow for more' %></p>
                     </div>
                 <% } %>
             </div>
@@ -386,8 +402,8 @@
     <div class="col-md-6">
         <div class="card mb-4 challenges-card success-theme">
             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> Completed Challenges</h5>
-                <span class="badge rounded-pill bg-success"><%= completedToday %> completed</span>
+                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> <%= isArabic ? 'التحديات المكتملة' : 'Completed Challenges' %></h5>
+                <span class="badge rounded-pill bg-success"><%= isArabic ? completedToday + ' مكتملة' : completedToday + ' completed' %></span>
             </div>
             <div class="card-body p-0">
                 <!-- Only show completed challenges if the user has completed any -->
@@ -398,11 +414,21 @@
                                 <li class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="challenge-info">
-                                            <h6 class="mb-1"><%= challenge.title %></h6>
-                                            <p class="text-muted mb-0 small"><%= challenge.description %></p>
+                                            <h6 class="mb-1"><%= isArabic
+                                                ? (challenge.id === 'daily-login'
+                                                    ? 'تسجيل الدخول اليومي'
+                                                    : 'ابدأ الاستثمار')
+                                                : challenge.title %></h6>
+                                            <p class="text-muted mb-0 small"><%= isArabic
+                                                ? (challenge.id === 'daily-login'
+                                                    ? 'قم بتسجيل الدخول إلى حسابك اليوم'
+                                                    : 'قم بزيارة صفحة الاستثمارات وابدأ أول استثمار لك')
+                                                : challenge.description %></p>
                                         </div>
                                         <div>
-                                            <span class="badge bg-success rounded-pill"><i class="fas fa-star me-1"></i> <%= challenge.points %> points</span>
+                                            <span class="badge bg-success rounded-pill"><i class="fas fa-star me-1"></i> <%= isArabic
+                                                ? challenge.points + ' نقطة'
+                                                : challenge.points + ' points' %></span>
                                         </div>
                                     </div>
                                 </li>
@@ -412,8 +438,8 @@
                 <% } else { %>
                     <div class="text-center py-4">
                         <i class="fas fa-hourglass-start fa-3x text-light mb-3"></i>
-                        <h5 class="text-white">No challenges completed yet</h5>
-                        <p style="color: rgba(255, 255, 255, 0.7) !important;">Complete challenges to earn points</p>
+                        <h5 class="text-white"><%= isArabic ? 'لا توجد تحديات مكتملة بعد' : 'No challenges completed yet' %></h5>
+                        <p style="color: rgba(255, 255, 255, 0.7) !important;"><%= isArabic ? 'أكمل التحديات لكسب النقاط' : 'Complete challenges to earn points' %></p>
                     </div>
                 <% } %>
             </div>
@@ -435,21 +461,21 @@
             <div class="flex-grow-1 p-4 text-center text-md-start">
                 <% if (user.completedChallenges && user.completedChallenges.includes('start-investing')) { %>
                 <!-- Already Investing Display -->
-                <h4 class="text-gradient-success mb-2">You Are Investing!</h4>
-                <p class="mb-3">Your investment journey has begun! You've earned bonus points for completing this challenge.</p>
+                <h4 class="text-gradient-success mb-2"><%= isArabic ? 'لقد بدأت الاستثمار!' : 'You Are Investing!' %></h4>
+                <p class="mb-3"><%= isArabic ? 'لقد بدأت رحلتك الاستثمارية! لقد كسبت نقاط مكافأة لإكمال هذا التحدي.' : 'Your investment journey has begun! You\'ve earned bonus points for completing this challenge.' %></p>
                 <div class="status-badge bg-success text-white py-2 px-4 rounded-pill">
-                    <i class="fas fa-check-circle me-2"></i> Investment Active
+                    <i class="fas fa-check-circle me-2"></i> <%= isArabic ? 'الاستثمار نشط' : 'Investment Active' %>
                 </div>
                 <% } else { %>
                 <!-- Not Yet Investing Display -->
-                <h4 class="text-gradient mb-2">Start Investing Today!</h4>
-                <p class="mb-3">Begin your investment journey and complete the challenge to earn bonus points.</p>
+                <h4 class="text-gradient mb-2"><%= isArabic ? 'ابدأ الاستثمار اليوم!' : 'Start Investing Today!' %></h4>
+                <p class="mb-3"><%= isArabic ? 'ابدأ رحلتك الاستثمارية واكمل التحدي لكسب نقاط مكافأة.' : 'Begin your investment journey and complete the challenge to earn bonus points.' %></p>
                 <!-- Form that submits challenge completion but uses the animated button -->
                 <form id="completeInvestingForm" action="/complete-challenge" method="POST" class="d-inline">
                     <input type="hidden" name="challengeId" value="start-investing">
                     <button id="startInvestingBtn" type="button" class="btn btn-primary btn-lg progress-button">
                         <span class="button-content">
-                            <i class="fas fa-chart-line me-2"></i> Start Investing
+                            <i class="fas fa-chart-line me-2"></i> <%= isArabic ? 'ابدأ الاستثمار' : 'Start Investing' %>
                         </span>
                         <span class="progress-circle"></span>
                         <span class="checkmark">
@@ -468,21 +494,21 @@
 
 <div class="card mb-4">
     <div class="card-header">
-        <h5><i class="fas fa-info-circle me-2"></i> Challenge Information</h5>
+        <h5><i class="fas fa-info-circle me-2"></i> <%= isArabic ? 'معلومات التحدي' : 'Challenge Information' %></h5>
     </div>
     <div class="card-body">
         <ul class="mb-0">
-            <li>Complete daily challenges to earn points</li>
-            <li>Challenges reset every 24 hours at midnight</li>
-            <li>Points can be used for special features and rewards</li>
-            <li>Some challenges may require verification</li>
+            <li><%= isArabic ? 'أكمل التحديات اليومية لكسب النقاط' : 'Complete daily challenges to earn points' %></li>
+            <li><%= isArabic ? 'يتم إعادة تعيين التحديات كل 24 ساعة عند منتصف الليل' : 'Challenges reset every 24 hours at midnight' %></li>
+            <li><%= isArabic ? 'يمكن استخدام النقاط للميزات والمكافآت الخاصة' : 'Points can be used for special features and rewards' %></li>
+            <li><%= isArabic ? 'قد تتطلب بعض التحديات التحقق' : 'Some challenges may require verification' %></li>
         </ul>
     </div>
 </div>
 
 <div class="text-center mt-4">
     <a href="/" class="btn btn-primary">
-        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        <i class="fas fa-arrow-left me-2"></i> <%= isArabic ? 'العودة إلى لوحة التحكم' : 'Back to Dashboard' %>
     </a>
 </div>
 
