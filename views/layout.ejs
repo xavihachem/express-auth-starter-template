@@ -1881,6 +1881,16 @@
                                     </div>
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="/tutorial">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <span><%= locals.user && locals.user.language === 'ar' ? 'الدروس التعليمية' : 'Tutorial' %></span>
+                                    </div>
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item menu-item py-2 sign-out-button" href="/sign-out">
@@ -2072,6 +2082,16 @@
                                             <i class="fas fa-headset"></i>
                                         </div>
                                         <span><%= locals.user && locals.user.language === 'ar' ? 'تذكرة الدعم' : 'Support Ticket' %></span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item menu-item py-2" href="/tutorial">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle menu-icon icon-info me-2">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <span><%= locals.user && locals.user.language === 'ar' ? 'الدروس التعليمية' : 'Tutorial' %></span>
                                     </div>
                                 </a>
                             </li>

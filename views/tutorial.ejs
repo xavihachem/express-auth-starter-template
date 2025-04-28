@@ -1,0 +1,35 @@
+<% const isArabic = locals.user && locals.user.language === 'ar'; %>
+
+<div class="container-fluid animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-book me-2"></i><%= isArabic ? 'الدروس التعليمية' : 'Tutorial' %></h3>
+        </div>
+    </div>
+    <div class="row tutorial-steps justify-content-center">
+        <% const steps = [
+            { file: 'Screen 1 ( Sign in ) .png', title: { en: 'Sign In', ar: 'تسجيل الدخول' }, desc: { en: 'This screen shows the sign-in page where users enter their credentials to securely access the platform.', ar: 'تعرض هذه الشاشة صفحة تسجيل الدخول حيث يقوم المستخدمون بإدخال بياناتهم للوصول إلى المنصة بأمان.' } },
+            { file: 'Screen 2 ( Dashboard ).png', title: { en: 'Dashboard', ar: 'لوحة التحكم' }, desc: { en: 'The dashboard provides an overview of your account metrics and quick navigation to features.', ar: 'توفر لوحة التحكم نظرة عامة على مؤشرات حسابك وروابط سريعة للميزات.' } },
+            { file: 'Screen 3 ( Contact Support ) .png', title: { en: 'Contact Support', ar: 'الاتصال بالدعم' }, desc: { en: 'Use this page to submit support tickets and get assistance from our team.', ar: 'استخدم هذه الصفحة لإرسال تذاكر الدعم والحصول على المساعدة من فريقنا.' } },
+            { file: 'Screen 4 ( Menu profile icon ) .png', title: { en: 'Profile Menu', ar: 'قائمة الملف الشخصي' }, desc: { en: 'Access your profile options, settings, tutorial, and sign-out links from here.', ar: 'يمكنك من هنا الوصول إلى خيارات الملف الشخصي والإعدادات والدروس وتسجيل الخروج.' } },
+            { file: 'Screen 5 ( My team page ) .png', title: { en: 'My Team', ar: 'فريقي' }, desc: { en: 'View and manage your team members and their permissions on this page.', ar: 'عرض وإدارة أعضاء فريقك وأذوناتهم في هذه الصفحة.' } },
+            { file: 'screen 6 ( Investment Acces requiered page ) .png', title: { en: 'Investment Access Required', ar: 'مطلوب وصول للاستثمار' }, desc: { en: 'Indicates that admin approval is needed before accessing the investment platform.', ar: 'تشير إلى أنه يلزم الحصول على موافقة المدير قبل الوصول إلى منصة الاستثمار.' } },
+            { file: 'Screen 7 ( Investment Access after reqesting ) .png', title: { en: 'Request Pending', ar: 'بانتظار الموافقة' }, desc: { en: 'Your investment access request is pending; you will be notified once approved.', ar: 'طلبك للوصول إلى الاستثمار قيد الانتظار؛ سيتم إعلامك عند الموافقة.' } },
+            { file: 'Screen 8 ( after getting accepted in the investment ) .png', title: { en: 'Access Granted', ar: 'تم منح الوصول' }, desc: { en: 'Congratulations—the administrator has approved your investment access.', ar: 'تهانينا—قام المدير بالموافقة على وصولك للاستثمار.' } },
+            { file: 'Screen 9 ( Deposit wallet in the investment page ) .png', title: { en: 'Deposit Wallet Setup', ar: 'إعداد محفظة الإيداع' }, desc: { en: 'Configure your deposit wallet to fund your investment activities.', ar: 'قم بتكوين محفظة الإيداع لتمويل أنشطة الاستثمار الخاصة بك.' } },
+            { file: 'Screen  10 ( Withdraw wallet investment page ) .png', title: { en: 'Withdraw Wallet Setup', ar: 'إعداد محفظة السحب' }, desc: { en: 'Set up your withdrawal wallet to receive returns from investments.', ar: 'قم بإعداد محفظة السحب لاستلام عوائد الاستثمار.' } },
+            { file: 'screen 11 ( withdraw wallet 2 investment page ) .png', title: { en: 'Withdrawal Confirmation', ar: 'تأكيد السحب' }, desc: { en: 'Verify and confirm your withdrawal wallet details here.', ar: 'تحقق وأكد تفاصيل محفظة السحب الخاصة بك هنا.' } },
+            { file: 'Screen 12 ( Daily challenge page ) .png', title: { en: 'Daily Challenges', ar: 'التحديات اليومية' }, desc: { en: 'Complete daily challenges to earn points and rewards.', ar: 'أكمل التحديات اليومية لكسب النقاط والمكافآت.' } },
+            { file: 'Screen 13 ( VIP levels Vip and offers page ) .png', title: { en: 'VIP Levels & Offers', ar: 'مستويات VIP والعروض' }, desc: { en: 'Explore VIP tiers and special offers available to premium members.', ar: 'استكشف مستويات VIP والعروض الخاصة المتاحة للأعضاء المميزين.' } },
+            { file: 'Screen 14 ( invitation friends program Vip and offers page ) .png', title: { en: 'Invitation Program', ar: 'برنامج الدعوات' }, desc: { en: 'Invite friends to join and earn referral bonuses and VIP perks.', ar: 'ادعُ أصدقائك للانضمام واحصل على مكافآت الإحالة وامتيازات VIP.' } },
+            { file: 'Screen 15 ( Moonify coin offers and vip page ) .png', title: { en: 'Moonify Coin & VIP', ar: 'عملة Moonify وVIP' }, desc: { en: 'Discover Moonify coin features and VIP rewards in this section.', ar: 'اكتشف ميزات عملة Moonify ومكافآت VIP في هذا القسم.' } }
+        ]; %>
+        <% steps.forEach((step, idx) => { %>
+            <div class="col-12 col-md-10 col-lg-8 mb-5 tutorial-step mx-auto text-center">
+                <h5><%= isArabic ? 'الخطوة ' + (idx + 1) + ': ' + step.title.ar : 'Step ' + (idx + 1) + ': ' + step.title.en %></h5>
+                <img src="<%= '/Toturial/' + encodeURIComponent(step.file) %>" alt="<%= isArabic ? step.title.ar : step.title.en %>" class="img-fluid rounded mb-3">
+                <p><%= isArabic ? step.desc.ar : step.desc.en %></p>
+            </div>
+        <% }); %>
+    </div>
+</div>

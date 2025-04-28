@@ -75,6 +75,11 @@ router.get('/team', passport.checkAuthentication, teamController.team); // Team 
 // Offers page route - accessible by all users
 router.get('/offers', offersController.offers); // Offers page
 
+// Tutorial page route - only accessible to authenticated users
+router.get('/tutorial', passport.checkAuthentication, (req, res) => {
+    res.render('tutorial');
+}); // Tutorial page
+
 // Ranks route - only accessible by authenticated users
 router.get('/ranks', passport.checkAuthentication, ranksController.ranks); // Ranks page
 
