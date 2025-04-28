@@ -5,7 +5,7 @@
 <!-- Uses EJS templating language to insert dynamic content -->
 <!-- Uses Bootstrap and Material Design Bootstrap for layout and styling -->
 <!-- Displays success and error messages using the Noty library -->
-<html>
+<html lang="<%= locals.user && locals.user.language === 'ar' ? 'ar' : 'en' %>">
 
 <head>
     <title>
@@ -806,7 +806,6 @@
         
         .menu-item:hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
-            transform: translateX(3px) !important;
         }
         
         .sign-out-button {
@@ -1034,7 +1033,7 @@
                 to { opacity: 1; transform: translateY(0); }
             }
         }
-        
+
         body.platform .navbar {
             background-color: transparent !important;
         }
@@ -1090,6 +1089,156 @@
             0% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
             50% { filter: drop-shadow(0 0 10px rgba(95, 145, 255, 0.8)); }
             100% { filter: drop-shadow(0 0 2px rgba(95, 145, 255, 0.4)); }
+        }
+        
+        /* Hamburger Menu Animation */
+        .nav-toggler-btn {
+            background: transparent !important;
+            border: none !important;
+            width: 30px !important;
+            height: 30px !important;
+            position: relative !important;
+            padding: 0.4rem !important; /* Reduced padding */
+            display: none !important; /* Hide by default */
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+        }
+        
+        /* Only show hamburger on mobile */
+        @media (max-width: 991.98px) {
+            .nav-toggler-btn {
+                display: flex !important;
+            }
+        }
+        
+        .toggler-icon {
+            width: 100% !important;
+            height: 2px !important;
+            background-color: white !important;
+            border-radius: 2px !important;
+            transition: all 0.3s !important;
+            transform-origin: 1px !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:first-child {
+            transform: rotate(45deg) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:nth-child(2) {
+            opacity: 0 !important;
+            transform: translateX(-20px) !important;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .toggler-icon:last-child {
+            transform: rotate(-45deg) !important;
+        }
+        
+        /* Navigation Menu Items */
+        .nav-menu {
+            gap: 8px !important;
+        }
+        
+        .nav-btn {
+            padding: 0.6rem 1rem !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            overflow: hidden !important;
+        }
+        
+        .nav-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(to right, rgba(95, 145, 255, 0.1), transparent) !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.3s ease-out !important;
+            z-index: -1 !important;
+        }
+        
+        .nav-btn:hover {
+            color: white !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .nav-btn:hover::before {
+            transform: translateX(0) !important;
+        }
+        
+        .nav-btn.active {
+            background: rgba(95, 145, 255, 0.2) !important;
+            box-shadow: 0 0 10px rgba(95, 145, 255, 0.3) !important;
+            color: white !important;
+        }
+        
+        .nav-icon {
+            margin-right: 10px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .nav-btn:hover .nav-icon {
+            transform: scale(1.2) !important;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 991.98px) {
+            .nav-menu {
+                padding: 1rem 0.5rem !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+            }
+            
+            .nav-btn {
+                padding: 0.8rem 1rem !important;
+                margin-bottom: 5px !important;
+                border-radius: 8px !important;
+            }
+            
+            .nav-btn:active {
+                background: rgba(95, 145, 255, 0.2) !important;
+            }
+            
+            .navbar-collapse {
+                background: rgba(13, 25, 42, 0.95) !important;
+                border-radius: 12px !important;
+                margin-top: 10px !important;
+                padding: 0.5rem !important;
+                border: 1px solid rgba(95, 145, 255, 0.2) !important;
+                animation: slideDown 0.3s ease forwards !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+            }
+            
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        body.platform .navbar {
+            background-color: transparent !important;
+        }
+        body.platform section.vh-100 {
+            background-color: transparent !important;
+        }
+        /* Glass effect matching auth `.cosmic-card` */
+        body.platform .card {
+            background: rgba(13, 25, 42, 0.5) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(95, 145, 255, 0.3) !important;
+            box-shadow: 0 0 20px rgba(95, 145, 255, 0.2) !important;
+        }
+        body.platform .card:hover {
+            box-shadow: 0 0 30px rgba(95, 145, 255, 0.4) !important;
+            border: 1px solid rgba(95, 145, 255, 0.5) !important;
         }
     </style>
 
@@ -1593,7 +1742,7 @@
                                 <span class="visually-hidden">unread notifications</span>
                             </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; max-width: 280px; right: 0; left: auto; transform: translateX(-70%); z-index: 9999 !important;">
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute notification-dropdown" aria-labelledby="notificationDropdownMobile" style="min-width: 280px; right: 0; left: auto; transform: translateX(-70%); z-index: 9999 !important;">
                             <li><h6 class="dropdown-header py-1"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <!-- Notification items -->
@@ -1728,43 +1877,53 @@
                     <li class="nav-item animate-fade-in delay-1">
                         <a class="nav-link nav-btn <%= locals.page === 'dashboard' ? 'active' : '' %>" href="/">
                             <i class="fas fa-home nav-icon"></i>
-                            <span class="nav-text">Dashboard</span>
+                            <span class="nav-text"><%= locals.user && locals.user.language === 'ar' ? 'لوحة التحكم' : 'Dashboard' %></span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-2">
                         <a class="nav-link nav-btn <%= locals.page === 'team' ? 'active' : '' %>" href="/team">
                             <i class="fas fa-users nav-icon"></i>
-                            <span class="nav-text">My Team</span>
+                            <span class="nav-text"><%= locals.user && locals.user.language === 'ar' ? 'فريقي' : 'My Team' %></span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-3">
                         <a class="nav-link nav-btn <%= locals.page === 'investments' ? 'active' : '' %>" href="/investments">
                             <i class="fas fa-chart-line nav-icon"></i>
-                            <span class="nav-text">Investments</span>
+                            <span class="nav-text"><%= locals.user && locals.user.language === 'ar' ? 'الاستثمارات' : 'Investments' %></span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-4">
                         <a class="nav-link nav-btn <%= locals.page === 'challenges' ? 'active' : '' %>" href="/challenges">
                             <i class="fas fa-trophy nav-icon"></i>
-                            <span class="nav-text">Daily Challenges</span>
+                            <span class="nav-text"><%= locals.user && locals.user.language === 'ar' ? 'التحديات اليومية' : 'Daily Challenges' %></span>
                         </a>
                     </li>
                     <li class="nav-item animate-fade-in delay-5">
                         <a class="nav-link nav-btn <%= locals.page === 'offers' ? 'active' : '' %>" href="/offers">
                             <i class="fas fa-gift nav-icon"></i>
-                            <span class="nav-text">Offers & VIP</span>
+                            <span class="nav-text"><%= locals.user && locals.user.language === 'ar' ? 'العروض & VIP' : 'Offers & VIP' %></span>
                         </a>
                     </li>
                     <% if (locals.user && locals.user.role === 'admin') { %>
                     <!-- Admin Dashboard link only visible to admin users -->
                     <li class="nav-item animate-fade-in delay-4">
                         <a class="nav-link" href="/admin">
-                            <i class="fas fa-user-shield me-2"></i>Admin Panel
+                            <i class="fas fa-user-shield me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel' %>
                         </a>
                     </li>
                     <% } %>
                 </ul>
                 <div class="d-flex align-items-center animate-fade-in d-none d-lg-flex">
+                    <!-- Language Dropdown (Desktop only) -->
+                    <div class="dropdown me-3 d-none d-lg-block">
+                        <a class="nav-link" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose Language">
+                            <i class="fas fa-language text-white"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="languageDropdown" style="min-width: 120px; z-index: 9999 !important;">
+                            <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
+                        </ul>
+                    </div>
                     <!-- Notification Dropdown (Desktop only) -->
                     <div class="dropdown me-3 d-none d-lg-block">
                         <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -2334,7 +2493,7 @@
         if (sessionStorage.getItem('scrollPos')) {
           const savedPos = JSON.parse(sessionStorage.getItem('scrollPos'));
           // Use a slight delay to ensure all content is rendered
-          setTimeout(() => {
+          setTimeout(function() {
             window.scrollTo(savedPos.x, savedPos.y);
           }, 100);
         }
@@ -2458,3 +2617,38 @@
   </body>
 
 </html>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('[Language] DOM loaded');
+    console.log('[Language] Page loaded. Current language:', '<%= locals.user ? locals.user.language : "guest" %>');
+    var icon = document.getElementById('languageDropdown');
+    if (!icon) {
+      console.log('[Language] No language dropdown present on this page.');
+      return;
+    }
+    icon.addEventListener('click', function() {
+      console.log('[Language] Icon clicked');
+    });
+    document.querySelectorAll('#languageDropdown + .dropdown-menu .dropdown-item').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        var lang = this.getAttribute('data-lang');
+        console.log('[Language] Selected language:', lang);
+        console.log('[Language] Sending update-language request with:', lang);
+        fetch('/update-language', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ language: lang, _csrf: '<%= csrfToken %>' })
+        })
+        .then(function(res) { console.log('[Language] Response status:', res.status); return res.json(); })
+        .then(function(data) { console.log('[Language] Server response:', data); 
+          if (data && data.success) {
+            window.location.reload();
+          }
+        })
+        .catch(function(err) { console.error('[Language] update-language error:', err); });
+      });
+    });
+  });
+</script>

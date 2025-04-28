@@ -1,23 +1,23 @@
-<h3 class="mb-5">Your Team</h3>
+<h3 class="mb-5"><%= locals.user && locals.user.language === 'ar' ? 'فريقك' : 'Your Team' %></h3>
 
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
-        <h4>Team Overview</h4>
+        <h4><%= locals.user && locals.user.language === 'ar' ? 'نظرة عامة على الفريق' : 'Team Overview' %></h4>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-8">
-                <p>Hello, <strong><%= locals.user.name %></strong>!</p>
-                <p>Your team consists of users who signed up using your invitation code.</p>
-                <p>Team Size: <span class="badge bg-primary"><%= teamSize %></span></p>
+                <p><%= locals.user && locals.user.language === 'ar' ? 'مرحبًا،' : 'Hello,' %> <strong><%= locals.user.name %></strong>!</p>
+                <p><%= locals.user && locals.user.language === 'ar' ? 'يتكون فريقك من المستخدمين الذين سجلوا باستخدام رمز الدعوة الخاص بك.' : 'Your team consists of users who signed up using your invitation code.' %></p>
+                <p><%= locals.user && locals.user.language === 'ar' ? 'عدد أعضاء الفريق:' : 'Team Size:' %> <span class="badge bg-primary"><%= teamSize %></span></p>
             </div>
             <div class="col-md-4 text-center border-start">
                 <div class="py-2">
-                    <h5 class="text-muted mb-3">Your Invitation Code</h5>
+                    <h5 class="text-muted mb-3"><%= locals.user && locals.user.language === 'ar' ? 'رمز الدعوة الخاص بك' : 'Your Invitation Code' %></h5>
                     <div class="user-code" style="font-size: 1.5rem;">
                         <%= locals.user.userCode || 'N/A' %>
                     </div>
-                    <p class="small text-muted mt-2">Share this code to grow your team</p>
+                    <p class="small text-muted mt-2"><%= locals.user && locals.user.language === 'ar' ? 'شارك هذا الرمز لتنمية فريقك' : 'Share this code to grow your team' %></p>
                 </div>
             </div>
         </div>
@@ -27,8 +27,8 @@
 <% if (teamMembers && teamMembers.length > 0) { %>
     <div class="card mb-4 border-primary">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-users me-2"></i> Your Team Members</h5>
-            <span style="background: transparent !important; color: white !important;" class="badge"><%= teamMembers.length %> members</span>
+            <h5 class="mb-0"><i class="fas fa-users me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'أعضاء فريقك' : 'Your Team Members' %></h5>
+            <span style="background: transparent !important; color: white !important;" class="badge"><%= teamMembers.length %> <%= locals.user && locals.user.language === 'ar' ? 'أعضاء' : 'members' %></span>
         </div>
         <style>
             /* Custom styling for team members table */
@@ -62,11 +62,11 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">User Code</th>
-                            <th scope="col">Their Invites</th>
-                            <th scope="col">Joined Date</th>
+                            <th scope="col"><%= locals.user && locals.user.language === 'ar' ? 'الاسم' : 'Name' %></th>
+                            <th scope="col"><%= locals.user && locals.user.language === 'ar' ? 'البريد الإلكتروني' : 'Email' %></th>
+                            <th scope="col"><%= locals.user && locals.user.language === 'ar' ? 'رمز المستخدم' : 'User Code' %></th>
+                            <th scope="col"><%= locals.user && locals.user.language === 'ar' ? 'دعواتهم' : 'Their Invites' %></th>
+                            <th scope="col"><%= locals.user && locals.user.language === 'ar' ? 'تاريخ الانضمام' : 'Joined Date' %></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,8 +119,8 @@
             <div class="mb-4">
                 <i class="fas fa-users fa-4x text-muted"></i>
             </div>
-            <h5 class="text-muted">You don't have any team members yet</h5>
-            <p class="text-muted">Share your invitation code with others to build your team</p>
+            <h5 class="text-muted"><%= locals.user && locals.user.language === 'ar' ? 'ليس لديك أي أعضاء في الفريق بعد' : 'You don\'t have any team members yet' %></h5>
+            <p class="text-muted"><%= locals.user && locals.user.language === 'ar' ? 'شارك رمز الدعوة الخاص بك مع الآخرين لبناء فريقك' : 'Share your invitation code with others to build your team' %></p>
             <div class="mt-3">
                 <div class="d-flex justify-content-center">
                     <div class="user-code">
@@ -129,7 +129,7 @@
                 </div>
                 <p class="mt-3">
                     <a href="/" class="btn btn-primary">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                        <i class="fas fa-arrow-left me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'العودة إلى لوحة التحكم' : 'Back to Dashboard' %>
                     </a>
                 </p>
             </div>
@@ -141,14 +141,14 @@
     <div class="col-md-12">
         <div class="card mb-4">
             <div class="card-header">
-                <h5>How to Grow Your Team</h5>
+                <h5><%= locals.user && locals.user.language === 'ar' ? 'كيفية تنمية فريقك' : 'How to Grow Your Team' %></h5>
             </div>
             <div class="card-body">
                 <ol class="mb-0">
-                    <li class="mb-2">Share your invitation code <code><%= locals.user.userCode %></code> with friends</li>
-                    <li class="mb-2">Ask them to enter your code when they sign up</li>
-                    <li class="mb-2">They'll be added to your team automatically</li>
-                    <li>Track your team's growth on this page</li>
+                    <li class="mb-2"><%= locals.user && locals.user.language === 'ar' ? 'شارك رمز الدعوة الخاص بك' : 'Share your invitation code' %> <code><%= locals.user.userCode %></code> <%= locals.user && locals.user.language === 'ar' ? 'مع الأصدقاء' : 'with friends' %></li>
+                    <li class="mb-2"><%= locals.user && locals.user.language === 'ar' ? 'اطلب منهم إدخال الرمز الخاص بك عند التسجيل' : 'Ask them to enter your code when they sign up' %></li>
+                    <li class="mb-2"><%= locals.user && locals.user.language === 'ar' ? 'سيتم إضافتهم إلى فريقك تلقائيًا' : 'They\'ll be added to your team automatically' %></li>
+                    <li><%= locals.user && locals.user.language === 'ar' ? 'تتبع نمو فريقك في هذه الصفحة' : 'Track your team\'s growth on this page' %></li>
                 </ol>
             </div>
         </div>
@@ -157,6 +157,6 @@
 
 <div class="text-center mt-4">
     <a href="/" class="btn btn-primary">
-        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        <i class="fas fa-arrow-left me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'العودة إلى لوحة التحكم' : 'Back to Dashboard' %>
     </a>
 </div>

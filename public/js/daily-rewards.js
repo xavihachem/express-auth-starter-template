@@ -34,28 +34,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const challengesSection = document.createElement('div');
     challengesSection.id = 'incomplete-challenges';
     challengesSection.classList.add('text-center', 'd-none');
+    
+    const userLang = window.userLang || document.documentElement.lang || 'en';
+    console.log('[DailyRewards] Debug - Detected language:', userLang, 'window.userLang:', window.userLang, 'html.lang:', document.documentElement.lang);
+    
     challengesSection.innerHTML = `
         <div class="rounded-circle bg-info bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
             <i class="fas fa-tasks fa-2x text-info"></i>
         </div>
-        <h4>Complete Daily Challenges First</h4>
-        <p id="challenges-message">You need to complete the required daily challenges before claiming your reward.</p>
+        <h4>${userLang === 'ar' ? 'أكمل التحديات اليومية أولاً' : 'Complete Daily Challenges First'}</h4>
+        <p id="challenges-message">${userLang === 'ar' ? 'تحتاج إلى إكمال التحديات اليومية المطلوبة قبل المطالبة بمكافأتك.' : 'You need to complete the required daily challenges before claiming your reward.'}</p>
         <div class="mt-3">
             <div class="d-flex justify-content-center align-items-center mb-2">
                 <div id="challenge-daily-login" class="challenge-status me-2">
                     <i class="fas fa-circle text-danger"></i>
                 </div>
-                <span>Daily Login Challenge</span>
+                <span>${userLang === 'ar' ? 'تحدي تسجيل الدخول اليومي' : 'Daily Login Challenge'}</span>
             </div>
             <div class="d-flex justify-content-center align-items-center mb-2">
                 <div id="challenge-start-investing" class="challenge-status me-2">
                     <i class="fas fa-circle text-danger"></i>
                 </div>
-                <span>Start Investing Challenge</span>
+                <span>${userLang === 'ar' ? 'تحدي بدء الاستثمار' : 'Start Investing Challenge'}</span>
             </div>
         </div>
         <a href="/challenges" class="btn btn-primary mt-2">
-            <i class="fas fa-trophy me-2"></i>Go to Challenges
+            <i class="fas fa-trophy me-2"></i>${userLang === 'ar' ? 'انتقل إلى التحديات' : 'Go to Challenges'}
         </a>
     `;
     

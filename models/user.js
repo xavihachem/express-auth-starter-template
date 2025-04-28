@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user'
         },
+        language: {
+            type: String,
+            enum: ['en', 'ar'],
+            default: 'en'
+        },
         // Additional fields for admin dashboard
         userCode: {
             type: String,

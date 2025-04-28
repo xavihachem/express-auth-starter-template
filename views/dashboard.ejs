@@ -1,7 +1,7 @@
 <div class="container-fluid animate-fade-in">
     <div class="row mb-4">
         <div class="col-12">
-            <h3 class="mb-4 animate-fade-in"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h3>
+            <h3 class="mb-4 animate-fade-in"><i class="fas fa-tachometer-alt me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'لوحة التحكم' : 'Dashboard' %></h3>
         </div>
     </div>
 
@@ -27,8 +27,8 @@
                             </div>
                         </div>
                         <div>
-                            <h4 class="cosmic-welcome-title">Welcome back, <span class="user-name-glow"><%= locals.user.name %></span>!</h4>
-                            <p class="cosmic-subtitle">Your cosmic journey continues</p>
+                            <h4 class="cosmic-welcome-title"><%= locals.user && locals.user.language === 'ar' ? 'مرحبًا بعودتك' : 'Welcome back' %>, <span class="user-name-glow"><%= locals.user.name %></span>!</h4>
+                            <p class="cosmic-subtitle"><%= locals.user && locals.user.language === 'ar' ? 'تستمر رحلتك الكونية' : 'Your cosmic journey continues' %></p>
                         </div>
                     </div>
                 </div>
@@ -36,16 +36,14 @@
                 <div class="card-body cosmic-card-body">
                     <div class="row align-items-center">
                         <div class="col-md-7">
-                            <p class="cosmic-welcome-text">Navigate through your universe dashboard and explore your cosmic achievements and galactic stats</p>
+                            <p class="cosmic-welcome-text"><%= locals.user && locals.user.language === 'ar' ? 'تصفح لوحة معلوماتك واستكشف إنجازاتك الكونية وإحصائيات المجرة' : 'Navigate through your universe dashboard and explore your cosmic achievements and galactic stats' %></p>
                             
                             <!-- Support Ticket Status -->
                             <div class="cosmic-support-status" id="supportTicketStatus">
                                 <div class="cosmic-status-icon">
                                     <i class="fas fa-headset"></i>
                                 </div>
-                                <div class="cosmic-status-message">
-                                    You have already submitted a support ticket in the last 24 hours. Please wait before submitting another request.
-                                </div>
+                                <div class="cosmic-status-message"><%= locals.user && locals.user.language === 'ar' ? 'لقد قمت بالفعل بإرسال تذكرة دعم خلال الـ 24 ساعة الماضية. يرجى الانتظار قبل تقديم طلب آخر.' : 'You have already submitted a support ticket in the last 24 hours. Please wait before submitting another request.' %></div>
                             </div>
                         </div>
                         
@@ -55,7 +53,7 @@
                                     <span class="cosmic-button-stars"></span>
                                     <span class="cosmic-button-glow"></span>
                                     <span class="cosmic-button-content">
-                                        <i class="fas fa-user-astronaut me-2"></i>View My Profile
+                                        <i class="fas fa-user-astronaut me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'عرض ملفي الشخصي' : 'View My Profile' %>
                                     </span>
                                 </a>
                             </div>
@@ -92,10 +90,11 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                        radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+        background-image: 
+            radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
         background-repeat: repeat;
         background-size: 200px 200px;
         opacity: 0.2;
@@ -347,11 +346,11 @@
         right: -50%;
         bottom: -50%;
         background-image: 
-            radial-gradient(1px 1px at 25px 5px, white, rgba(0, 0, 0, 0)),
-            radial-gradient(1px 1px at 50px 25px, white, rgba(0, 0, 0, 0)),
-            radial-gradient(1px 1px at 125px 20px, white, rgba(0, 0, 0, 0)),
-            radial-gradient(1.5px 1.5px at 50px 75px, white, rgba(0, 0, 0, 0));
-        background-size: 200% 200%;
+            radial-gradient(1px 1px at 25px 5px, white, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 50px 25px, white, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 90px 40px, white, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 50px 75px, white, rgba(0,0,0,0));
+        background-size: 200px 200px;
         animation: twinkle 4s ease-in-out infinite;
     }
     
@@ -427,7 +426,7 @@
                     </div>
                     <div class="cosmic-stat-value">
                         <span class="cosmic-stat-counter"><%= locals.user.challengePoints || 0 %></span>
-                        <div class="cosmic-stat-label">Challenge Points</div>
+                        <div class="cosmic-stat-label"><%= locals.user && locals.user.language === 'ar' ? 'نقاط التحدي' : 'Challenge Points' %></div>
                     </div>
                 </div>
             </div>
@@ -449,7 +448,7 @@
                     </div>
                     <div class="cosmic-stat-value">
                         <span class="cosmic-stat-counter">0</span>
-                        <div class="cosmic-stat-label">Team Members</div>
+                        <div class="cosmic-stat-label"><%= locals.user && locals.user.language === 'ar' ? 'أعضاء الفريق' : 'Team Members' %></div>
                     </div>
                 </div>
             </div>
@@ -471,7 +470,7 @@
                     </div>
                     <div class="cosmic-stat-value">
                         <span class="cosmic-stat-counter">$<%= locals.user.balance ? Number(locals.user.balance).toFixed(2) : '0.00' %></span>
-                        <div class="cosmic-stat-label">Balance</div>
+                        <div class="cosmic-stat-label"><%= locals.user && locals.user.language === 'ar' ? 'الرصيد' : 'Balance' %></div>
                     </div>
                 </div>
             </div>
@@ -493,7 +492,7 @@
                     </div>
                     <div class="cosmic-stat-value">
                         <span class="cosmic-stat-counter"><%= locals.user.completedChallenges ? locals.user.completedChallenges.length : 0 %></span>
-                        <div class="cosmic-stat-label">Completed Tasks</div>
+                        <div class="cosmic-stat-label"><%= locals.user && locals.user.language === 'ar' ? 'المهام المكتملة' : 'Completed Tasks' %></div>
                     </div>
                 </div>
             </div>
@@ -745,14 +744,14 @@
         <div class="col-12">
             <div class="card animate-fade-in delay-4" id="daily-reward-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-gift me-2"></i>Daily Rewards</h5>
+                    <h5 class="mb-0"><i class="fas fa-gift me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'المكافآت اليومية' : 'Daily Rewards' %></h5>
                 </div>
                 <div class="card-body">
                     <div class="text-center" id="reward-status-loading">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-2">Checking reward status...</p>
+                        <p class="mt-2"><%= locals.user && locals.user.language === 'ar' ? 'جارٍ التحقق من حالة المكافأة...' : 'Checking reward status...' %></p>
                     </div>
                     
                     <!-- This will be shown if user is not eligible for any VIP level -->
@@ -760,8 +759,8 @@
                         <div class="rounded-circle bg-secondary bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
                             <i class="fas fa-lock fa-2x text-secondary"></i>
                         </div>
-                        <h4>Not Eligible</h4>
-                        <p>You need at least $80 balance to qualify for daily rewards.</p>
+                        <h4><%= locals.user && locals.user.language === 'ar' ? 'غير مؤهل' : 'Not Eligible' %></h4>
+                        <p><%= locals.user && locals.user.language === 'ar' ? 'تحتاج إلى رصيد لا يقل عن $80 للتأهل للمكافآت اليومية.' : 'You need at least $80 balance to qualify for daily rewards.' %></p>
                     </div>
                     
                     <!-- This will be shown if user is eligible but needs to wait -->
@@ -769,8 +768,8 @@
                         <div class="rounded-circle bg-warning bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
                             <i class="fas fa-hourglass-half fa-2x text-warning"></i>
                         </div>
-                        <h4>Not Ready Yet</h4>
-                        <p id="cooldown-message">You can claim your next reward in <span id="cooldown-timer">60</span> seconds.</p>
+                        <h4><%= locals.user && locals.user.language === 'ar' ? 'غير جاهز بعد' : 'Not Ready Yet' %></h4>
+                        <p id="cooldown-message"><%= locals.user && locals.user.language === 'ar' ? 'يمكنك المطالبة بالمكافأة التالية في ' : 'You can claim your next reward in ' %><span id="cooldown-timer">60</span><%= locals.user && locals.user.language === 'ar' ? ' ثانية.' : ' seconds.' %></p>
                     </div>
                     
                     <!-- This will be shown if user can claim their reward -->
@@ -778,10 +777,10 @@
                         <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
                             <i class="fas fa-gift fa-2x text-success"></i>
                         </div>
-                        <h4>Reward Ready!</h4>
-                        <p>You can claim your VIP <span id="vip-level-display">1</span> reward of $<span id="reward-amount-display">0.00</span></p>
+                        <h4><%= locals.user && locals.user.language === 'ar' ? 'المكافأة جاهزة!' : 'Reward Ready!' %></h4>
+                        <p><%= locals.user && locals.user.language === 'ar' ? 'يمكنك المطالبة بمكافأة VIP ' : 'You can claim your VIP ' %><span id="vip-level-display">1</span><%= locals.user && locals.user.language === 'ar' ? ' بقيمة $' : ' reward of $' %><span id="reward-amount-display">0.00</span></p>
                         <button id="claim-reward-btn" class="btn btn-success">
-                            <i class="fas fa-gift me-2"></i>Claim Reward
+                            <i class="fas fa-gift me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'المطالبة بالمكافأة' : 'Claim Reward' %>
                         </button>
                     </div>
                     
@@ -790,14 +789,14 @@
                         <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: fit-content;">
                             <i class="fas fa-check-circle fa-2x text-success"></i>
                         </div>
-                        <h4>Reward Claimed!</h4>
-                        <p id="success-message">You've claimed $<span id="claimed-amount">0.00</span>. New balance: $<span id="new-balance">0.00</span></p>
+                        <h4><%= locals.user && locals.user.language === 'ar' ? 'تم استلام المكافأة!' : 'Reward Claimed!' %></h4>
+                        <p id="success-message"><%= locals.user && locals.user.language === 'ar' ? 'لقد استلمت $' : 'You\'ve claimed $' %><span id="claimed-amount">0.00</span>. <%= locals.user && locals.user.language === 'ar' ? 'الرصيد الجديد: ' : 'New balance: ' %>$<span id="new-balance">0.00</span></p>
                     </div>
                     
                     <!-- Error message area -->
                     <div class="alert alert-danger mt-3 d-none" id="reward-error">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        <span id="error-message">An error occurred.</span>
+                        <span id="error-message"><%= locals.user && locals.user.language === 'ar' ? 'حدث خطأ.' : 'An error occurred.' %></span>
                     </div>
                 </div>
             </div>
@@ -809,25 +808,25 @@
         <div class="col-12">
             <div class="card animate-fade-in delay-4">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'الإجراءات السريعة' : 'Quick Actions' %></h5>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap justify-content-center gap-3">
                         <a href="/team" class="btn btn-primary">
-                            <i class="fas fa-users me-2"></i>View Team
+                            <i class="fas fa-users me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'عرض الفريق' : 'View Team' %>
                         </a>
                         <a href="/investments" class="btn btn-success">
-                            <i class="fas fa-chart-line me-2"></i>Investments
+                            <i class="fas fa-chart-line me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'الاستثمارات' : 'Investments' %>
                         </a>
                         <a href="/challenges" class="btn btn-warning">
-                            <i class="fas fa-trophy me-2"></i>Daily Challenges
+                            <i class="fas fa-trophy me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'التحديات اليومية' : 'Daily Challenges' %>
                         </a>
                         <button type="button" class="btn btn-info" id="contactSupportBtn">
-                            <i class="fas fa-headset me-2"></i>Contact Support
+                            <i class="fas fa-headset me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'اتصل بالدعم' : 'Contact Support' %>
                         </button>
                         <% if (locals.user && locals.user.role === 'admin') { %>
                         <a href="/admin" class="btn btn-danger">
-                            <i class="fas fa-user-shield me-2"></i>Admin Panel
+                            <i class="fas fa-user-shield me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'لوحة التحكم الإدارية' : 'Admin Panel' %>
                         </a>
                         <% } %>
                     </div>
@@ -845,37 +844,37 @@
             <div class="support-header-icon">
                 <i class="fas fa-headset"></i>
             </div>
-            <h4>Contact Support</h4>
+            <h4><%= locals.user && locals.user.language === 'ar' ? 'اتصل بالدعم' : 'Contact Support' %></h4>
             <button type="button" class="contact-close-btn" id="closeSupportPanel" aria-label="Close support panel">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="contact-support-body">
             <div class="support-intro mb-4">
-                <p>Our support team is here to help you with any questions or issues you may have. Please fill out the form below and we'll get back to you as soon as possible.</p>
+                <p><%= locals.user && locals.user.language === 'ar' ? 'فريق الدعم هنا لمساعدتك في أي أسئلة أو مشاكل قد تواجهها. يرجى ملء الاستمارة أدناه وسنقوم بالرد عليك في أقرب وقت ممكن.' : 'Our support team is here to help you with any questions or issues you may have. Please fill out the form below and we\'ll get back to you as soon as possible.' %></p>
                 <div class="support-note">
                     <i class="fas fa-info-circle me-2"></i>
-                    <span>You can submit one support ticket per day.</span>
+                    <span><%= locals.user && locals.user.language === 'ar' ? 'يمكنك تقديم تذكرة دعم واحدة في اليوم.' : 'You can submit one support ticket per day.' %></span>
                 </div>
             </div>
             <form id="contactSupportForm" action="/contact-support" method="post">
                 <div class="mb-4">
-                    <label for="supportSubject" class="form-label">Subject</label>
+                    <label for="supportSubject" class="form-label"><%= locals.user && locals.user.language === 'ar' ? 'الموضوع' : 'Subject' %></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                        <input type="text" class="form-control" id="supportSubject" name="subject" required placeholder="How can we help you?">
+                        <input type="text" class="form-control" id="supportSubject" name="subject" required placeholder="<%= locals.user && locals.user.language === 'ar' ? 'كيف يمكننا مساعدتك؟' : 'How can we help you?' %>">
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label for="supportMessage" class="form-label">Message</label>
+                    <label for="supportMessage" class="form-label"><%= locals.user && locals.user.language === 'ar' ? 'الرسالة' : 'Message' %></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-comment-alt"></i></span>
-                        <textarea class="form-control" id="supportMessage" name="message" rows="5" required placeholder="Please describe your issue in detail..."></textarea>
+                        <textarea class="form-control" id="supportMessage" name="message" rows="5" required placeholder="<%= locals.user && locals.user.language === 'ar' ? 'الرجاء وصف مشكلتك بالتفصيل...' : 'Please describe your issue in detail...' %>"></textarea>
                     </div>
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary support-submit-btn">
-                        <i class="fas fa-paper-plane me-2"></i>Submit Request
+                        <i class="fas fa-paper-plane me-2"></i><%= locals.user && locals.user.language === 'ar' ? 'إرسال الطلب' : 'Submit Request' %>
                     </button>
                 </div>
             </form>
@@ -1137,7 +1136,7 @@
                 if (data.success) {
                     // Support request submitted successfully
                     // Show success message using cosmic notification system
-                    cosmicNotify.success('Your message has been sent. We will get back to you soon.');
+                    cosmicNotify.success("<%= locals.user && locals.user.language === 'ar' ? 'تم إرسال رسالتك. سنقوم بالرد عليك قريبا.' : 'Your message has been sent. We will get back to you soon.' %>");
                     
                     // Reset form and close panel
                     contactForm.reset();
@@ -1146,7 +1145,7 @@
                 } else {
                     // Support request failed
                     // Show error message using cosmic notification system
-                    cosmicNotify.error(data.message || 'Failed to send message. Please try again.');
+                    cosmicNotify.error(data.message || "<%= locals.user && locals.user.language === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Failed to send message. Please try again.' %>");
                     
                     // If the error is about the 24-hour limit, show the special message in the welcome card
                     if (data.message && data.message.includes('already submitted a support ticket')) {
@@ -1157,14 +1156,15 @@
             .catch(error => {
                 // Handle error from fetch request
                 // Show error message using cosmic notification system
-                cosmicNotify.error('An error occurred. Please try again later.');
+                cosmicNotify.error("<%= locals.user && locals.user.language === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again later.' %>");
             });
         });
     });
 </script>
 </div> <!-- End of contactSupportSection -->
 
-<!-- Quick actions and account settings sections removed -->
-
 <!-- Load the daily rewards script -->
+<script>
+    window.userLang = "<%= locals.user && locals.user.language ? locals.user.language : 'en' %>";
+</script>
 <script src="/js/daily-rewards.js"></script>

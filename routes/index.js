@@ -17,6 +17,8 @@ const OtpToken = require('../models/otpToken');
 const axios = require('axios'); // for SMS sending
 const rateLimit = require('express-rate-limit');
 
+console.log('[Routes] routes/index.js loaded');
+
 // Check if SMS API key is set
 if (!process.env.EASY_SMS_API_KEY) {
     console.warn('⚠️ Missing EASY_SMS_API_KEY environment variable - SMS features will be disabled');
@@ -90,7 +92,9 @@ router.get('/upload-avatar', passport.checkAuthentication, profileController.sho
 router.post('/contact-support', passport.checkAuthentication, profileController.contactSupport); // Handle contact support requests
 // Handle avatar selection
 router.post('/update-avatar', passport.checkAuthentication, profileController.updateAvatar); // Profile page
-
+// Update language preference
+router.post('/update-language', passport.checkAuthentication, profileController.updateLanguage); 
+console.log('[Routes] Registered POST /update-language');
 // Investments page routes - only accessible by authenticated users
 router.get('/investments', passport.checkAuthentication, investmentsController.investments); // Investments page
 router.post('/request-investment-access', passport.checkAuthentication, investmentsController.requestInvestmentAccess); // Request investment access
