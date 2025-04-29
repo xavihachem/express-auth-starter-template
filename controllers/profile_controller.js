@@ -138,7 +138,6 @@ module.exports.updateName = async function(req, res) {
         req.flash('success', 'Your name has been updated successfully');
         return res.redirect('/profile');
     } catch (err) {
-        console.log('Error in update name controller:', err);
         req.flash('error', 'An error occurred while updating your name');
         return res.redirect('/profile');
     }
@@ -185,7 +184,6 @@ module.exports.updateAvatar = async function(req, res) {
         req.flash('success', 'Your profile avatar has been updated successfully');
         return res.redirect('/profile');
     } catch (err) {
-        console.log('Error in update avatar controller:', err);
         req.flash('error', 'An error occurred while updating your profile avatar');
         return res.redirect('/profile');
     }
@@ -214,7 +212,6 @@ module.exports.showAvatarUpload = async function(req, res) {
             users: users
         });
     } catch (err) {
-        console.log('Error in show avatar upload controller:', err);
         req.flash('error', 'An error occurred while loading the avatar selection page');
         return res.redirect('/profile');
     }
@@ -345,18 +342,14 @@ module.exports.contactSupport = async function(req, res) {
 
 // Add language update handler
 module.exports.updateLanguage = async function(req, res) {
-    console.log('[Language] Received updateLanguage request for user', req.user._id, 'lang:', req.body.language);
     try {
         const lang = req.body.language;
         if (!['en', 'ar'].includes(lang)) {
-            console.log('[Language] Invalid language:', lang);
             return res.status(400).json({ success: false, message: 'Invalid language' });
         }
         const user = await User.findByIdAndUpdate(req.user._id, { language: lang }, { new: true });
-        console.log('[Language] Successfully updated language for user', req.user._id, 'to', user.language);
         return res.json({ success: true, language: user.language });
     } catch (error) {
-        console.error('[Language] Error updating language for user', req.user._id, error);
         return res.status(500).json({ success: false, message: 'Server error' });
     }
 };

@@ -81,7 +81,6 @@ module.exports.investments = async function(req, res) {
             isMobile: isMobile // Pass mobile flag to template
         });
     } catch (err) {
-        console.log('Error in investments controller:', err);
         req.flash('error', 'Something went wrong. Please try again.');
         return res.redirect('/');
     }
@@ -104,7 +103,6 @@ module.exports.updateDepositWallet = async function(req, res) {
         req.flash('success', 'Deposit wallet updated successfully');
         return res.redirect('/investments');
     } catch (err) {
-        console.log('Error updating deposit wallet:', err);
         req.flash('error', 'Failed to update deposit wallet');
         return res.redirect('/investments');
     }
@@ -133,7 +131,6 @@ module.exports.updateWithdrawWallet = async function(req, res) {
         req.flash('success', 'Withdraw wallet updated successfully');
         return res.redirect('/investments');
     } catch (err) {
-        console.log('Error updating withdraw wallet:', err);
         req.flash('error', 'Failed to update withdraw wallet');
         return res.redirect('/investments');
     }
@@ -184,7 +181,6 @@ module.exports.requestInvestmentAccess = async function(req, res) {
         req.flash('success', 'Investment access requested successfully. Please wait for admin approval.');
         return res.redirect('/investments');
     } catch (err) {
-        console.log('Error requesting investment access:', err);
         req.flash('error', 'Failed to request investment access');
         return res.redirect('/investments');
     }
@@ -280,7 +276,6 @@ module.exports.requestWithdraw = async function(req, res) {
         req.flash('success', `Withdrawal request for $${withdrawAmount} submitted successfully. You can cancel this request before it's processed.`);
         return res.redirect('/investments');
     } catch (err) {
-        console.log('Error requesting withdrawal:', err);
         req.flash('error', 'Failed to process withdrawal request');
         return res.redirect('/investments');
     }
@@ -361,7 +356,6 @@ module.exports.cancelWithdrawal = async function(req, res) {
         req.flash('success', `Withdrawal request for $${withdrawalRequest.amount} has been cancelled. The funds have been returned to your balance.`);
         return res.redirect('/investments');
     } catch (err) {
-        console.log('Error cancelling withdrawal:', err);
         req.flash('error', 'Failed to cancel withdrawal request');
         return res.redirect('/investments');
     }
@@ -390,7 +384,6 @@ module.exports.handleWalletVerification = async function(req, res) {
         req.flash('success', 'Withdraw wallet updated successfully');
         return res.redirect('/investments');
     } catch (err) {
-        console.error('Error in wallet verification:', err);
         req.flash('error', 'Failed to verify code');
         return res.redirect('/verify-wallet');
     }

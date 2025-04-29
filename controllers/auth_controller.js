@@ -227,13 +227,11 @@ const completeDailyLoginChallenge = async (userId) => {
     try {
         // Check if Challenge model is properly initialized
         if (!Challenge || typeof Challenge.findOne !== 'function') {
-            console.warn('⚠️ Challenge model not available - skipping daily login challenge');
             return true; // Return success to prevent breaking login flow
         }
 
         // Check if userId is valid
         if (!userId) {
-            console.warn('⚠️ Invalid user ID passed to completeDailyLoginChallenge');
             return true; // Return success to prevent breaking login flow
         }
 
@@ -242,12 +240,10 @@ const completeDailyLoginChallenge = async (userId) => {
         try {
             userCheck = await User.findById(userId).lean();
         } catch (userError) {
-            console.error('Error finding user:', userError.message);
             return true; // Return success to prevent breaking login flow
         }
         
         if (!userCheck) {
-            console.warn(`⚠️ User ${userId} not found - skipping challenge completion`);
             return true; // Return success to prevent breaking login flow
         }
 
@@ -279,12 +275,10 @@ const completeDailyLoginChallenge = async (userId) => {
         try {
             challenge = await Challenge.findOne({ id: dailyLoginChallengeId, active: true });
         } catch (challengeError) {
-            console.error('Error finding challenge:', challengeError.message);
             return true; // Return success to prevent breaking login flow
         }
         
         if (!challenge) {
-            console.warn(`⚠️ Challenge ${dailyLoginChallengeId} not found or not active`);
             return true; // Return success to prevent breaking login flow
         }
 
@@ -294,14 +288,11 @@ const completeDailyLoginChallenge = async (userId) => {
             user.challengePoints = (user.challengePoints || 0) + (challenge.points || 0);
             user.lastChallengeReset = new Date();
             await user.save();
-            console.log(`✅ Daily login challenge completed for user ${userId}`);
             return true;
         } catch (saveError) {
-            console.error('Error saving user challenge completion:', saveError.message);
             return true; // Return success to prevent breaking login flow
         }
     } catch (error) {
-        console.error('Unhandled error in completeDailyLoginChallenge:', error);
         return true; // Return success to prevent breaking login flow
     }
 };
@@ -345,7 +336,6 @@ module.exports.verifyEmail = async function (req, res) {
         req.flash('success', 'Email verified successfully! You can now sign in.');
         return res.redirect('/sign-in');
     } catch (err) {
-        console.log('Error in email verification:', err);
         req.flash('error', 'Something went wrong. Please try again.');
         return res.redirect('/sign-in');
     }

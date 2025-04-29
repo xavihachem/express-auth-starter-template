@@ -52,7 +52,6 @@ module.exports.team = async function(req, res) {
             isMobile: isMobile
         });
     } catch (err) {
-        console.log('Error in team controller:', err);
         req.flash('error', 'Something went wrong. Please try again.');
         return res.redirect('/');
     }

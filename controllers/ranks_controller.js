@@ -30,7 +30,6 @@ module.exports.ranks = async function(req, res) {
             currentUserRank: currentUserRank
         });
     } catch (err) {
-        console.log('Error in ranks controller:', err);
         req.flash('error', 'An error occurred while fetching rankings');
         return res.redirect('back');
     }

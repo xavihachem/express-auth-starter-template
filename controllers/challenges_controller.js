@@ -126,7 +126,6 @@ module.exports.challenges = async function(req, res) {
             layout: 'layout' // Ensure the layout is used
         });
     } catch (err) {
-        console.log('Error loading challenges page:', err);
         req.flash('error', 'Failed to load challenges');
         return res.redirect('/');
     }
@@ -201,7 +200,6 @@ module.exports.completeChallenge = async function(req, res) {
         req.flash('success', `Challenge completed! You earned ${challenge.points} points.`);
         return res.redirect('/challenges');
     } catch (err) {
-        console.error('Error completing challenge:', err);
         req.flash('error', 'Failed to complete challenge');
         return res.redirect('/challenges');
     }
@@ -248,10 +246,8 @@ module.exports.initializeChallenges = async function() {
             
             // Create the default challenges
             await Challenge.insertMany(defaultChallenges);
-            console.log('Default challenges initialized');
         }
     } catch (err) {
-        console.log('Error initializing challenges:', err);
     }
 };
 
@@ -312,7 +308,6 @@ module.exports.resetTestChallenges = async function(req, res) {
         req.flash('success', `Successfully reset challenges: ${challengeIds.join(', ')}`);
         return res.redirect('/challenges');
     } catch (err) {
-        console.error('Error resetting challenges:', err);
         req.flash('error', 'Failed to reset challenges');
         return res.redirect('/challenges');
     }
